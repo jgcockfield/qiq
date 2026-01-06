@@ -1,0 +1,25 @@
+{
+  "work_relationship": "business_owner",
+  "taxonomy_fields": [
+    {
+      "key": "identity.full_name",
+      "depends_on": []
+    },
+    {
+      "key": "identity.email",
+      "depends_on": ["identity.full_name"]
+    },
+    {
+      "key": "identity.nationality",
+      "depends_on": ["identity.full_name"]
+    },
+    {
+      "key": "business.entity_name",
+      "depends_on": ["identity.full_name"]
+    },
+    {
+      "key": "business.monthly_income",
+      "depends_on": ["identity.full_name"]
+    }
+  ]
+}

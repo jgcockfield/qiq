@@ -1,0 +1,25 @@
+{
+"work_relationship": "employee",
+"taxonomy_fields": [
+{
+"key": "identity.full_name",
+"depends_on": []
+},
+{
+"key": "identity.email",
+"depends_on": ["identity.full_name"]
+},
+{
+"key": "identity.nationality",
+"depends_on": ["identity.full_name"]
+},
+{
+"key": "employment.employer_name",
+"depends_on": ["identity.full_name"]
+},
+{
+"key": "employment.monthly_income",
+"depends_on": ["identity.full_name"]
+}
+]
+}
