@@ -1,0 +1,88 @@
+{
+  "version": "v1.0",
+  "work_type": "business_owner",
+  "rules": [
+    {
+      "rule_id": "DN_MIN_MONTHLY_INCOME",
+      "field_keys": [
+        "role.business_owner.monthly_income_usd",
+        "routing.applicant_type"
+      ],
+      "test": "gte_threshold_by_applicant_type",
+      "pass": {
+        "individual": 3000,
+        "family": 4000
+      },
+      "fail_outcome": "ineligible",
+      "user_facing_meaning": "Monthly business income must meet the minimum for your applicant type.",
+      "inline_support": "Use your typical monthly business revenue average before taxes."
+    },
+    {
+      "rule_id": "DN_INCOME_EVIDENCE_DURATION",
+      "field_keys": [
+        "role.business_owner.income_evidence_months"
+      ],
+      "test": "equals",
+      "pass": "12+",
+      "fail_outcome": "ineligible",
+      "user_facing_meaning": "You must be able to document business income for the required lookback period.",
+      "inline_support": "Only months you can document count."
+    },
+    {
+      "rule_id": "DN_INCOME_SOURCE_ORIGIN",
+      "field_keys": [
+        "routing.income_foreign_only"
+      ],
+      "test": "equals",
+      "pass": "yes",
+      "fail_outcome": "ineligible",
+      "user_facing_meaning": "Business income must be foreign-sourced.",
+      "inline_support": "This means your business will not earn revenue from Costa Rica–based clients or conduct commercial activity in Costa Rica while you are there."
+    },
+    {
+      "rule_id": "DN_PASSPORT_VALIDITY",
+      "field_keys": [
+        "routing.passport_validity_months"
+      ],
+      "test": "is_valid_at_application",
+      "pass": true,
+      "fail_outcome": "ineligible",
+      "user_facing_meaning": "A valid passport is required at the time of application.",
+      "inline_support": "Your passport must be valid when you apply."
+    },
+    {
+      "rule_id": "DN_HEALTH_INSURANCE_REQUIREMENT",
+      "field_keys": [
+        "routing.health_insurance_status"
+      ],
+      "test": "not_equals",
+      "pass": "no",
+      "fail_outcome": "ineligible",
+      "user_facing_meaning": "You must have qualifying health insurance or commit to obtaining it.",
+      "inline_support": "Insurance must cover your stay in Costa Rica."
+    },
+    {
+      "rule_id": "DN_NATIONALITY_ELIGIBILITY",
+      "field_keys": [
+        "routing.nationality"
+      ],
+      "test": "requires_policy_check",
+      "pass": "meets_entry_regime",
+      "fail_outcome": "needs_review",
+      "user_facing_meaning": "Nationality must permit lawful entry under Costa Rica’s visa regime.",
+      "inline_support": "List all nationalities held."
+    },
+    {
+      "rule_id": "DN_CRIMINAL_BACKGROUND_REVIEW",
+      "field_keys": [
+        "routing.background_check_available",
+        "routing.criminal_record_flag"
+      ],
+      "test": "dgme_controlled_gate",
+      "pass": "reviewable",
+      "fail_outcome": "needs_review",
+      "user_facing_meaning": "Approval is subject to DGME security and background review.",
+      "inline_support": "A yes answer does not mean automatic denial."
+    }
+  ]
+}
