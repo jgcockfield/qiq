@@ -1,0 +1,17 @@
+{
+  "work_relationship": "contractor",
+  "taxonomy_fields": [
+    {
+      "key": "identity.full_name",
+      "depends_on": []
+    },
+    {
+      "key": "identity.email",
+      "depends_on": ["identity.full_name"]
+    },
+    {
+      "key": "identity.nationality",
+      "depends_on": ["identity.full_name"]
+    }
+  ]
+}
