@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QualifyIQ Minimal Consumer UI</title>
+    <style>
+      body { font-family: monospace; margin: 16px; }
+      .row { margin-bottom: 12px; }
+      pre { padding: 12px; border: 1px solid #ccc; overflow: auto; max-height: 360px; }
+      .error { border: 2px solid #c00; padding: 12px; white-space: pre-wrap; }
+      .box { border: 1px solid #999; padding: 12px; }
+      input, textarea { width: 100%; padding: 8px; font-family: monospace; }
+      button { padding: 8px 12px; }
+      .muted { opacity: 0.8; }
+    </style>
+  </head>
+  <body>
+    <h1>QualifyIQ Minimal Consumer UI</h1>
+    <div class="muted">STRICT CONSUMER MODE — UI obeys engine. No fallback logic.</div>
+
+    <div id="errorBox" class="row" style="display:none;"></div>
+
+    <div class="row box">
+      <div><strong>next_field_key:</strong> <span id="nextFieldKey">—</span></div>
+      <div><strong>label:</strong> <span id="nextFieldLabel">—</span></div>
+      <div><strong>eligibility_status:</strong> <span id="eligibilityStatus">—</span></div>
+    </div>
+
+    <div class="row box">
+      <div><strong>Payload</strong> (opaque object; UI only writes to next_field_key):</div>
+      <textarea id="payloadEditor" rows="10"></textarea>
+      <div style="margin-top:8px;">
+        <button id="sendBtn">POST /evaluate</button>
+      </div>
+    </div>
+
+    <div class="row box">
+      <div><strong>Current Question</strong></div>
+      <div id="questionArea" class="row muted">No question rendered.</div>
+
+      <div id="answerArea" style="display:none;">
+        <div class="row">
+          <input id="answerInput" type="text" placeholder="type answer, submit" />
+        </div>
+        <button id="submitAnswerBtn">Submit Answer</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div><strong>Engine Response (verbatim)</strong></div>
+      <pre id="engineResponsePre">{}</pre>
+    </div>
+
+    <script>
+      // If your UI is served from the same FastAPI origin, leave this as "".
+      // If you are opening index.html directly (file://) while API runs at localhost:8000, set:
+      const API_URL = "http://127.0.0.1:8000";
+
+      // State (minimal)
+      let payload = {
+        routing: {
+          // start empty; you can set work_relationship here manually for testing
+          // work_relationship: "contractor"
+        },
+        identity: {}
+      };
+      let lastEngineResponse = null;
+
+      const $ = (id) => document.getElementById(id);
+
+      function showError(text) {
+        const box = $("errorBox");
+        box.className = "row error";
+        box.textContent = text;
+        box.style.display = "block";
+      }
+
+      function clearError() {
+        const box = $("errorBox");
+        box.textContent = "";
+        box.style.display = "none";
+      }
+
+      function setDotted(obj, dottedKey, value) {
+        const parts = dottedKey.split(".");
+        let cur = obj;
+        for (let i = 0; i < parts.length - 1; i++) {
+          const p = parts[i];
+          if (typeof cur[p] !== "object" || cur[p] === null || Array.isArray(cur[p])) {
+            cur[p] = {};
+          }
+          cur = cur[p];
+        }
+        cur[parts[parts.length - 1]] = value;
+      }
+
+      function render() {
+        $("payloadEditor").value = JSON.stringify(payload, null, 2);
+
+        // Render engine response verbatim
+        $("engineResponsePre").textContent = JSON.stringify(lastEngineResponse ?? {}, null, 2);
+
+        // Pull required fields (no inference, no fallback logic)
+        const nfk = lastEngineResponse?.next_field_key ?? null;
+        const status = lastEngineResponse?.eligibility_status ?? "—";
+
+        $("nextFieldKey").textContent = nfk === null ? "null" : String(nfk);
+        $("eligibilityStatus").textContent = String(status);
+
+        // Label: ONLY if engine provides one (otherwise blank)
+        const label =
+          (lastEngineResponse && typeof lastEngineResponse.next_field_label === "string" && lastEngineResponse.next_field_label) ||
+          "";
+        $("nextFieldLabel").textContent = label ? label : "—";
+
+        // Question render: exactly one field referenced by next_field_key
+        if (typeof nfk === "string" && nfk.length > 0) {
+          $("questionArea").textContent = label ? label : nfk;
+          $("answerArea").style.display = "block";
+          $("answerInput").value = "";
+          $("answerInput").focus();
+        } else {
+          $("questionArea").textContent = "No question rendered (next_field_key is null).";
+          $("answerArea").style.display = "none";
+        }
+      }
+
+      async function postEvaluate() {
+        clearError();
+
+        // Allow manual editing of payload for debugging, but treat it as opaque.
+        try {
+          payload = JSON.parse($("payloadEditor").value);
+        } catch (e) {
+          showError("PAYLOAD JSON INVALID:\n" + String(e));
+          return;
+        }
+
+        let resp;
+        try {
+          resp = await fetch(API_URL + "/evaluate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+        } catch (e) {
+          showError("NETWORK ERROR:\n" + String(e));
+          return;
+        }
+
+        const rawText = await resp.text();
+
+        if (!resp.ok) {
+          showError("HTTP ERROR " + resp.status + ":\n" + rawText);
+          return;
+        }
+
+        let data;
+        try {
+          data = JSON.parse(rawText);
+        } catch (e) {
+          showError("ENGINE RESPONSE NOT JSON:\n" + rawText);
+          return;
+        }
+
+        // Minimal required keys validation (no recovery, expose breakage)
+        const required = ["eligibility_status", "rule_results", "missing_fields", "next_field_key"];
+        const missing = required.filter((k) => !(k in data));
+        if (missing.length) {
+          showError("ENGINE RESPONSE INVALID (missing keys): " + missing.join(", ") + "\n\nRAW:\n" + rawText);
+          lastEngineResponse = data;
+          render();
+          return;
+        }
+
+        lastEngineResponse = data;
+        render();
+      }
+
+      function submitAnswer() {
+        clearError();
+
+        const nfk = lastEngineResponse?.next_field_key ?? null;
+        if (!(typeof nfk === "string" && nfk.length > 0)) {
+          showError("Cannot submit answer: next_field_key is null/invalid.");
+          return;
+        }
+
+        const val = $("answerInput").value;
+
+        // Only permitted mutation:
+        setDotted(payload, nfk, val);
+
+        // Immediately post updated payload
+        postEvaluate();
+      }
+
+      // Wire events
+      $("sendBtn").addEventListener("click", postEvaluate);
+      $("submitAnswerBtn").addEventListener("click", submitAnswer);
+      $("answerInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submitAnswer();
+      });
+
+      // Initial render
+      render();
+    </script>
+  </body>
+</html>

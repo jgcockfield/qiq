@@ -3,12 +3,22 @@
 # This file delegates to the evaluator engine.
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Dict, Any
 
 from app.engine.evaluator import evaluate as engine_evaluate
 
 app = FastAPI()
+
+# Allow local file-based UI (file://) to call the API during P3 validation
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 VALID_WORK = {"employee", "contractor", "business_owner"}
 
