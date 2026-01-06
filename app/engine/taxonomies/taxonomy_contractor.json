@@ -12,6 +12,11 @@
     {
       "key": "identity.nationality",
       "depends_on": ["identity.full_name"]
+    },
+    {
+      "key": "income.monthly_amount",
+      "depends_on": ["identity.full_name"]
     }
+
   ]
 }
