@@ -277,6 +277,15 @@ def evaluate(payload: Dict[str, Any]) -> dict:
                 return {"rule_id": rid, "status": "pass", "reason": user_meaning}
             return {"rule_id": rid, "status": _fail_status(), "reason": user_meaning}
 
+        if test == "gte_number":
+            v_num = _as_number(_get_dotted(rule_payload, field_keys[0]))
+            threshold = _as_number(rule.get("pass"))
+            if v_num is None or threshold is None:
+                return {"rule_id": rid, "status": "needs_review", "reason": "Numeric comparison not evaluable."}
+            if v_num >= threshold:
+                return {"rule_id": rid, "status": "pass", "reason": user_meaning}
+            return {"rule_id": rid, "status": _fail_status(), "reason": user_meaning}
+
         if test == "gte_threshold_by_applicant_type":
             income_val = _as_number(_get_dotted(rule_payload, field_keys[0]))
             applicant_type = _get_dotted(rule_payload, field_keys[1])
@@ -328,12 +337,24 @@ def evaluate(payload: Dict[str, Any]) -> dict:
             return
 
         src = _get_dotted(rule_payload, "income.monthly_amount")
-        if _is_missing(src):
-            return
+        if not _is_missing(src):
+            tgt = _get_dotted(rule_payload, "role.contractor.monthly_income_usd")
+            if _is_missing(tgt):
+                _set_dotted(rule_payload, "role.contractor.monthly_income_usd", src)
 
-        tgt = _get_dotted(rule_payload, "role.contractor.monthly_income_usd")
-        if _is_missing(tgt):
-            _set_dotted(rule_payload, "role.contractor.monthly_income_usd", src)
+        # M2 — Work relationship -> applicant type
+        # routing.work_relationship -> routing.applicant_type
+        src_wr = _get_dotted(rule_payload, "routing.work_relationship")
+        tgt_at = _get_dotted(rule_payload, "routing.applicant_type")
+        if not _is_missing(src_wr) and _is_missing(tgt_at):
+            _set_dotted(rule_payload, "routing.applicant_type", src_wr)
+
+        # M3 — Identity nationality -> routing nationality
+        # identity.nationality -> routing.nationality
+        src_nat = _get_dotted(rule_payload, "identity.nationality")
+        tgt_nat = _get_dotted(rule_payload, "routing.nationality")
+        if not _is_missing(src_nat) and _is_missing(tgt_nat):
+            _set_dotted(rule_payload, "routing.nationality", src_nat)
 
     rule_results: List[Dict[str, str]] = []
     eligibility_status: str = "Needs Review"

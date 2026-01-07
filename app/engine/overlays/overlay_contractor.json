@@ -22,8 +22,8 @@
       "field_keys": [
         "role.contractor.income_evidence_months"
       ],
-      "test": "equals",
-      "pass": "12+",
+      "test": "gte_number",
+      "pass": 12,
       "fail_outcome": "ineligible",
       "user_facing_meaning": "You must be able to document income for the required lookback period.",
       "inline_support": "Only months you can document count."
@@ -34,7 +34,7 @@
         "routing.income_foreign_only"
       ],
       "test": "equals",
-      "pass": "yes",
+      "pass": true,
       "fail_outcome": "ineligible",
       "user_facing_meaning": "Income must be fully foreign-sourced.",
       "inline_support": "This means you will not provide services to Costa Rica–based clients or companies while in Costa Rica."
