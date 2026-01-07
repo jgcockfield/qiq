@@ -111,10 +111,18 @@ def evaluate(payload: Dict[str, Any]) -> dict:
     """
 
     # Only read known sections (unknown keys ignored by construction)
-    safe_payload: Dict[str, Any] = {
-        "routing": payload.get("routing", {}) if isinstance(payload.get("routing", {}), dict) else {},
-        "identity": payload.get("identity", {}) if isinstance(payload.get("identity", {}), dict) else {},
-    }
+    safe_payload: Dict[str, Any] = payload if isinstance(payload, dict) else {}
+
+    # Normalize critical roots to dicts
+    if not isinstance(safe_payload.get("routing"), dict):
+        safe_payload["routing"] = {}
+    if not isinstance(safe_payload.get("identity"), dict):
+        safe_payload["identity"] = {}
+    if not isinstance(safe_payload.get("income"), dict):
+        safe_payload["income"] = {}
+    if not isinstance(safe_payload.get("role"), dict):
+        safe_payload["role"] = {}
+
 
     # 1) Compute missing_fields (ordered, deduped)
     missing_fields: List[str] = []
@@ -247,7 +255,7 @@ def evaluate(payload: Dict[str, Any]) -> dict:
             return {
                 "rule_id": rid,
                 "status": "needs_review",
-                "reason": f"Missing required field(s): {', '.join(missing)}."
+                "reason": f"Missing required field(s): {', '.join(missing)}.",
             }
 
         # Helper to map a failing rule to deterministic status
@@ -300,12 +308,42 @@ def evaluate(payload: Dict[str, Any]) -> dict:
         # Unknown test => fail closed at rule level
         return {"rule_id": rid, "status": "needs_review", "reason": f"Unsupported rule test: {test}."}
 
+    # --- Phase 4: Deterministic Field Mapping (source -> canonical) ---
+    # Runs BEFORE overlay rule evaluation. Does not modify missing_fields logic/order.
+
+    def _set_dotted(obj: Dict[str, Any], dotted_key: str, value: Any) -> None:
+        cur: Any = obj
+        parts = dotted_key.split(".")
+        for part in parts[:-1]:
+            if part not in cur or not isinstance(cur.get(part), dict):
+                cur[part] = {}
+            cur = cur[part]
+        cur[parts[-1]] = value
+
+    def _apply_field_mappings(rule_payload: Dict[str, Any]) -> None:
+        # M1 — Contractor monthly income
+        # income.monthly_amount -> role.contractor.monthly_income_usd
+        work_rel = _get_dotted(rule_payload, "routing.work_relationship")
+        if work_rel != "contractor":
+            return
+
+        src = _get_dotted(rule_payload, "income.monthly_amount")
+        if _is_missing(src):
+            return
+
+        tgt = _get_dotted(rule_payload, "role.contractor.monthly_income_usd")
+        if _is_missing(tgt):
+            _set_dotted(rule_payload, "role.contractor.monthly_income_usd", src)
+
     rule_results: List[Dict[str, str]] = []
     eligibility_status: str = "Needs Review"
 
     try:
         overlay = _load_overlay(work)
         rule_payload = payload if isinstance(payload, dict) else {}
+
+        # Apply deterministic mappings before rule evaluation
+        _apply_field_mappings(rule_payload)
 
         for r in overlay.get("rules", []):
             rule_results.append(_evaluate_rule(rule_payload, r))
