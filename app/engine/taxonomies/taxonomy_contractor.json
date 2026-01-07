@@ -18,6 +18,11 @@
       "depends_on": ["identity.full_name"]
     },
     {
+      "key": "routing.applicant_type",
+      "depends_on": ["routing.work_relationship"]
+    },
+
+    {
       "key": "routing.income_foreign_only",
       "depends_on": ["routing.work_relationship"]
     },

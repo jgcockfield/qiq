@@ -292,9 +292,23 @@ def evaluate(payload: Dict[str, Any]) -> dict:
             thresholds = rule.get("pass")
             if income_val is None or applicant_type is _MISSING or applicant_type is None:
                 return {"rule_id": rid, "status": "needs_review", "reason": "Income/applicant type not evaluable."}
-            if not isinstance(thresholds, dict) or applicant_type not in thresholds:
+
+            # Normalize applicant_type for deterministic threshold lookup
+            applicant_type_str = str(applicant_type).strip()
+            applicant_type_norm = applicant_type_str.lower().replace(" ", "_")
+
+            if not isinstance(thresholds, dict):
                 return {"rule_id": rid, "status": "needs_review", "reason": "Applicant type threshold not available."}
-            threshold_val = _as_number(thresholds.get(applicant_type))
+
+            # Try exact key first, then normalized key
+            threshold_key = applicant_type_str if applicant_type_str in thresholds else None
+            if threshold_key is None and applicant_type_norm in thresholds:
+                threshold_key = applicant_type_norm
+
+            if threshold_key is None:
+                return {"rule_id": rid, "status": "needs_review", "reason": "Applicant type threshold not available."}
+
+            threshold_val = _as_number(thresholds.get(threshold_key))
             if threshold_val is None:
                 return {"rule_id": rid, "status": "needs_review", "reason": "Applicant type threshold not evaluable."}
             if income_val >= threshold_val:
