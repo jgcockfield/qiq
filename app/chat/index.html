@@ -29,7 +29,7 @@
 
     <div class="row box">
       <div><strong>Payload</strong> (opaque object; UI only writes to next_field_key):</div>
-      <textarea id="payloadEditor" rows="10"></textarea>
+      <textarea id="payloadEditor" rows="10" readonly></textarea>
       <div style="margin-top:8px;">
         <button id="sendBtn">POST /evaluate</button>
       </div>
@@ -128,16 +128,11 @@
 
       async function postEvaluate() {
         clearError();
-
-        // Allow manual editing of payload for debugging, but treat it as opaque.
-        try {
-          payload = JSON.parse($("payloadEditor").value);
-        } catch (e) {
-          showError("PAYLOAD JSON INVALID:\n" + String(e));
-          return;
-        }
+        // Payload is authoritative state owned by UI runtime.
+        // STRICT CONSUMER MODE: UI does NOT accept arbitrary payload edits here.
 
         let resp;
+
         try {
           resp = await fetch(API_URL + "/evaluate", {
             method: "POST",
