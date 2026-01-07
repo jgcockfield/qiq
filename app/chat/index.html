@@ -17,7 +17,7 @@
   </head>
   <body>
     <h1>QualifyIQ Minimal Consumer UI</h1>
-    <div class="muted">STRICT CONSUMER MODE — UI obeys engine. No fallback logic.</div>
+    <div class="muted">STRICT CONSUMER MODE — UI obeys engine; payload is read-only.</div>
 
     <div id="errorBox" class="row" style="display:none;"></div>
 
@@ -28,7 +28,7 @@
     </div>
 
     <div class="row box">
-      <div><strong>Payload</strong> (opaque object; UI only writes to next_field_key):</div>
+      <div><strong>Payload</strong> (debug editable):</div>
       <textarea id="payloadEditor" rows="10" readonly></textarea>
       <div style="margin-top:8px;">
         <button id="sendBtn">POST /evaluate</button>
@@ -53,16 +53,10 @@
     </div>
 
     <script>
-      // If your UI is served from the same FastAPI origin, leave this as "".
-      // If you are opening index.html directly (file://) while API runs at localhost:8000, set:
       const API_URL = "http://127.0.0.1:8000";
 
-      // State (minimal)
       let payload = {
-        routing: {
-          // start empty; you can set work_relationship here manually for testing
-          // work_relationship: "contractor"
-        },
+        routing: { work_relationship: "contractor" },
         identity: {}
       };
       let lastEngineResponse = null;
@@ -97,24 +91,19 @@
 
       function render() {
         $("payloadEditor").value = JSON.stringify(payload, null, 2);
-
-        // Render engine response verbatim
         $("engineResponsePre").textContent = JSON.stringify(lastEngineResponse ?? {}, null, 2);
 
-        // Pull required fields (no inference, no fallback logic)
         const nfk = lastEngineResponse?.next_field_key ?? null;
         const status = lastEngineResponse?.eligibility_status ?? "—";
 
         $("nextFieldKey").textContent = nfk === null ? "null" : String(nfk);
         $("eligibilityStatus").textContent = String(status);
 
-        // Label: ONLY if engine provides one (otherwise blank)
         const label =
           (lastEngineResponse && typeof lastEngineResponse.next_field_label === "string" && lastEngineResponse.next_field_label) ||
           "";
         $("nextFieldLabel").textContent = label ? label : "—";
 
-        // Question render: exactly one field referenced by next_field_key
         if (typeof nfk === "string" && nfk.length > 0) {
           $("questionArea").textContent = label ? label : nfk;
           $("answerArea").style.display = "block";
@@ -128,11 +117,12 @@
 
       async function postEvaluate() {
         clearError();
-        // Payload is authoritative state owned by UI runtime.
-        // STRICT CONSUMER MODE: UI does NOT accept arbitrary payload edits here.
+
+        // STRICT CONSUMER MODE:
+        // Payload is engine-owned state.
+        // UI must NOT parse or overwrite payload here.
 
         let resp;
-
         try {
           resp = await fetch(API_URL + "/evaluate", {
             method: "POST",
@@ -145,7 +135,6 @@
         }
 
         const rawText = await resp.text();
-
         if (!resp.ok) {
           showError("HTTP ERROR " + resp.status + ":\n" + rawText);
           return;
@@ -159,7 +148,6 @@
           return;
         }
 
-        // Minimal required keys validation (no recovery, expose breakage)
         const required = ["eligibility_status", "rule_results", "missing_fields", "next_field_key"];
         const missing = required.filter((k) => !(k in data));
         if (missing.length) {
@@ -175,30 +163,22 @@
 
       function submitAnswer() {
         clearError();
-
         const nfk = lastEngineResponse?.next_field_key ?? null;
         if (!(typeof nfk === "string" && nfk.length > 0)) {
           showError("Cannot submit answer: next_field_key is null/invalid.");
           return;
         }
-
         const val = $("answerInput").value;
-
-        // Only permitted mutation:
         setDotted(payload, nfk, val);
-
-        // Immediately post updated payload
         postEvaluate();
       }
 
-      // Wire events
       $("sendBtn").addEventListener("click", postEvaluate);
       $("submitAnswerBtn").addEventListener("click", submitAnswer);
       $("answerInput").addEventListener("keydown", (e) => {
         if (e.key === "Enter") submitAnswer();
       });
 
-      // Initial render
       render();
     </script>
   </body>

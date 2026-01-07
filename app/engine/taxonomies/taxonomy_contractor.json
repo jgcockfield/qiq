@@ -1,38 +1,24 @@
 {
   "work_relationship": "contractor",
   "taxonomy_fields": [
-    {
-      "key": "identity.full_name",
-      "depends_on": []
-    },
-    {
-      "key": "identity.email",
-      "depends_on": ["identity.full_name"]
-    },
-    {
-      "key": "identity.nationality",
-      "depends_on": ["identity.full_name"]
-    },
-    {
-      "key": "income.monthly_amount",
-      "depends_on": ["identity.full_name"]
-    },
-    {
-      "key": "routing.applicant_type",
-      "depends_on": ["routing.work_relationship"]
-    },
+    { "key": "routing.work_relationship", "depends_on": [] },
+    { "key": "routing.applicant_type", "depends_on": ["routing.work_relationship"] },
 
-    {
-      "key": "routing.income_foreign_only",
-      "depends_on": ["routing.work_relationship"]
-    },
-    {
-      "key": "routing.passport_validity_months",
-      "depends_on": ["routing.work_relationship"]
-    },
-    {
-      "key": "routing.health_insurance_status",
-      "depends_on": ["routing.work_relationship"]
-    }
+    { "key": "role.contractor.monthly_income_usd", "depends_on": ["routing.work_relationship"] },
+    { "key": "routing.income_foreign_only", "depends_on": ["routing.work_relationship"] },
+
+    { "key": "role.contractor.income_evidence_types", "depends_on": ["routing.work_relationship"] },
+    { "key": "role.contractor.income_evidence_months", "depends_on": ["role.contractor.income_evidence_types"] },
+
+    { "key": "routing.dependents_count", "depends_on": ["routing.applicant_type"] },
+    { "key": "routing.dependent_relationships", "depends_on": ["routing.dependents_count"] },
+    { "key": "routing.dependent_ages", "depends_on": ["routing.dependents_count"] },
+
+    { "key": "routing.nationality", "depends_on": [] },
+    { "key": "routing.passport_validity_months", "depends_on": [] },
+    { "key": "routing.health_insurance_status", "depends_on": [] },
+
+    { "key": "routing.background_check_available", "depends_on": [] },
+    { "key": "routing.criminal_record_flag", "depends_on": ["routing.background_check_available"] }
   ]
 }
