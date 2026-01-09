@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QualifyIQ</title>
+
+  <style>
+    :root{
+      --bg: #ffffff;
+      --panel: #f6f6f6;
+      --panel-2: #fbfbfb;
+      --border: #e6e6e6;
+      --text: #111;
+      --muted: #666;
+      --bubble: #f2f2f2;
+      --bubble-user: #111;
+      --bubble-user-text: #fff;
+      --shadow: 0 1px 2px rgba(0,0,0,0.06);
+      --radius: 10px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      --composer-max: 760px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--font); }
+
+    .app{ height:100%; display:flex; flex-direction:column; }
+
+    /* Top bar */
+    .topbar{
+      height:44px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:0 14px;
+      border-bottom:1px solid var(--border);
+      background:var(--bg);
+    }
+    .brand{ display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; }
+    .brand-dot{ width:18px; height:18px; border-radius:6px; background:#111; }
+    .topbar-spacer{ flex:1; }
+    .status{ font-size:12px; color:var(--muted); }
+
+    /* Body split */
+    .body{ flex:1; min-height:0; display:flex; }
+
+    /* Sidebar */
+    .sidebar{
+      width:220px;
+      border-right:1px solid var(--border);
+      background:var(--panel-2);
+      display:flex;
+      flex-direction:column;
+      padding:10px;
+      gap:10px;
+    }
+
+    .btn{
+      border:1px solid var(--border);
+      background:#111;
+      color:#fff;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      user-select:none;
+    }
+    .btn:active{ transform:translateY(1px); }
+    .btn.secondary{ background:#fff; color:#111; box-shadow:none; }
+
+    .chatlist{ flex:1; min-height:0; overflow:auto; padding-right:4px; }
+
+    .chatitem{
+      border:1px solid transparent;
+      padding:8px 10px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:12px;
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .chatitem:hover{ background:var(--panel); }
+    .chatitem.active{ background:var(--panel); border-color:var(--border); }
+    .chatitem .title{ font-weight:600; }
+    .chatitem .sub{ color:var(--muted); font-size:11px; }
+
+    /* Main */
+    .main{ flex:1; min-width:0; display:flex; flex-direction:column; position:relative; background:#fff; }
+
+    .messages{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding:18px 0;
+      display:flex;
+      justify-content:center;
+      position:relative;
+      background: url('https://qiq.gonimbleai.com/images/chatbot_bg.jpg') center center / cover no-repeat;
+    }
+
+    .messages::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:rgba(255,255,255,0.85);
+      pointer-events:none;
+    }
+
+    .messages-inner{
+      position:relative;
+      width:100%;
+      max-width:var(--composer-max);
+      padding:0 18px;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .bubble-row{ display:flex; margin:10px 0; }
+    .bubble-row.user{ justify-content:flex-end; }
+
+    .bubble{
+      max-width:760px;
+      padding:10px 12px;
+      border-radius:var(--radius);
+      background:var(--bubble);
+      box-shadow:var(--shadow);
+      font-size:13px;
+      line-height:1.35;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .bubble.user{ background:var(--bubble-user); color:var(--bubble-user-text); }
+
+    .meta{ margin-top:6px; font-size:11px; color:var(--muted); }
+
+    .choices{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .chip{
+      border:1px solid var(--border);
+      background:#fff;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      user-select:none;
+    }
+    .chip:hover{ background:var(--panel); }
+
+    /* === CENTERED COMPOSER (ChatGPT-style) === */
+    .composer{
+      border-top:1px solid var(--border);
+      background:var(--bg);
+      padding:16px 0 20px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .composer-inner{
+      width:100%;
+      max-width:var(--composer-max);
+      padding:0 18px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .promptlabel{ font-size:12px; color:var(--muted); }
+
+    .composer-row{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+    }
+
+    textarea{
+      flex:1;
+      resize:none;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px 14px;
+      font-family:var(--font);
+      font-size:13px;
+      outline:none;
+      min-height:44px;
+      max-height:140px;
+      overflow:auto;
+      background:#fff;
+    }
+
+    .send{
+      width:44px;
+      height:44px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#111;
+      color:#fff;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      user-select:none;
+    }
+
+    .send:disabled{ opacity:.5; cursor:not-allowed; }
+
+    .debug{
+      font-size:11px;
+      color:var(--muted);
+      padding:0 18px 12px 18px;
+    }
+    .debug code{ font-size:11px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <div class="topbar">
+      <div class="brand"><span class="brand-dot"></span> QualifyIQ</div>
+      <div class="topbar-spacer"></div>
+      <div class="status" id="status">Disconnected</div>
+    </div>
+
+    <div class="body">
+
+      <aside class="sidebar">
+        <button class="btn" id="newChatBtn">+ New Chat</button>
+        <div class="chatlist" id="chatList"></div>
+        <button class="btn secondary" id="clearStorageBtn" title="Local only">Clear local</button>
+      </aside>
+
+      <main class="main">
+        <div class="messages" id="messages"><div class="messages-inner" id="messagesInner"></div></div>
+
+        <div class="composer">
+          <div class="composer-inner">
+            <div class="promptlabel" id="promptLabel">Waiting for engine…</div>
+            <div class="composer-row">
+              <textarea id="textInput" rows="1" placeholder="Type your message…"></textarea>
+              <button class="send" id="sendBtn" title="Send">➤</button>
+            </div>
+            <div class="debug" id="debug"></div>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <script>
+    /*****************************************************************
+     * CONFIG
+     *****************************************************************/
+    // If /evaluate is served on the SAME origin as this page, leave API_URL = "".
+    // If different origin (e.g., https://api.gonimbleai.com), set it here.
+    const API_URL = "http://127.0.0.1:8000/evaluate";
+    const EVALUATE_PATH = ""; // Passenger app is mounted at /api/
+
+    // Local-only persistence for UI convenience
+    const STORAGE_KEY = "qiq_chats_v1";
+
+    /*****************************************************************
+     * STATE
+     *****************************************************************/
+    let chats = loadChats();
+    let activeChatId = chats.activeChatId || null;
+
+    function makeId(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function nowIso(){
+      return new Date().toISOString();
+    }
+
+    function loadChats(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return { activeChatId:null, items:[] };
+        return JSON.parse(raw);
+      }catch{
+        return { activeChatId:null, items:[] };
+      }
+    }
+
+    function saveChats(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ activeChatId, items: chats.items }));
+    }
+
+    function getActiveChat(){
+      return chats.items.find(c => c.id === activeChatId) || null;
+    }
+
+    function setStatus(text){
+      document.getElementById("status").textContent = text;
+    }
+
+    function setPromptLabel(text){
+      document.getElementById("promptLabel").textContent = text;
+    }
+
+    function setDebug(norm){
+      const el = document.getElementById("debug");
+      if(!norm){ el.textContent = ""; return; }
+      const v = (norm.next_field_key === null || norm.next_field_key === undefined) ? "null" : String(norm.next_field_key);
+      el.innerHTML = `next_field_key: <code>${escapeHtml(v)}</code>`;
+    }
+
+    function escapeHtml(s){
+      return s
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    /*****************************************************************
+     * RENDER
+     *****************************************************************/
+    function renderChatList(){
+      const list = document.getElementById("chatList");
+      list.innerHTML = "";
+
+      if(chats.items.length === 0){
+        const empty = document.createElement("div");
+        empty.style.color = "#666";
+        empty.style.fontSize = "12px";
+        empty.style.padding = "10px";
+        empty.textContent = "No chats yet.";
+        list.appendChild(empty);
+        return;
+      }
+
+      for(const chat of chats.items){
+        const item = document.createElement("div");
+        item.className = "chatitem" + (chat.id === activeChatId ? " active" : "");
+        item.onclick = () => { activeChatId = chat.id; saveChats(); refresh(); };
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = chat.title || "New chat";
+
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        sub.textContent = chat.updated_at ? new Date(chat.updated_at).toLocaleString() : "";
+
+        item.appendChild(title);
+        item.appendChild(sub);
+        list.appendChild(item);
+      }
+    }
+
+    function renderMessages(){
+      const wrap = document.getElementById("messagesInner");
+      wrap.innerHTML = "";
+
+      const chat = getActiveChat();
+      if(!chat){
+        const empty = document.createElement("div");
+        empty.style.color = "#666";
+        empty.style.fontSize = "13px";
+        empty.style.padding = "18px";
+        empty.textContent = "Start a new chat.";
+        wrap.appendChild(empty);
+        return;
+      }
+
+      for(const m of chat.messages){
+        const row = document.createElement("div");
+        row.className = "bubble-row " + (m.role === "user" ? "user" : "assistant");
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble " + (m.role === "user" ? "user" : "");
+        bubble.textContent = m.text || "";
+
+        row.appendChild(bubble);
+        wrap.appendChild(row);
+
+        if(m.meta){
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = m.meta;
+          wrap.appendChild(meta);
+        }
+
+        if(Array.isArray(m.choices) && m.choices.length){
+          const choices = document.createElement("div");
+          choices.className = "choices";
+
+          for(const choice of m.choices){
+            const chip = document.createElement("button");
+            chip.className = "chip";
+            chip.type = "button";
+            chip.textContent = choice;
+            chip.onclick = () => {
+              // UI never infers next question. A chip click is just a convenience to submit a value.
+              const input = document.getElementById("textInput");
+              input.value = choice;
+              autosize(input);
+              sendCurrent();
+            };
+            choices.appendChild(chip);
+          }
+
+          wrap.appendChild(choices);
+        }
+      }
+
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    function refresh(){
+      renderChatList();
+      renderMessages();
+      syncComposerState();
+    }
+
+    /*****************************************************************
+     * ENGINE WIRING (STRICT CONSUMER)
+     * - UI never decides next question.
+     * - UI only writes to next_field_key.
+     * - UI renders metadata returned by /evaluate.
+     *****************************************************************/
+
+    async function callEvaluate(payload){
+      const url = (API_URL || "") + EVALUATE_PATH;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if(!res.ok){
+        const txt = await res.text().catch(() => "");
+        throw new Error(`Evaluate failed (${res.status}): ${txt}`);
+      }
+
+      return res.json();
+    }
+
+    // Normalize backend response to the minimal shape we render.
+    // IMPORTANT: The UI has NO question map. It only uses what the backend returns.
+    function normalizeEngineResponse(raw){
+      const next_field_key = raw.next_field_key ?? raw.nextFieldKey ?? null;
+
+      // Try common shapes: raw.field OR raw.next_question
+      const fieldMeta = raw.field ?? raw.next_question ?? raw.nextQuestion ?? null;
+
+      const label =
+        fieldMeta?.label ??
+        fieldMeta?.prompt ??
+        (next_field_key ? `Answer: ${next_field_key}` : "Complete");
+
+      const input_type =
+        fieldMeta?.input_type ??
+        fieldMeta?.answer_type ??
+        "text";
+
+      const choices =
+        fieldMeta?.choices ??
+        fieldMeta?.options ??
+        [];
+
+      return { next_field_key, label, input_type, choices, raw };
+    }
+
+    function getBaseIntake(){
+      // Start with an empty payload. External systems (e.g., Gravity Forms)
+      // provide identity fields; the engine will request routing first.
+      return {};
+    }
+
+    function ensureActiveChat(){
+      let chat = getActiveChat();
+      if(chat) return chat;
+
+      const id = makeId();
+      chat = {
+        id,
+        title: "New chat",
+        created_at: nowIso(),
+        updated_at: nowIso(),
+        intake: getBaseIntake(),
+        last_engine: null,
+        messages: []
+      };
+
+      chats.items.unshift(chat);
+      activeChatId = id;
+      saveChats();
+      return chat;
+    }
+
+    function syncComposerState(){
+      const chat = getActiveChat();
+      const input = document.getElementById("textInput");
+      const btn = document.getElementById("sendBtn");
+
+      if(!chat || !chat.last_engine){
+        btn.disabled = true;          // cannot send until engine responds
+        input.disabled = false;       // NEVER lock the textbox
+        setPromptLabel("Waiting for engine…");
+        return;
+      }
+
+      const { next_field_key, label } = chat.last_engine;
+
+      if(!next_field_key){
+        // IMPORTANT: never brick the textbox. "Complete" only disables sending.
+        btn.disabled = true;
+        input.disabled = false;
+        setPromptLabel("Complete");
+        return;
+      }
+
+      input.disabled = false;
+      btn.disabled = false;
+      setPromptLabel(label || next_field_key);
+    }
+
+    async function bootstrapEngine(){
+      const chat = ensureActiveChat();
+
+      try{
+        setStatus("Connecting…");
+
+        const raw = await callEvaluate(chat.intake);
+        const norm = normalizeEngineResponse(raw);
+        chat.last_engine = norm;
+
+        chat.messages.push({
+          role: "assistant",
+          text: norm.label || "…",
+          meta: norm.next_field_key ? `field: ${norm.next_field_key}` : "done",
+          choices: Array.isArray(norm.choices) ? norm.choices : []
+        });
+
+        chat.updated_at = nowIso();
+        saveChats();
+        setStatus("Connected");
+        setDebug(norm);
+        refresh();
+      }catch(err){
+        setStatus("Error");
+        setPromptLabel("Engine error");
+
+        chat.messages.push({
+          role: "assistant",
+          text: `Error connecting to ${EVALUATE_PATH}.
+${String(err.message || err)}`,
+          meta: "check API_URL / CORS / HTTPS / path"
+        });
+
+        chat.updated_at = nowIso();
+        saveChats();
+        refresh();
+      }
+    }
+
+    async function sendCurrent(){
+      const chat = ensureActiveChat();
+      if(!chat.last_engine) return;
+
+      const inputEl = document.getElementById("textInput");
+      const val = (inputEl.value || "").trim();
+      if(!val) return;
+
+      const { next_field_key } = chat.last_engine;
+      if(!next_field_key) return;
+
+      // Append user message
+      chat.messages.push({ role: "user", text: val });
+
+      // STRICT RULE: UI only writes the answer to next_field_key (no inference)
+      setDotted(chat.intake, next_field_key, val);
+
+      // Clear input immediately
+      inputEl.value = "";
+      autosize(inputEl);
+
+      chat.updated_at = nowIso();
+      saveChats();
+      refresh();
+
+      try{
+        setStatus("Thinking…");
+
+        const raw = await callEvaluate(chat.intake);
+        const norm = normalizeEngineResponse(raw);
+        chat.last_engine = norm;
+
+        chat.messages.push({
+          role: "assistant",
+          text: norm.label || "…",
+          meta: norm.next_field_key ? `field: ${norm.next_field_key}` : "done",
+          choices: Array.isArray(norm.choices) ? norm.choices : []
+        });
+
+        // Title: first user message
+        if(chat.title === "New chat"){
+          chat.title = val.length > 28 ? val.slice(0,28) + "…" : val;
+        }
+
+        chat.updated_at = nowIso();
+        saveChats();
+        setStatus("Connected");
+        setDebug(norm);
+        refresh();
+      }catch(err){
+        setStatus("Error");
+        chat.messages.push({
+          role: "assistant",
+          text: `Engine call failed.
+${String(err.message || err)}`,
+          meta: `check ${EVALUATE_PATH}`
+        });
+        chat.updated_at = nowIso();
+        saveChats();
+        refresh();
+      }
+    }
+
+    function setDotted(obj, path, value){
+      const parts = String(path).split(".");
+      let cur = obj;
+      for(let i=0;i<parts.length-1;i++){
+        const k = parts[i];
+        if(typeof cur[k] !== "object" || cur[k] === null) cur[k] = {};
+        cur = cur[k];
+      }
+      cur[parts[parts.length-1]] = value;
+    }
+
+    /*****************************************************************
+     * UI EVENTS
+     *****************************************************************/
+    function autosize(el){
+      el.style.height = "0px";
+      el.style.height = Math.min(el.scrollHeight, 140) + "px";
+    }
+
+    document.getElementById("textInput").addEventListener("input", (e) => autosize(e.target));
+
+    document.getElementById("textInput").addEventListener("keydown", (e) => {
+      if(e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        sendCurrent();
+      }
+    });
+
+    document.getElementById("sendBtn").addEventListener("click", sendCurrent);
+
+    document.getElementById("newChatBtn").addEventListener("click", () => {
+      const id = makeId();
+      chats.items.unshift({
+        id,
+        title: "New chat",
+        created_at: nowIso(),
+        updated_at: nowIso(),
+        intake: getBaseIntake(),
+        last_engine: null,
+        messages: []
+      });
+      activeChatId = id;
+      saveChats();
+      refresh();
+      bootstrapEngine();
+    });
+
+    document.getElementById("clearStorageBtn").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      chats = { activeChatId:null, items:[] };
+      activeChatId = null;
+      refresh();
+      bootstrapEngine();
+    });
+
+    /*****************************************************************
+     * BOOT
+     *****************************************************************/
+    (function init(){
+      if(!activeChatId && chats.items.length){
+        activeChatId = chats.items[0].id;
+      }
+
+      saveChats();
+      refresh();
+
+      const active = getActiveChat();
+
+      // If there is no engine state OR it says "Complete", force a fresh bootstrap
+      if(!active || !active.last_engine || !active.last_engine.next_field_key){
+        bootstrapEngine();
+        return;
+      }
+
+      setStatus("Connected");
+      setDebug(active.last_engine);
+      syncComposerState();
+    })();
+  </script>
+</body>
+</html>
+!-- Paste the full contents of index.html here -->
