@@ -10,23 +10,8 @@ from pathlib import Path
 
 # --- Proto-taxonomy (in-code field spec) ---
 # Fallback only. Real taxonomies are loaded from app/engine/taxonomies/.
-FIELD_SPECS: List[Dict[str, Any]] = [
-    {
-        "key": "identity.full_name",
-        "depends_on": [],
-        "applies_when": None,  # placeholder; always true for now
-    },
-    {
-        "key": "identity.email",
-        "depends_on": [],
-        "applies_when": None,
-    },
-    {
-        "key": "identity.nationality",
-        "depends_on": ["identity.full_name"],
-        "applies_when": None,
-    },
-]
+# Keep empty to avoid asking external identity fields when a taxonomy file is missing.
+FIELD_SPECS: List[Dict[str, Any]] = []
 
 
 def _get_dotted(payload: Dict[str, Any], dotted_key: str) -> Any:
@@ -93,6 +78,9 @@ def _load_taxonomy_specs(work_relationship: Optional[str]) -> List[Dict[str, Any
                     "key": key,
                     "depends_on": list(f.get("depends_on") or []),
                     "applies_when": f.get("applies_when"),
+                    "label": f.get("label"),
+                    "choices": f.get("choices"),
+                    "input_type": f.get("input_type"),
                 }
             )
         return specs or FIELD_SPECS
@@ -119,61 +107,270 @@ def evaluate(payload: Dict[str, Any]) -> dict:
         return {
             "missing_fields": ["routing.work_relationship"],
             "next_field_key": "routing.work_relationship",
+            "field": {
+                "label": "What best describes your work relationship?",
+                "choices": ["contractor", "employee", "business_owner"],
+                "input_type": "choice",
+            },
         }
 
+    # --- HARD GATE: routing.applicant_type ---
+    if _is_missing(_get_dotted(safe_payload, "routing.applicant_type")):
+        return {
+            "missing_fields": ["routing.applicant_type"],
+            "next_field_key": "routing.applicant_type",
+            "field": {
+                "label": "Are you applying as an individual or with family dependents?",
+                "choices": ["individual", "family"],
+                "input_type": "choice",
+            },
+        }
+
+    # --- HARD GATE: routing.dependents_* (family only; must come before income gates) ---
+    if safe_payload.get("routing", {}).get("applicant_type") == "family" and _is_missing(_get_dotted(safe_payload, "routing.dependents_count")):
+        return {
+            "missing_fields": ["routing.dependents_count"],
+            "next_field_key": "routing.dependents_count",
+            "field": {
+                "label": "How many dependents are included in your application?",
+                "input_type": "number",
+            },
+        }
+
+    if safe_payload.get("routing", {}).get("applicant_type") == "family" and _is_missing(_get_dotted(safe_payload, "routing.dependent_relationships")):
+        return {
+            "missing_fields": ["routing.dependent_relationships"],
+            "next_field_key": "routing.dependent_relationships",
+            "field": {
+                "label": "What is each dependent’s relationship to you?",
+                "input_type": "text",
+            },
+        }
+
+    if safe_payload.get("routing", {}).get("applicant_type") == "family" and _is_missing(_get_dotted(safe_payload, "routing.dependent_ages")):
+        return {
+            "missing_fields": ["routing.dependent_ages"],
+            "next_field_key": "routing.dependent_ages",
+            "field": {
+                "label": "What is the age of each dependent?",
+                "input_type": "text",
+            },
+        }
+
+    # --- HARD GATE: routing.income_foreign_only ---
+    if _is_missing(_get_dotted(safe_payload, "routing.income_foreign_only")):
+        return {
+            "missing_fields": ["routing.income_foreign_only"],
+            "next_field_key": "routing.income_foreign_only",
+            "field": {
+                "label": "Is all of your income sourced from outside Costa Rica?",
+                "choices": ["yes", "no"],
+                "input_type": "choice",
+            },
+        }
+
+    # --- HARD GATE: role.*.monthly_income_usd (work-relationship specific) --- (work-relationship specific) ---
+    wr = safe_payload.get("routing", {}).get("work_relationship")
+
+    if wr == "contractor" and _is_missing(_get_dotted(safe_payload, "role.contractor.monthly_income_usd")):
+        return {
+            "missing_fields": ["role.contractor.monthly_income_usd"],
+            "next_field_key": "role.contractor.monthly_income_usd",
+            "field": {
+                "label": "What is your average gross monthly contract income (USD)?",
+                "input_type": "number",
+            },
+        }
+
+    if wr == "employee" and _is_missing(_get_dotted(safe_payload, "role.employee.monthly_income_usd")):
+        return {
+            "missing_fields": ["role.employee.monthly_income_usd"],
+            "next_field_key": "role.employee.monthly_income_usd",
+            "field": {
+                "label": "What is your average gross monthly employment income (USD)?",
+                "input_type": "number",
+            },
+        }
+
+    if wr == "business_owner" and _is_missing(_get_dotted(safe_payload, "role.business_owner.monthly_income_usd")):
+        return {
+            "missing_fields": ["role.business_owner.monthly_income_usd"],
+            "next_field_key": "role.business_owner.monthly_income_usd",
+            "field": {
+                "label": "What is your average gross monthly business income (USD)?",
+                "input_type": "number",
+            },
+        }
+
+    # --- HARD GATE: role.*.income_evidence_types (work-relationship specific) ---
+    if wr == "contractor" and _is_missing(_get_dotted(safe_payload, "role.contractor.income_evidence_types")):
+        return {
+            "missing_fields": ["role.contractor.income_evidence_types"],
+            "next_field_key": "role.contractor.income_evidence_types",
+            "field": {
+                "label": "Which documents can you provide as proof of your contractor income?",
+                "choices": ["bank_statements", "invoices", "contracts", "tax_returns", "other"],
+                "input_type": "multi_choice",
+            },
+        }
+
+    if wr == "employee" and _is_missing(_get_dotted(safe_payload, "role.employee.income_evidence_types")):
+        return {
+            "missing_fields": ["role.employee.income_evidence_types"],
+            "next_field_key": "role.employee.income_evidence_types",
+            "field": {
+                "label": "Which documents can you provide as proof of your employment income?",
+                "choices": ["pay_stubs", "bank_statements", "employment_letter", "tax_returns", "other"],
+                "input_type": "multi_choice",
+            },
+        }
+
+    if wr == "business_owner" and _is_missing(_get_dotted(safe_payload, "role.business_owner.income_evidence_types")):
+        return {
+            "missing_fields": ["role.business_owner.income_evidence_types"],
+            "next_field_key": "role.business_owner.income_evidence_types",
+            "field": {
+                "label": "Which documents can you provide as proof of your business income?",
+                "choices": ["bank_statements", "invoices", "financial_statements", "tax_returns", "other"],
+                "input_type": "multi_choice",
+            },
+        }
+
+    # --- HARD GATE: role.*.income_evidence_months (work-relationship specific) ---
+    if wr == "contractor" and _is_missing(_get_dotted(safe_payload, "role.contractor.income_evidence_months")):
+        return {
+            "missing_fields": ["role.contractor.income_evidence_months"],
+            "next_field_key": "role.contractor.income_evidence_months",
+            "field": {
+                "label": "For how many months can you prove this income with those documents?",
+                "choices": ["3", "6", "9", "12"],
+                "input_type": "choice",
+            },
+        }
+
+    if wr == "employee" and _is_missing(_get_dotted(safe_payload, "role.employee.income_evidence_months")):
+        return {
+            "missing_fields": ["role.employee.income_evidence_months"],
+            "next_field_key": "role.employee.income_evidence_months",
+            "field": {
+                "label": "For how many months can you prove this income with those documents?",
+                "choices": ["3", "6", "9", "12"],
+                "input_type": "choice",
+            },
+        }
+
+    if wr == "business_owner" and _is_missing(_get_dotted(safe_payload, "role.business_owner.income_evidence_months")):
+        return {
+            "missing_fields": ["role.business_owner.income_evidence_months"],
+            "next_field_key": "role.business_owner.income_evidence_months",
+            "field": {
+                "label": "For how many months can you prove this income with those documents?",
+                "choices": ["3", "6", "9", "12"],
+                "input_type": "choice",
+            },
+        }
+
+    # --- HARD GATE: routing.nationality ---
+    if _is_missing(_get_dotted(safe_payload, "routing.nationality")):
+        return {
+            "missing_fields": ["routing.nationality"],
+            "next_field_key": "routing.nationality",
+            "field": {
+                "label": "What is your nationality?",
+                "input_type": "text",
+            },
+        }
+
+    # --- HARD GATE: routing.passport_validity_months ---
+    if _is_missing(_get_dotted(safe_payload, "routing.passport_validity_months")):
+        return {
+            "missing_fields": ["routing.passport_validity_months"],
+            "next_field_key": "routing.passport_validity_months",
+            "field": {
+                "label": "How many months will your passport be valid from your intended entry date?",
+                "input_type": "number",
+            },
+        }
+
+    # --- HARD GATE: routing.health_insurance_status ---
+    if _is_missing(_get_dotted(safe_payload, "routing.health_insurance_status")):
+        return {
+            "missing_fields": ["routing.health_insurance_status"],
+            "next_field_key": "routing.health_insurance_status",
+            "field": {
+                "label": "Do you have qualifying health insurance for Costa Rica, or will you obtain it?",
+                "choices": ["have_it", "will_obtain"],
+                "input_type": "choice",
+            },
+        }
+
+    # --- HARD GATE: routing.background_check_available ---
+    if _is_missing(_get_dotted(safe_payload, "routing.background_check_available")):
+        return {
+            "missing_fields": ["routing.background_check_available"],
+            "next_field_key": "routing.background_check_available",
+            "field": {
+                "label": "Can you obtain a criminal background check from your country of residence?",
+                "choices": ["yes", "no"],
+                "input_type": "choice",
+            },
+        }
+
+    # --- HARD GATE: routing.criminal_record_flag ---
+    if _is_missing(_get_dotted(safe_payload, "routing.criminal_record_flag")):
+        return {
+            "missing_fields": ["routing.criminal_record_flag"],
+            "next_field_key": "routing.criminal_record_flag",
+            "field": {
+                "label": "Do you have any criminal convictions that may appear on your background check?",
+                "choices": ["yes", "no"],
+                "input_type": "choice",
+            },
+        }
+
+    # --- TAXONOMY-DRIVEN FIELDS ---
+    # NOTE: dependents fields must be skipped unless applicant_type == 'family'
+    specs = _load_taxonomy_specs(safe_payload.get("routing", {}).get("work_relationship"))
+
     missing_fields: List[str] = []
+    spec_used: Optional[Dict[str, Any]] = None
 
-    work = safe_payload.get("routing", {}).get("work_relationship")
-    active_specs = _load_taxonomy_specs(work)
-
-    declared_order = [s["key"] for s in active_specs]
-    declared_pos = {k: i for i, k in enumerate(declared_order)}
-
-    def _add_missing(key: str) -> None:
-        if key not in missing_fields:
-            missing_fields.append(key)
-
-    for spec in active_specs:
+    for spec in specs:
         key = spec["key"]
-        depends_on: List[str] = list(spec.get("depends_on") or [])
 
-        value = _get_dotted(safe_payload, key)
-
-        is_external_identity = key in ("identity.full_name", "identity.email")
-
-        if is_external_identity:
-            if value is _MISSING:
+        # Skip dependents fields unless family
+        if key.startswith("routing.dependent") or key == "routing.dependents_count":
+            if safe_payload.get("routing", {}).get("applicant_type") != "family":
                 continue
-            if value is None:
-                _add_missing(key)
-            continue
-
-        if _is_missing(value):
-            for dep in depends_on:
-                # Never auto-add external identity fields as missing (Gravity Forms owns them)
-                if dep in ("identity.full_name", "identity.email"):
-                    continue
-                dep_val = _get_dotted(safe_payload, dep)
-                if _is_missing(dep_val):
-                    _add_missing(dep)
-            _add_missing(key)
-
-    missing_fields.sort(key=lambda k: declared_pos.get(k, 10**9))
-
-    next_field_key: Optional[str] = None
-
-    for key in missing_fields:
-        spec = next((s for s in active_specs if s["key"] == key), None)
-        if spec is None:
-            continue
         if not _applies_when_true(safe_payload, spec):
             continue
-        deps: List[str] = list(spec.get("depends_on") or [])
-        if all((d in ("identity.full_name", "identity.email")) or (not _is_missing(_get_dotted(safe_payload, d))) for d in deps):
-            next_field_key = key
+        if _is_missing(_get_dotted(safe_payload, key)):
+            missing_fields.append(key)
+            spec_used = spec
             break
+
+    if not missing_fields:
+        return {"missing_fields": [], "next_field_key": None}
+
+    next_field_key = missing_fields[0]
+
+    # --- FIELD METADATA (taxonomy-first; fallback to key prettify) ---
+    field: Dict[str, Any] = {
+        "label": next_field_key.replace(".", " ").replace("_", " ").title(),
+        "input_type": "text",
+    }
+
+    if spec_used:
+        if isinstance(spec_used.get("label"), str) and spec_used["label"].strip():
+            field["label"] = spec_used["label"].strip()
+        if isinstance(spec_used.get("input_type"), str) and spec_used["input_type"].strip():
+            field["input_type"] = spec_used["input_type"].strip()
+        choices = spec_used.get("choices")
+        if isinstance(choices, list) and choices:
+            field["choices"] = choices
 
     return {
         "missing_fields": missing_fields,
         "next_field_key": next_field_key,
+        "field": field,
     }

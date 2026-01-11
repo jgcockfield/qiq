@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QualifyIQ</title>
+  <link rel="icon" href="data:," />
 
   <style>
     :root{
@@ -150,6 +151,9 @@
       user-select:none;
     }
     .chip:hover{ background:var(--panel); }
+    .chip.selected{ background:#111; color:#fff; border-color:#111; }
+    .choice-actions{ margin-top:10px; display:flex; gap:8px; align-items:center; }
+    .choice-hint{ font-size:11px; color:var(--muted); }
 
     /* === CENTERED COMPOSER (ChatGPT-style) === */
     .composer{
@@ -390,22 +394,73 @@
           const choices = document.createElement("div");
           choices.className = "choices";
 
+          const isMulti = m.input_type === "multi_choice";
+          const fieldKey = m.field_key || null;
+
+          // Local selection state (per chat + field)
+          const chatState = getActiveChat();
+          if(isMulti && chatState && fieldKey){
+            if(!chatState.pending_multi) chatState.pending_multi = {};
+            if(!Array.isArray(chatState.pending_multi[fieldKey])) chatState.pending_multi[fieldKey] = [];
+          }
+
           for(const choice of m.choices){
             const chip = document.createElement("button");
             chip.className = "chip";
             chip.type = "button";
             chip.textContent = choice;
-            chip.onclick = () => {
-              // UI never infers next question. A chip click is just a convenience to submit a value.
-              const input = document.getElementById("textInput");
-              input.value = choice;
-              autosize(input);
-              sendCurrent();
-            };
+
+            if(isMulti && chatState && fieldKey){
+              const selected = chatState.pending_multi[fieldKey].includes(choice);
+              if(selected) chip.classList.add("selected");
+
+              chip.onclick = () => {
+                const arr = chatState.pending_multi[fieldKey];
+                const idx = arr.indexOf(choice);
+                if(idx >= 0){ arr.splice(idx, 1); chip.classList.remove("selected"); }
+                else { arr.push(choice); chip.classList.add("selected"); }
+                saveChats();
+
+                // Enable/disable the submit button
+                const submitBtn = document.getElementById(`submit_multi__${fieldKey}`);
+                if(submitBtn) submitBtn.disabled = arr.length === 0;
+              };
+            }else{
+              chip.onclick = () => {
+                // UI never infers next question. A chip click is just a convenience to submit a value.
+                const input = document.getElementById("textInput");
+                input.value = choice;
+                autosize(input);
+                sendCurrent();
+              };
+            }
+
             choices.appendChild(chip);
           }
 
           wrap.appendChild(choices);
+
+          // Multi-choice submit row
+          if(isMulti && fieldKey && chatState){
+            const actions = document.createElement("div");
+            actions.className = "choice-actions";
+
+            const hint = document.createElement("div");
+            hint.className = "choice-hint";
+            hint.textContent = "Select all that apply, then submit.";
+
+            const submit = document.createElement("button");
+            submit.className = "btn";
+            submit.type = "button";
+            submit.id = `submit_multi__${fieldKey}`;
+            submit.textContent = "Submit";
+            submit.disabled = chatState.pending_multi[fieldKey].length === 0;
+            submit.onclick = () => submitMultiChoice(fieldKey);
+
+            actions.appendChild(submit);
+            actions.appendChild(hint);
+            wrap.appendChild(actions);
+          }
         }
       }
 
@@ -416,6 +471,8 @@
       renderChatList();
       renderMessages();
       syncComposerState();
+      const active = getActiveChat();
+      setDebug(active && active.last_engine ? active.last_engine : null);
     }
 
     /*****************************************************************
@@ -444,6 +501,8 @@
 
     // Normalize backend response to the minimal shape we render.
     // IMPORTANT: The UI has NO question map. It only uses what the backend returns.
+    let isSubmitting = false;
+
     function normalizeEngineResponse(raw){
       const next_field_key = raw.next_field_key ?? raw.nextFieldKey ?? null;
 
@@ -501,30 +560,36 @@
       const btn = document.getElementById("sendBtn");
 
       if(!chat || !chat.last_engine){
-        btn.disabled = true;          // cannot send until engine responds
-        input.disabled = false;       // NEVER lock the textbox
+        btn.disabled = true;
+        input.disabled = false;
         setPromptLabel("Waiting for engine…");
         return;
       }
 
-      const { next_field_key, label } = chat.last_engine;
+      const { next_field_key, label, choices } = chat.last_engine;
 
       if(!next_field_key){
-        // IMPORTANT: never brick the textbox. "Complete" only disables sending.
         btn.disabled = true;
         input.disabled = false;
         setPromptLabel("Complete");
         return;
       }
 
-      input.disabled = false;
-      btn.disabled = false;
+      // P6-S3: if choices exist, force picklist (no free text)
+      if(Array.isArray(choices) && choices.length){
+        input.disabled = true;
+        btn.disabled = true;
+      }else{
+        input.disabled = false;
+        btn.disabled = false;
+      }
+
       setPromptLabel(label || next_field_key);
     }
 
     async function bootstrapEngine(){
       const chat = ensureActiveChat();
-
+      const btn = document.getElementById("sendBtn");
       try{
         setStatus("Connecting…");
 
@@ -536,7 +601,9 @@
           role: "assistant",
           text: norm.label || "…",
           meta: norm.next_field_key ? `field: ${norm.next_field_key}` : "done",
-          choices: Array.isArray(norm.choices) ? norm.choices : []
+          choices: Array.isArray(norm.choices) ? norm.choices : [],
+          field_key: norm.next_field_key || null,
+          input_type: norm.input_type || "text",
         });
 
         chat.updated_at = nowIso();
@@ -550,35 +617,36 @@
 
         chat.messages.push({
           role: "assistant",
-          text: `Error connecting to ${EVALUATE_PATH}.
-${String(err.message || err)}`,
-          meta: "check API_URL / CORS / HTTPS / path"
+          text: `Engine error.\n${String(err.message || err)}`,
+          meta: "bootstrap"
         });
+
+        // Error containment: clear engine state so UI doesn't show stale next_field_key
+        chat.last_engine = null;
+        setDebug(null);
 
         chat.updated_at = nowIso();
         saveChats();
         refresh();
+      }finally{
+        isSubmitting = false;
+        if(btn) btn.disabled = false;
       }
     }
 
-    async function sendCurrent(){
+    async function sendValue(fieldKey, finalVal, displayText){
+      if(isSubmitting) return;
+      isSubmitting = true;
+
       const chat = ensureActiveChat();
-      if(!chat.last_engine) return;
-
       const inputEl = document.getElementById("textInput");
-      const val = (inputEl.value || "").trim();
-      if(!val) return;
+      const btn = document.getElementById("sendBtn");
+      btn.disabled = true;
 
-      const { next_field_key } = chat.last_engine;
-      if(!next_field_key) return;
+      chat.messages.push({ role: "user", text: String(displayText) });
+      setDotted(chat.intake, fieldKey, finalVal);
 
-      // Append user message
-      chat.messages.push({ role: "user", text: val });
-
-      // STRICT RULE: UI only writes the answer to next_field_key (no inference)
-      setDotted(chat.intake, next_field_key, val);
-
-      // Clear input immediately
+      // Clear composer
       inputEl.value = "";
       autosize(inputEl);
 
@@ -597,12 +665,15 @@ ${String(err.message || err)}`,
           role: "assistant",
           text: norm.label || "…",
           meta: norm.next_field_key ? `field: ${norm.next_field_key}` : "done",
-          choices: Array.isArray(norm.choices) ? norm.choices : []
+          choices: Array.isArray(norm.choices) ? norm.choices : [],
+          field_key: norm.next_field_key || null,
+          input_type: norm.input_type || "text",
         });
 
         // Title: first user message
         if(chat.title === "New chat"){
-          chat.title = val.length > 28 ? val.slice(0,28) + "…" : val;
+          const v = String(displayText || "");
+          chat.title = v.length > 28 ? v.slice(0,28) + "…" : v;
         }
 
         chat.updated_at = nowIso();
@@ -621,7 +692,38 @@ ${String(err.message || err)}`,
         chat.updated_at = nowIso();
         saveChats();
         refresh();
+      }finally{
+        btn.disabled = false;
+        isSubmitting = false;
       }
+    }
+
+    async function submitMultiChoice(fieldKey){
+      const chat = ensureActiveChat();
+      const selected = (chat.pending_multi && Array.isArray(chat.pending_multi[fieldKey])) ? chat.pending_multi[fieldKey].slice() : [];
+      if(!selected.length) return;
+
+      // Clear pending after capture
+      chat.pending_multi[fieldKey] = [];
+      saveChats();
+
+      await sendValue(fieldKey, selected, selected.join(", "));
+    }
+
+    async function sendCurrent(){
+      const chat = ensureActiveChat();
+      if(!chat.last_engine) return;
+
+      const inputEl = document.getElementById("textInput");
+      const val = (inputEl.value || "").trim();
+      if(!val) return;
+
+      const { next_field_key } = chat.last_engine;
+      if(!next_field_key) return;
+
+      // P6-S4 rollback: UI does NOT coerce/validate numeric types in P6.
+      const finalVal = val;
+      await sendValue(next_field_key, finalVal, val);
     }
 
     function setDotted(obj, path, value){
@@ -702,7 +804,21 @@ ${String(err.message || err)}`,
       setDebug(active.last_engine);
       syncComposerState();
     })();
+
+    // Global error containment (P6-S5)
+    window.addEventListener("error", () => {
+      const btn = document.getElementById("sendBtn");
+      isSubmitting = false;
+      if(btn) btn.disabled = false;
+      setStatus("Error");
+    });
+
+    window.addEventListener("unhandledrejection", () => {
+      const btn = document.getElementById("sendBtn");
+      isSubmitting = false;
+      if(btn) btn.disabled = false;
+      setStatus("Error");
+    });
   </script>
 </body>
 </html>
-!-- Paste the full contents of index.html here -->
