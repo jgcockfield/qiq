@@ -1,0 +1,222 @@
+/**
+ * Admin Console - Styles (Records / Runs)
+ * Modern card-table UI + status pill
+ */
+
+:root {
+  --primary-color: #2563eb;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+
+  --bg: #fbfbfb;
+  --card: #ffffff;
+
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gray-900);
+  background: var(--bg);
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 22px;
+}
+
+/* Header */
+header {
+  margin-bottom: 18px;
+}
+
+header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  color: var(--gray-600);
+  margin-top: 4px;
+}
+
+/* Layout */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* Card */
+.list-panel {
+  background: var(--card);
+  border-radius: 18px;
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-header h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.edr-list {
+  padding: 0;
+  background: var(--card);
+}
+
+/* Rows */
+.edr-item {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.edr-item:last-child {
+  border-bottom: none;
+}
+
+.edr-item:hover {
+  background: rgba(17, 24, 39, 0.02);
+}
+
+/* Grid used by admin.js */
+.edr-item-header {
+  display: grid;
+  grid-template-columns: 160px 240px 1fr 1fr 90px;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Header row (first .edr-item created by JS) */
+.edr-item:first-child {
+  background: var(--gray-50);
+}
+
+.edr-item:first-child strong {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gray-700);
+}
+
+/* Links */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Modern status pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  border: 1px solid currentColor;
+  width: fit-content;
+}
+
+.badge::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+
+.status-eligible {
+  background: rgba(16, 185, 129, 0.08);
+  color: var(--success-color);
+}
+
+.status-needs-review {
+  background: rgba(245, 158, 11, 0.10);
+  color: var(--warning-color);
+}
+
+.status-not-eligible {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger-color);
+}
+
+.status-unknown {
+  background: var(--gray-100);
+  color: var(--gray-600);
+  border-color: var(--gray-300);
+}
+
+/* Buttons */
+.btn-secondary {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: white;
+  border: 1px solid var(--gray-300);
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-300);
+  box-shadow: 0 6px 14px rgba(17, 24, 39, 0.06);
+}
+
+/* States */
+.loading,
+.empty,
+.error {
+  padding: 18px;
+  text-align: center;
+  color: var(--gray-600);
+}
+
+.error {
+  color: var(--danger-color);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .edr-item-header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}

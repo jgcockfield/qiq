@@ -1,0 +1,24 @@
+{
+  "section": "summary_statement",
+  "description": "Provides the single procedural summary statement beneath the eligibility header.",
+  "driven_by": ["eligibility_status"],
+  "variants": {
+    "eligible": {
+      "text": "Based on the information provided, you meet the eligibility requirements.",
+      "max_sentences": 1
+    },
+    "needs_review": {
+      "text": "Eligibility cannot be confirmed yet due to pending verification.",
+      "max_sentences": 1
+    },
+    "ineligible": {
+      "text": "Based on the information provided, you do not meet the eligibility requirements.",
+      "max_sentences": 1
+    }
+  },
+  "rules": [
+    "No reassurance or educational language",
+    "No requirement-level details",
+    "Sentence count must not exceed the defined maximum"
+  ]
+}

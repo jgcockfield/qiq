@@ -1,0 +1,22 @@
+{
+  "scope": "all_work_types",
+  "requirement": "criminal_background",
+  "title": "Criminal Background — Police Clearance",
+  "clarification": "Costa Rica requires an official police clearance certificate from the country of nationality and recent residence.",
+  "police_clearance_requirement": {
+    "required": true,
+    "criteria": [
+      "Issued by the appropriate authority",
+      "Covering the required time period",
+      "Properly legalized or apostilled if required"
+    ]
+  },
+  "handling": {
+    "no_criminal_record": "If no criminal record exists, the certificate serves as proof of a clean record.",
+    "criminal_record_disclosed": "If a criminal record exists (including misdemeanors), the certificate provides the factual basis used by immigration authorities for discretionary review."
+  },
+  "boundary": {
+    "case_by_case_review": "Costa Rica evaluates criminal background information on a case-by-case basis and does not publish a list of acceptable or unacceptable offenses.",
+    "legal_deferral": "If a criminal record exists, legal guidance from an immigration attorney is required to assess how it may affect eligibility."
+  }
+}

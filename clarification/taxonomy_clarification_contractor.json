@@ -1,0 +1,181 @@
+{
+  "work_type": "contractor",
+  "clarifications": [
+    {
+      "requirement": "tax_returns",
+      "title": "Tax Returns",
+      "clarification": "When formal tax returns are unavailable, immigration authorities may accept alternative evidence that clearly demonstrates income amount, source, and continuity over time.",
+      "secondary_evidence": [
+        {
+          "type": "accountant_income_summary_letter",
+          "label": "CPA or accountant income summary letter",
+          "description": "Must be prepared by a licensed accountant.",
+          "should_state": [
+            "Total income earned over the past 12 months",
+            "Source(s) of income",
+            "Time period covered"
+          ],
+          "requirements": [
+            "The letter should be signed, dated, and issued on professional letterhead.",
+            "Supporting documents may still be requested."
+          ]
+        },
+        {
+          "type": "year_end_income_statements",
+          "label": "Year-end income statements",
+          "description": "Annual summaries issued by an employer, platform, or accounting system.",
+          "must_clearly_show": [
+            "Gross income totals",
+            "Name of issuing entity",
+            "Year covered"
+          ],
+          "notes": [
+            "Informal or self-generated summaries may require additional review."
+          ]
+        },
+        {
+          "type": "platform_annual_payout_summaries",
+          "label": "Platform annual payout summaries",
+          "description": "Official annual earnings reports from recognized platforms.",
+          "must_include": [
+            "Applicant’s name or account identifier",
+            "Total payouts for the year",
+            "Platform branding or verification markers"
+          ],
+          "notes": [
+            "Screenshots without platform identification may not be sufficient."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "invoices",
+      "title": "Invoices",
+      "clarification": "When formal invoices are unavailable, immigration authorities may accept alternative evidence that demonstrates services rendered, payment terms, and income continuity.",
+      "secondary_evidence": [
+        {
+          "type": "signed_contracts",
+          "label": "Signed contracts",
+          "description": "Executed agreements between the contractor and client.",
+          "should_state": [
+            "Scope of services",
+            "Payment terms or rate",
+            "Duration of engagement"
+          ],
+          "requirements": [
+            "Contracts should be signed and dated by both parties."
+          ]
+        },
+        {
+          "type": "client_confirmation_letters",
+          "label": "Client confirmation letters",
+          "description": "Written confirmation from the client verifying the working relationship.",
+          "should_state": [
+            "Nature of services provided",
+            "Payment amount and frequency",
+            "Time period of engagement"
+          ],
+          "requirements": [
+            "Letters should be signed and include client contact information."
+          ]
+        },
+        {
+          "type": "platform_work_records",
+          "label": "Platform work records",
+          "description": "Official records from freelance or contracting platforms (Upwork, Fiverr, etc.).",
+          "must_include": [
+            "Contractor account identifier",
+            "Evidence of completed work",
+            "Payment history or earnings summary"
+          ],
+          "notes": [
+            "Screenshots without platform identification may require additional review."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "contracts",
+      "title": "Contracts",
+      "clarification": "When formal contracts are unavailable, immigration authorities may accept alternative evidence that demonstrates an ongoing work relationship and income generation.",
+      "secondary_evidence": [
+        {
+          "type": "invoices",
+          "label": "Invoices",
+          "description": "Formal billing records issued to clients.",
+          "should_state": [
+            "Services performed",
+            "Amount billed",
+            "Date(s) of service"
+          ],
+          "notes": [
+            "Recurring invoices strengthen proof of continuity."
+          ]
+        },
+        {
+          "type": "client_confirmation_letters",
+          "label": "Client confirmation letters",
+          "description": "Written confirmation from clients acknowledging the working relationship.",
+          "should_state": [
+            "Nature of work performed",
+            "Duration of engagement",
+            "Payment terms"
+          ],
+          "requirements": [
+            "Letters should be signed and include client contact information."
+          ]
+        },
+        {
+          "type": "platform_contracts_or_profiles",
+          "label": "Platform contracts or profiles",
+          "description": "Official platform records showing active engagements.",
+          "must_include": [
+            "Contractor profile identifier",
+            "Evidence of active or recent contracts",
+            "Platform branding or verification markers"
+          ],
+          "notes": [
+            "Screenshots without platform identification may not be sufficient."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "income_duration_months",
+      "title": "Income History Duration",
+      "clarification": "Costa Rica’s Digital Nomad visa requires proof of income continuity for at least 12 months. If you can only document income for a shorter period, immigration authorities may not be able to confirm financial eligibility.",
+      "boundary": {
+        "minimum_requirement": "A minimum of 12 months of documented income is required.",
+        "case_by_case": "Applications with less than 12 months of income history typically require additional review or legal guidance."
+      }
+    },
+    {
+      "requirement": "income_amount",
+      "title": "Income Amount — Minimum Monthly Income",
+      "clarification": "Costa Rica’s Digital Nomad program requires a minimum level of monthly income. Based on your answer, the amount reported does not meet the minimum threshold for your selected category.",
+      "what_to_do": [
+        "Recheck your monthly income figure and currency conversion (use a consistent monthly average).",
+        "If your income varies, calculate a conservative monthly average across recent months.",
+        "If the income is correct, you may not qualify under the minimum income requirement."
+      ]
+    },
+    {
+      "requirement": "foreign_income",
+      "title": "Foreign Income — Source Must Be Outside Costa Rica",
+      "clarification": "For this visa category, income must come from sources outside Costa Rica. Your answers indicate your income is not primarily sourced from outside Costa Rica, which does not meet this requirement.",
+      "what_to_do": [
+        "Confirm whether your clients or pay sources are outside Costa Rica.",
+        "If only some income is foreign-sourced, you may need to show that qualifying income is foreign-sourced and meets the minimum."
+      ]
+    },
+    {
+      "requirement": "passport_validity",
+      "title": "Passport Validity — Expiration Window",
+      "clarification": "Applicants typically need a passport that remains valid beyond a minimum time window. Your passport expiration date appears too soon relative to that window, which can block eligibility until renewed.",
+      "what_to_do": [
+        "Renew your passport (or obtain a new one) before applying.",
+        "After renewal, re-run the check with the updated expiration date."
+      ]
+    }
+  ]
+}

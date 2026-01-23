@@ -137,8 +137,6 @@
 
     .bubble.user{ background:var(--bubble-user); color:var(--bubble-user-text); }
 
-    .meta{ margin-top:6px; font-size:11px; color:var(--muted); }
-
     .choices{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .chip{
       border:1px solid var(--border);
@@ -150,6 +148,10 @@
       box-shadow:var(--shadow);
       user-select:none;
     }
+    .chip:hover{ background:var(--panel); }
+    .chip.selected{ background:#111; color:#fff; border-color:#111; }
+    .chip:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; }
+    .chip:disabled:hover{ background:#fff; }
     .chip:hover{ background:var(--panel); }
     .chip.selected{ background:#111; color:#fff; border-color:#111; }
     .choice-actions{ margin-top:10px; display:flex; gap:8px; align-items:center; }
@@ -245,7 +247,7 @@
               <textarea id="textInput" rows="1" placeholder="Type your message…"></textarea>
               <button class="send" id="sendBtn" title="Send">➤</button>
             </div>
-            <div class="debug" id="debug"></div>
+            
           </div>
         </div>
       </main>
@@ -259,8 +261,9 @@
      *****************************************************************/
     // If /evaluate is served on the SAME origin as this page, leave API_URL = "".
     // If different origin (e.g., https://api.gonimbleai.com), set it here.
-    const API_URL = "http://127.0.0.1:8000/evaluate";
-    const EVALUATE_PATH = ""; // Passenger app is mounted at /api/
+    const API_URL = "http://127.0.0.1:8000";
+    const EVALUATE_PATH = "/evaluate"; // FastAPI endpoint
+
 
     // Local-only persistence for UI convenience
     const STORAGE_KEY = "qiq_chats_v1";
@@ -305,12 +308,7 @@
       document.getElementById("promptLabel").textContent = text;
     }
 
-    function setDebug(norm){
-      const el = document.getElementById("debug");
-      if(!norm){ el.textContent = ""; return; }
-      const v = (norm.next_field_key === null || norm.next_field_key === undefined) ? "null" : String(norm.next_field_key);
-      el.innerHTML = `next_field_key: <code>${escapeHtml(v)}</code>`;
-    }
+    function setDebug(){ /* debug disabled */ }
 
     function escapeHtml(s){
       return s
@@ -320,6 +318,110 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
+
+    function buildCompletionText(raw, exports){
+      exports = exports || {};
+      const meta = raw.meta || {};
+      const status = meta.status || raw.eligibility_status || "";
+      const work = meta.work_relationship || meta.work_type || raw.work_relationship || "";
+      const visa = meta.visa_type || "";
+
+      let html = '<div style="font-family:var(--font); line-height:1.5; white-space:normal;">';
+      html += '<div style="font-weight:600; font-size:14px; margin-bottom:8px;">Eligibility Summary</div>';
+      if(status) html += `<div style="font-size:13px;">Status: ${status}</div>`;
+      if(work) html += `<div style="font-size:13px;">Work Type: ${work}</div>`;
+      if(visa) html += `<div style="font-size:13px;">Visa Type: ${visa}</div>`;
+      
+      const summary = raw.summary || raw.summary_text || "";
+      if(summary) html += `<div style="margin-top:12px; font-size:13px;">${summary}</div>`;
+
+      const clar = raw.clarifications;
+      if(Array.isArray(clar) && clar.length){
+        html += '<div style="margin-top:16px; font-weight:600; font-size:14px;">Clarifications</div>';
+        for(const c of clar){
+          if(!c) continue;
+          html += '<div style="margin:16px 0; padding:12px; background:#f9f9f9; border-left:3px solid #111; border-radius:4px;">';
+          if(c.title) html += `<div style="font-weight:600; font-size:14px; margin-bottom:8px;">${c.title}</div>`;
+          if(c.clarification) html += `<div style="font-size:13px; line-height:1.4; margin-bottom:12px; color:#333;">${c.clarification}</div>`;
+
+          // Extra criminal background sections (if present)
+          if(c.police_clearance_requirement && typeof c.police_clearance_requirement === "object"){
+            const pcr = c.police_clearance_requirement;
+            html += '<div style="margin-top:10px; font-weight:600; font-size:12px; color:#666;">Police clearance requirements:</div>';
+            if(Array.isArray(pcr.criteria) && pcr.criteria.length){
+              html += '<ul style="margin:6px 0 0 18px; padding-left:18px; font-size:12px; color:#444;">';
+              pcr.criteria.forEach(item => html += `<li style=\"margin:2px 0;\">${item}</li>`);
+              html += '</ul>';
+            }
+          }
+
+          if(c.handling && typeof c.handling === "object"){
+            const h = c.handling;
+            html += '<div style="margin-top:10px; font-weight:600; font-size:12px; color:#666;">How this is handled:</div>';
+            if(h.no_criminal_record) html += `<div style=\"margin-top:6px; font-size:12px; color:#444;\"><strong>No record:</strong> ${h.no_criminal_record}</div>`;
+            if(h.criminal_record_disclosed) html += `<div style=\"margin-top:6px; font-size:12px; color:#444;\"><strong>Record disclosed:</strong> ${h.criminal_record_disclosed}</div>`;
+          }
+
+          if(c.boundary && typeof c.boundary === "object"){
+            const b = c.boundary;
+            html += '<div style="margin-top:10px; font-weight:600; font-size:12px; color:#666;">Important boundary:</div>';
+            if(b.case_by_case_review) html += `<div style=\"margin-top:6px; font-size:12px; color:#444;\">${b.case_by_case_review}</div>`;
+            if(b.legal_deferral) html += `<div style=\"margin-top:6px; font-size:12px; color:#444;\"><strong>Legal guidance:</strong> ${b.legal_deferral}</div>`;
+          }
+
+          if(Array.isArray(c.secondary_evidence) && c.secondary_evidence.length){
+            html += '<div style="font-weight:600; font-size:12px; margin-top:12px; margin-bottom:8px; color:#666;">Alternative Evidence Options:</div>';
+            for(const ev of c.secondary_evidence){
+              html += '<div style="margin:8px 0 12px 12px; padding-left:12px; border-left:2px solid #ddd;">';
+              if(ev.label) html += `<div style="font-weight:600; font-size:12px; color:#111;">${ev.label}</div>`;
+              if(ev.description) html += `<div style="font-size:12px; color:#555; margin:4px 0;">${ev.description}</div>`;
+              
+              const makeList = (arr, title) => {
+                if(!Array.isArray(arr) || !arr.length) return '';
+                let out = `<div style="margin:4px 0; font-size:11px; color:#666;"><strong>${title}:</strong><ul style="margin:4px 0; padding-left:20px;">`;
+                arr.forEach(item => out += `<li style="margin:2px 0;">${item}</li>`);
+                return out + '</ul></div>';
+              };
+              
+              html += makeList(ev.should_state, 'Should state');
+              html += makeList(ev.must_include, 'Must include');
+              html += makeList(ev.must_clearly_show, 'Must clearly show');
+              html += makeList(ev.requirements, 'Requirements');
+              html += makeList(ev.notes, 'Notes');
+              html += '</div>';
+            }
+          }
+          html += '</div>';
+        }
+      }
+
+      const cta = raw.cta || raw.next_steps || raw.nextSteps;
+      const toText = (v) => !v ? "" : Array.isArray(v) ? v.filter(Boolean).map(String).join("<br>") : String(v);
+      const ctaText = (typeof cta === "string") ? cta : toText(cta?.text);
+      if(ctaText) html += `<div style="margin-top:16px; font-size:13px;">${ctaText}</div>`;
+      
+      const action = cta?.action || null;
+      const actionLabel = action?.label || action?.text || cta?.action_label || cta?.actionLabel || "";
+      if(actionLabel) html += `<div style="margin-top:12px; font-size:13px;">${actionLabel}</div>`;
+
+      // Export links (from wrapper)
+      const mkLink = (href, label) => {
+        if(!href) return "";
+        const abs = (API_URL || "") + href;
+        return `<a href="${abs}" target="_blank" rel="noopener" style="display:inline-block; padding:8px 10px; border-radius:999px; border:1px solid #111; background:#111; color:#fff; text-decoration:none; font-size:12px;">${label}</a>`;
+      };
+
+      const edrLink = mkLink(exports.edr_url, "Download JSON");
+      const pdfLink = mkLink(exports.pdf_url, "Download PDF");
+
+      if(edrLink || pdfLink){
+        html += `<div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">${pdfLink}${edrLink}</div>`;
+      }
+
+      html += '</div>';
+      return html;
+    }
+
 
     /*****************************************************************
      * RENDER
@@ -359,9 +461,9 @@
 
     function renderMessages(){
       const wrap = document.getElementById("messagesInner");
-      wrap.innerHTML = "";
-
       const chat = getActiveChat();
+      const activeKey = chat?.last_engine?.next_field_key ?? null;
+      wrap.innerHTML = "";
       if(!chat){
         const empty = document.createElement("div");
         empty.style.color = "#666";
@@ -378,17 +480,12 @@
 
         const bubble = document.createElement("div");
         bubble.className = "bubble " + (m.role === "user" ? "user" : "");
-        bubble.textContent = m.text || "";
+        if(m.is_completion_html){ bubble.innerHTML = m.text || ""; } else { bubble.textContent = m.text || ""; }
 
         row.appendChild(bubble);
         wrap.appendChild(row);
 
-        if(m.meta){
-          const meta = document.createElement("div");
-          meta.className = "meta";
-          meta.textContent = m.meta;
-          wrap.appendChild(meta);
-        }
+        
 
         if(Array.isArray(m.choices) && m.choices.length){
           const choices = document.createElement("div");
@@ -396,6 +493,7 @@
 
           const isMulti = m.input_type === "multi_choice";
           const fieldKey = m.field_key || null;
+          const isActiveQuestion = !!(fieldKey && activeKey && fieldKey === activeKey);
 
           // Local selection state (per chat + field)
           const chatState = getActiveChat();
@@ -409,12 +507,14 @@
             chip.className = "chip";
             chip.type = "button";
             chip.textContent = choice;
+            chip.disabled = !isActiveQuestion;
 
             if(isMulti && chatState && fieldKey){
               const selected = chatState.pending_multi[fieldKey].includes(choice);
               if(selected) chip.classList.add("selected");
 
               chip.onclick = () => {
+                if(!isActiveQuestion) return;
                 const arr = chatState.pending_multi[fieldKey];
                 const idx = arr.indexOf(choice);
                 if(idx >= 0){ arr.splice(idx, 1); chip.classList.remove("selected"); }
@@ -427,6 +527,7 @@
               };
             }else{
               chip.onclick = () => {
+                if(!isActiveQuestion) return;
                 // UI never infers next question. A chip click is just a convenience to submit a value.
                 const input = document.getElementById("textInput");
                 input.value = choice;
@@ -454,8 +555,8 @@
             submit.type = "button";
             submit.id = `submit_multi__${fieldKey}`;
             submit.textContent = "Submit";
-            submit.disabled = chatState.pending_multi[fieldKey].length === 0;
-            submit.onclick = () => submitMultiChoice(fieldKey);
+            submit.disabled = (!isActiveQuestion) || (chatState.pending_multi[fieldKey].length === 0);
+            submit.onclick = () => { if(!isActiveQuestion) return; submitMultiChoice(fieldKey); };
 
             actions.appendChild(submit);
             actions.appendChild(hint);
@@ -504,10 +605,32 @@
     let isSubmitting = false;
 
     function normalizeEngineResponse(raw){
-      const next_field_key = raw.next_field_key ?? raw.nextFieldKey ?? null;
+      // Preserve wrapper export links before unwrapping
+      const exports = {
+        edr_url: raw?.edr_url ?? raw?.edrUrl ?? null,
+        pdf_url: raw?.pdf_url ?? raw?.pdfUrl ?? null,
+      };
 
-      // Try common shapes: raw.field OR raw.next_question
-      const fieldMeta = raw.field ?? raw.next_question ?? raw.nextQuestion ?? null;
+      // unwrap export wrapper if present
+      const payload = raw && raw.result ? raw.result : raw;
+
+      const next_field_key = payload.next_field_key ?? payload.nextFieldKey ?? null;
+
+      // Completion payload (P7): backend may return a final structured output object
+      const isCompletionPayload = (
+        next_field_key === null && (
+          payload.completed === true ||
+          payload.meta || payload.summary || payload.clarifications || payload.next_steps || payload.cta
+        )
+      );
+
+      if(isCompletionPayload){
+        const label = buildCompletionText(payload, exports);
+        return { next_field_key: null, label, input_type: "text", choices: [], raw: payload, is_completion_html: true };
+      }
+
+      // Try common shapes: payload.field OR payload.next_question
+      const fieldMeta = payload.field ?? payload.next_question ?? payload.nextQuestion ?? null;
 
       const label =
         fieldMeta?.label ??
@@ -524,7 +647,7 @@
         fieldMeta?.options ??
         [];
 
-      return { next_field_key, label, input_type, choices, raw };
+      return { next_field_key, label, input_type, choices, raw: payload };
     }
 
     function getBaseIntake(){
@@ -569,9 +692,13 @@
       const { next_field_key, label, choices } = chat.last_engine;
 
       if(!next_field_key){
+        // Completion: do NOT assume eligible. Respect backend eligibility_status.
+        const status = (chat.last_engine?.raw?.eligibility_status) || (chat.last_engine?.raw?.meta?.status) || "";
+        if(String(status).toLowerCase() === "needs_review") setPromptLabel("Needs Review");
+        else setPromptLabel("Complete");
+
         btn.disabled = true;
-        input.disabled = false;
-        setPromptLabel("Complete");
+        input.disabled = true;
         return;
       }
 
@@ -593,89 +720,23 @@
       try{
         setStatus("Connecting…");
 
+        console.log("INTAKE PAYLOAD", JSON.stringify(chat.intake, null, 2));
         const raw = await callEvaluate(chat.intake);
+        console.log("EVALUATE RESPONSE", raw);
         const norm = normalizeEngineResponse(raw);
         chat.last_engine = norm;
 
         chat.messages.push({
           role: "assistant",
           text: norm.label || "…",
-          meta: norm.next_field_key ? `field: ${norm.next_field_key}` : "done",
           choices: Array.isArray(norm.choices) ? norm.choices : [],
           field_key: norm.next_field_key || null,
           input_type: norm.input_type || "text",
+          is_completion_html: norm.is_completion_html || false,
         });
 
-        chat.updated_at = nowIso();
-        saveChats();
-        setStatus("Connected");
-        setDebug(norm);
-        refresh();
-      }catch(err){
-        setStatus("Error");
-        setPromptLabel("Engine error");
-
-        chat.messages.push({
-          role: "assistant",
-          text: `Engine error.\n${String(err.message || err)}`,
-          meta: "bootstrap"
-        });
-
-        // Error containment: clear engine state so UI doesn't show stale next_field_key
-        chat.last_engine = null;
-        setDebug(null);
-
-        chat.updated_at = nowIso();
-        saveChats();
-        refresh();
-      }finally{
-        isSubmitting = false;
-        if(btn) btn.disabled = false;
-      }
-    }
-
-    async function sendValue(fieldKey, finalVal, displayText){
-      if(isSubmitting) return;
-      isSubmitting = true;
-
-      const chat = ensureActiveChat();
-      const inputEl = document.getElementById("textInput");
-      const btn = document.getElementById("sendBtn");
-      btn.disabled = true;
-
-      chat.messages.push({ role: "user", text: String(displayText) });
-      setDotted(chat.intake, fieldKey, finalVal);
-
-      // Clear composer
-      inputEl.value = "";
-      autosize(inputEl);
-
-      chat.updated_at = nowIso();
-      saveChats();
-      refresh();
-
-      try{
-        setStatus("Thinking…");
-
-        const raw = await callEvaluate(chat.intake);
-        const norm = normalizeEngineResponse(raw);
-        chat.last_engine = norm;
-
-        chat.messages.push({
-          role: "assistant",
-          text: norm.label || "…",
-          meta: norm.next_field_key ? `field: ${norm.next_field_key}` : "done",
-          choices: Array.isArray(norm.choices) ? norm.choices : [],
-          field_key: norm.next_field_key || null,
-          input_type: norm.input_type || "text",
-        });
-
-        // Title: first user message
-        if(chat.title === "New chat"){
-          const v = String(displayText || "");
-          chat.title = v.length > 28 ? v.slice(0,28) + "…" : v;
-        }
-
+        // Title: set only after first USER message (avoid undefined vars on bootstrap)
+        // Leave as "New chat" until the user answers at least once.
         chat.updated_at = nowIso();
         saveChats();
         setStatus("Connected");
@@ -687,7 +748,6 @@
           role: "assistant",
           text: `Engine call failed.
 ${String(err.message || err)}`,
-          meta: `check ${EVALUATE_PATH}`
         });
         chat.updated_at = nowIso();
         saveChats();
@@ -700,7 +760,12 @@ ${String(err.message || err)}`,
 
     async function submitMultiChoice(fieldKey){
       const chat = ensureActiveChat();
-      const selected = (chat.pending_multi && Array.isArray(chat.pending_multi[fieldKey])) ? chat.pending_multi[fieldKey].slice() : [];
+      const selectedRaw = (chat.pending_multi && Array.isArray(chat.pending_multi[fieldKey]))
+        ? chat.pending_multi[fieldKey]
+        : [];
+
+      // Defensive de-duplication
+      const selected = Array.from(new Set(selectedRaw));
       if(!selected.length) return;
 
       // Clear pending after capture
@@ -724,6 +789,62 @@ ${String(err.message || err)}`,
       // P6-S4 rollback: UI does NOT coerce/validate numeric types in P6.
       const finalVal = val;
       await sendValue(next_field_key, finalVal, val);
+    }
+
+    async function sendValue(fieldKey, value, displayText){
+      const chat = ensureActiveChat();
+      if(!fieldKey) return;
+
+      // Write into dotted intake payload
+      setDotted(chat.intake, fieldKey, value);
+
+      // Record user bubble (displayText is what UI shows; value is what engine receives)
+      chat.messages.push({
+        role: "user",
+        text: String(displayText ?? value),
+      });
+
+      try{
+        setStatus("Sending…");
+        console.log("INTAKE PAYLOAD", JSON.stringify(chat.intake, null, 2));
+        const raw = await callEvaluate(chat.intake);
+        console.log("EVALUATE RESPONSE", raw);
+        const norm = normalizeEngineResponse(raw);
+        chat.last_engine = norm;
+
+        chat.messages.push({
+          role: "assistant",
+          text: norm.label || "…",
+          choices: Array.isArray(norm.choices) ? norm.choices : [],
+          field_key: norm.next_field_key || null,
+          input_type: norm.input_type || "text",
+          is_completion_html: norm.is_completion_html || false,
+        });
+
+        // Title: set after first USER message
+        if(chat.title === "New chat"){
+          const v = String(displayText ?? "").trim();
+          if(v){
+            chat.title = v.length > 28 ? v.slice(0,28) + "…" : v;
+          }
+        }
+
+        chat.updated_at = nowIso();
+        saveChats();
+        setStatus("Connected");
+        setDebug(norm);
+        refresh();
+      }catch(err){
+        setStatus("Error");
+        chat.messages.push({
+          role: "assistant",
+          text: `Engine call failed.
+${String(err.message || err)}`,
+        });
+        chat.updated_at = nowIso();
+        saveChats();
+        refresh();
+      }
     }
 
     function setDotted(obj, path, value){
@@ -822,3 +943,8 @@ ${String(err.message || err)}`,
   </script>
 </body>
 </html>
+
+
+
+
+

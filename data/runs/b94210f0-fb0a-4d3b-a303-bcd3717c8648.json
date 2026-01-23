@@ -1,0 +1,26 @@
+{
+  "run_id": "b94210f0-fb0a-4d3b-a303-bcd3717c8648",
+  "created_at": "2026-01-17T09:13:47.470515+00:00",
+  "session_id": "fb141932-61fc-4a5f-9b56-cae1dc0039d8",
+  "full_name": "John Doe",
+  "email": "john@example.com",
+  "eligibility_status": "not_eligible",
+  "summary": "",
+  "primary_reason": null,
+  "failed_requirements": [
+    "income_duration_months",
+    "profit_loss_statements",
+    "tax_returns"
+  ],
+  "answers_log": {
+    "applicant_type": "individual",
+    "work_relationship": "business_owner",
+    "income_foreign_only": "yes",
+    "passport_validity_months": "12",
+    "background_check_available": "yes",
+    "criminal_record_flag": "no",
+    "health_insurance_status": "have_it"
+  },
+  "pdf_url": "/reports/edr_cb467950-967e-44b7-882c-72fd15634271.pdf",
+  "edr_id": "cb467950-967e-44b7-882c-72fd15634271"
+}

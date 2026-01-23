@@ -1,0 +1,24 @@
+{
+  "section": "eligibility_summary",
+  "description": "Controls header-level metadata displayed at the top of the eligibility output.",
+  "driven_by": ["eligibility_status"],
+  "statuses": {
+    "eligible": {
+      "label": "Eligible",
+      "fields": ["status", "work_type", "visa_type"]
+    },
+    "needs_review": {
+      "label": "Needs Review",
+      "fields": ["status", "work_type", "visa_type"]
+    },
+    "ineligible": {
+      "label": "Ineligible",
+      "fields": ["status", "work_type", "visa_type"]
+    }
+  },
+  "rules": [
+    "Work type and visa type are injected as data, not evaluated here",
+    "No explanatory text is included in this section",
+    "Field order is fixed"
+  ]
+}

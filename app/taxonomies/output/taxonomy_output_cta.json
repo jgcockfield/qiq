@@ -1,0 +1,44 @@
+{
+  "section": "next_steps_cta",
+  "description": "Provides optional, procedural guidance for application assistance. This section is quiet, non-sales, and eligibility-aware.",
+  "driven_by": ["eligibility_status"],
+  "variants": {
+    "eligible": {
+      "enabled": true,
+      "text": [
+        "If you would like assistance preparing or reviewing your application, professional support is available."
+      ],
+      "action": {
+        "label": "Book a consultation with Great Expatations",
+        "type": "link"
+      }
+    },
+    "needs_review": {
+      "enabled": true,
+      "text": [
+        "If you would like assistance addressing the pending requirements, professional support is available.",
+        "Services may include document review, application preparation, and legal consultation."
+      ],
+      "action": {
+        "label": "Book a consultation with Great Expatations",
+        "type": "link"
+      }
+    },
+    "ineligible": {
+      "enabled": true,
+      "text": [
+        "If you would like guidance on alternative pathways or future eligibility, professional support is available."
+      ],
+      "action": {
+        "label": "Book a consultation with Great Expatations",
+        "type": "link"
+      }
+    }
+  },
+  "rules": [
+    "CTA is optional and non-sales",
+    "No testimonials or lifestyle services",
+    "No guarantees or outcome promises",
+    "Action is limited to application-related assistance"
+  ]
+}

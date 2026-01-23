@@ -11,11 +11,8 @@ from pydantic import RootModel
 
 from app.api.exports_routes import router as exports_router
 from app.api.reports_routes import router as reports_router
-from app.api.identity_routes import router as identity_router
 from app.api.admin_routes import router as admin_router
 from app.core.eligibility_decision_record import build_edr_from_evaluator
-from app.core.session_store import get_session
-from app.storage.run_store import save_run
 from app.engine.evaluator import evaluate
 from app.engine.eligibility_rules import evaluate_eligibility
 from app.exports.edr_export import write_edr_json
@@ -29,7 +26,6 @@ app = FastAPI()
 app.include_router(exports_router)
 app.include_router(reports_router)
 app.include_router(admin_router)
-app.include_router(identity_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -191,36 +187,6 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
         if export_error is None:
             export_error = "PDF generation skipped - EDR creation failed"
 
-    # 6) Save run record with identity
-    run_id = None
-    if edr is not None:
-        # Get session identity
-        session = None
-        session_id = data.get("session_id")
-        if session_id:
-            session = get_session(session_id)
-        
-        # Build run record
-        run = {
-            "session_id": session_id,
-            "full_name": session.get("full_name") if session else None,
-            "email": session.get("email") if session else None,
-            "eligibility_status": eligibility_raw.get("eligibility_status"),
-            "summary": ui_result.get("summary"),
-            "primary_reason": eligibility_raw.get("primary_reason_code"),
-            "failed_requirements": eligibility_raw.get("failed_requirements", []),
-            "answers_log": data.get("routing", {}),
-            "pdf_url": pdf_url,
-            "edr_id": edr.decision_id if edr else None,
-        }
-        
-        # Save run
-        try:
-            run_id = save_run(run)
-            logger.info(f"✓ Run saved: {run_id}")
-        except Exception as e:
-            logger.error(f"Failed to save run: {e}", exc_info=True)
-
     # Log final status
     if export_error:
         logger.error(f"Export completed with errors: {export_error}")
@@ -234,7 +200,6 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
         "edr_filename": edr_filename,
         "edr_url": edr_url,
         "pdf_url": pdf_url,
-        "run_id": run_id,
         "export_error": export_error,
         "next_field_key": None,
         "missing_fields": [],

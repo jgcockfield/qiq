@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console - QualifyIQ</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="http://gonimbleai.com/wp-content/uploads/2026/01/LOGO-QIQ-1.webp" alt="QualifyIQ" class="admin-logo" style="height:28px;width:auto;" />
+            
+</header>
+
+        <div class="layout">
+            <!-- Records List (Runs) -->
+            <aside class="list-panel" style="width: 100%;">
+                <div class="panel-header">
+                    <h2>Records</h2>
+                    <button id="refresh-btn" class="btn-secondary">Refresh</button>
+                </div>
+
+                <div id="edr-list" class="edr-list">
+                    <p class="loading">Loading...</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="/admin/admin.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,28 @@
+{
+  "run_id": "8f3883e8-181e-48dd-8fd9-1211cc7b9998",
+  "created_at": "2026-01-17T11:02:23.685724+00:00",
+  "session_id": null,
+  "full_name": null,
+  "email": null,
+  "eligibility_status": "not_eligible",
+  "summary": "",
+  "primary_reason": null,
+  "failed_requirements": [
+    "income_amount",
+    "income_duration_months",
+    "profit_loss_statements",
+    "foreign_income",
+    "passport_validity"
+  ],
+  "answers_log": {
+    "work_relationship": "business_owner",
+    "applicant_type": "individual",
+    "income_foreign_only": "no",
+    "passport_validity_months": "5",
+    "health_insurance_status": "will_obtain",
+    "background_check_available": "yes",
+    "criminal_record_flag": "yes"
+  },
+  "pdf_url": "/reports/edr_93186c27-9231-4450-bf7d-1c99af5517c5.pdf",
+  "edr_id": "93186c27-9231-4450-bf7d-1c99af5517c5"
+}

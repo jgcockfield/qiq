@@ -1,0 +1,107 @@
+{
+  "work_type": "employee",
+  "clarifications": [
+    {
+      "requirement": "income_duration_months",
+      "title": "Income History Duration",
+      "clarification": "Costa Rica’s Digital Nomad visa requires proof of income continuity for at least 12 months. Providing documentation for a shorter period prevents immigration authorities from confirming financial stability.",
+      "boundary": {
+        "minimum_requirement": "At least 12 months of documented income is required."
+      }
+    },
+    {
+      "requirement": "bank_statements",
+      "title": "Bank Statements",
+      "clarification": "Bank statements are commonly used to verify deposits and confirm that income is received consistently over time. Provide statements that clearly show deposits matching your claimed income."
+    },
+    {
+      "requirement": "pay_stubs",
+      "title": "Pay Stubs",
+      "clarification": "Pay stubs help verify employment-based income. Provide recent pay stubs that clearly show your name, employer, pay dates, and gross pay."
+    },
+    {
+      "requirement": "tax_returns",
+      "title": "Tax Returns",
+      "clarification": "When formal tax returns are unavailable, immigration authorities may accept alternative evidence that demonstrates income amount, source, and continuity over time.",
+      "secondary_evidence": [
+        {
+          "type": "employer_income_summary_letter",
+          "label": "Employer income summary letter",
+          "description": "Issued by the employer or HR department.",
+          "should_state": [
+            "Gross annual income",
+            "Employment status",
+            "Time period covered"
+          ],
+          "requirements": [
+            "The letter should be signed, dated, and issued on official company letterhead."
+          ]
+        },
+        {
+          "type": "year_end_salary_statements",
+          "label": "Year-end salary statements",
+          "description": "Annual compensation summaries issued by the employer or payroll provider.",
+          "must_clearly_show": [
+            "Gross income totals",
+            "Employer name",
+            "Year covered"
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "employment_contract",
+      "title": "Employment Contract / Letter",
+      "clarification": "When a formal employment contract or offer letter is unavailable, immigration authorities may accept alternative confirmation of employment.",
+      "secondary_evidence": [
+        {
+          "type": "employer_confirmation_letter",
+          "label": "Employer confirmation letter",
+          "description": "Written confirmation of employment from the employer.",
+          "should_state": [
+            "Job title and role",
+            "Employment status (full-time / ongoing)",
+            "Salary or compensation"
+          ],
+          "requirements": [
+            "The letter should be signed and dated by an authorized representative."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "income_amount",
+      "title": "Income Amount — Minimum Monthly Income",
+      "clarification": "Costa Rica’s Digital Nomad program requires a minimum level of monthly income. Based on your answer, the amount reported does not meet the minimum threshold for your selected category.",
+      "what_to_do": [
+        "Recheck your monthly income figure and ensure gross vs. net is used consistently.",
+        "If compensation varies, calculate a conservative monthly average.",
+        "If the amount is accurate, you may not qualify under the minimum income requirement."
+      ]
+    },
+    {
+      "requirement": "foreign_income",
+      "title": "Foreign Income — Employer and Pay Source Must Be Outside Costa Rica",
+      "clarification": "For this visa category, income must be earned from sources outside Costa Rica. Your responses indicate the income source does not meet this requirement.",
+      "what_to_do": [
+        "Confirm your employer is based outside Costa Rica.",
+        "Confirm salary payments are issued from outside Costa Rica."
+      ]
+    },
+    {
+      "requirement": "passport_validity",
+      "title": "Passport Validity — Expiration Window",
+      "clarification": "Applicants must hold a passport that remains valid beyond a minimum time window. Your passport expiration date appears too soon to satisfy this requirement.",
+      "what_to_do": [
+        "Renew your passport before applying.",
+        "Re-run the eligibility check after updating the expiration date."
+      ]
+    }
+      ,
+    {
+      "requirement": "criminal_background",
+      "title": "Criminal Background — Police Clearance",
+      "clarification": "Costa Rica requires an official police clearance certificate from the country of nationality and recent residence."
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "work_type": "business_owner",
+  "clarifications": [
+    {
+      "requirement": "tax_returns",
+      "title": "Tax Returns",
+      "clarification": "When formal business tax returns are unavailable, immigration authorities may accept alternative evidence that clearly demonstrates business income amount, source, and continuity over time.",
+      "secondary_evidence": [
+        {
+          "type": "accountant_income_summary_letter",
+          "label": "CPA or accountant income summary letter",
+          "description": "Must be prepared by a licensed accountant or tax professional.",
+          "should_state": [
+            "Total business income earned over the past 12 months",
+            "Source(s) of business revenue",
+            "Time period covered"
+          ],
+          "requirements": [
+            "The letter should be signed, dated, and issued on professional letterhead.",
+            "Supporting financial documents may still be requested."
+          ]
+        },
+        {
+          "type": "year_end_financial_statements",
+          "label": "Year-end financial statements",
+          "description": "Annual financial summaries prepared by an accountant or accounting system.",
+          "must_clearly_show": [
+            "Gross business income totals",
+            "Business name or entity",
+            "Year covered"
+          ],
+          "notes": [
+            "Self-generated statements without professional verification may require additional review."
+          ]
+        },
+        {
+          "type": "business_bank_statements",
+          "label": "Business bank statements showing revenue",
+          "description": "Bank statements from business accounts showing consistent revenue deposits.",
+          "must_include": [
+            "Business account holder name",
+            "Monthly revenue deposits totaling minimum income requirement",
+            "12-month transaction history"
+          ],
+          "notes": [
+            "Statements should clearly distinguish business revenue from personal transfers or loans."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "profit_loss_statements",
+      "title": "Profit & Loss Statements",
+      "clarification": "When formal profit and loss statements are unavailable, immigration authorities may accept alternative evidence that demonstrates business profitability and income stability.",
+      "secondary_evidence": [
+        {
+          "type": "accountant_prepared_financials",
+          "label": "Accountant-prepared financial summaries",
+          "description": "Financial summaries or reports prepared by a licensed accountant.",
+          "should_state": [
+            "Monthly or quarterly revenue and expenses",
+            "Net income or profit figures",
+            "Time period covered (minimum 12 months)"
+          ],
+          "requirements": [
+            "Must be signed and dated by the accountant on professional letterhead."
+          ]
+        },
+        {
+          "type": "business_bank_statements",
+          "label": "Business bank statements",
+          "description": "Bank statements showing consistent business income deposits minus expenses.",
+          "must_clearly_show": [
+            "Regular revenue deposits",
+            "Business operating expenses",
+            "Net positive cash flow meeting minimum income requirement"
+          ],
+          "notes": [
+            "Statements covering 12 months strengthen proof of income stability."
+          ]
+        },
+        {
+          "type": "accounting_software_reports",
+          "label": "Accounting software reports",
+          "description": "P&L reports generated from recognized accounting platforms (QuickBooks, Xero, etc.).",
+          "must_include": [
+            "Business name or account identifier",
+            "Monthly revenue and expense breakdown",
+            "12-month summary showing net income"
+          ],
+          "notes": [
+            "Reports should include platform branding or export certification."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "bank_statements",
+      "title": "Bank Statements",
+      "clarification": "When business bank statements are unavailable or incomplete, immigration authorities may accept alternative evidence that demonstrates consistent business income deposits over the required time period.",
+      "secondary_evidence": [
+        {
+          "type": "payment_processor_statements",
+          "label": "Payment processor statements",
+          "description": "Transaction records from payment platforms (Stripe, PayPal, Square, etc.) showing business revenue.",
+          "must_include": [
+            "Business account identifier",
+            "Monthly revenue totals meeting minimum income requirement",
+            "12-month transaction history"
+          ],
+          "notes": [
+            "Screenshots should include platform branding and business name verification."
+          ]
+        },
+        {
+          "type": "accountant_verified_income_letter",
+          "label": "Accountant-verified income confirmation",
+          "description": "Written confirmation from a licensed accountant verifying business income deposits.",
+          "should_state": [
+            "Monthly business income over the past 12 months",
+            "Source and method of income verification",
+            "Confirmation that income meets minimum threshold"
+          ],
+          "requirements": [
+            "Must be signed and dated by licensed accountant on professional letterhead.",
+            "Accountant must confirm they have reviewed underlying financial records."
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "income_duration_months",
+      "title": "Income Duration — 12-Month Requirement",
+      "clarification": "Costa Rica's Digital Nomad visa requires proof of stable business income for at least 12 consecutive months. If you can only provide documentation for fewer months, additional evidence may be required.",
+      "secondary_evidence": [
+        {
+          "type": "extended_bank_statements",
+          "label": "Extended business bank statements",
+          "description": "Bank statements from business accounts covering the full 12-month period.",
+          "should_state": [
+            "Consistent monthly revenue deposits meeting minimum income requirement",
+            "Business account holder name",
+            "Full 12-month date range"
+          ]
+        },
+        {
+          "type": "accountant_confirmation_letter",
+          "label": "Accountant confirmation of income duration",
+          "description": "Written confirmation from a licensed accountant verifying duration of business income.",
+          "should_state": [
+            "Duration of business operations",
+            "Confirmation of consistent income generation over specified period",
+            "Monthly or annual income amounts"
+          ],
+          "requirements": [
+            "Signed and dated by licensed accountant on professional letterhead"
+          ]
+        },
+        {
+          "type": "business_registration_and_financial_records",
+          "label": "Business registration with supporting financial records",
+          "description": "Official business registration documents combined with financial evidence showing operational history.",
+          "must_include": [
+            "Business registration date proving 12+ months of operation",
+            "Supporting financial records (bank statements, tax filings, etc.)",
+            "Evidence of continuous revenue generation"
+          ]
+        }
+      ]
+    },
+    {
+      "requirement": "income_amount",
+      "title": "Income Amount — Minimum Monthly Income",
+      "clarification": "Costa Rica's Digital Nomad program requires a minimum level of monthly business income. Based on your answer, the amount reported does not meet the minimum threshold for your selected category.",
+      "what_to_do": [
+        "Recheck your monthly business income figure and currency conversion (use a consistent monthly average).",
+        "If business income fluctuates seasonally, calculate a conservative 12-month average.",
+        "If the amount is accurate, you may not qualify under the minimum income requirement."
+      ]
+    },
+    {
+      "requirement": "foreign_income",
+      "title": "Foreign Income — Business Revenue Must Be Earned Outside Costa Rica",
+      "clarification": "For this visa category, qualifying income must be earned from business activities outside Costa Rica. Your responses indicate the income source does not meet this requirement.",
+      "what_to_do": [
+        "Confirm that the revenue supporting your application is earned from clients or customers outside Costa Rica.",
+        "If revenue is mixed (both Costa Rican and foreign sources), you may need to demonstrate that qualifying foreign-sourced income meets the minimum threshold.",
+        "Provide documentation clearly showing the geographic source of your business revenue."
+      ]
+    },
+    {
+      "requirement": "passport_validity",
+      "title": "Passport Validity — Expiration Window",
+      "clarification": "Applicants must hold a passport that remains valid beyond a minimum time window. Your passport expiration date appears too soon to satisfy this requirement.",
+      "what_to_do": [
+        "Renew your passport before applying.",
+        "Re-run the eligibility check after updating the expiration date."
+      ]
+    }
+  ]
+}

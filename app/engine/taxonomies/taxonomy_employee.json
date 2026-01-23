@@ -1,25 +1,24 @@
 {
-"work_relationship": "employee",
-"taxonomy_fields": [
-{
-"key": "identity.full_name",
-"depends_on": []
-},
-{
-"key": "identity.email",
-"depends_on": ["identity.full_name"]
-},
-{
-"key": "identity.nationality",
-"depends_on": ["identity.full_name"]
-},
-{
-"key": "employment.employer_name",
-"depends_on": ["identity.full_name"]
-},
-{
-"key": "employment.monthly_income",
-"depends_on": ["identity.full_name"]
-}
-]
+  "work_relationship": "employee",
+  "taxonomy_fields": [
+    { "key": "routing.work_relationship", "depends_on": [] },
+    { "key": "routing.applicant_type", "depends_on": ["routing.work_relationship"] },
+
+    { "key": "role.employee.monthly_income_usd", "depends_on": ["routing.work_relationship"], "label": "What is your gross monthly salary (USD)?", "input_type": "number" },
+    { "key": "routing.income_foreign_only", "depends_on": ["routing.work_relationship"], "label": "Is all of your income sourced from outside Costa Rica?", "input_type": "choice", "choices": ["yes", "no"] },
+
+    { "key": "role.employee.income_evidence_types", "depends_on": ["routing.work_relationship"], "label": "Which documents can you provide as proof of income?", "input_type": "multi_choice", "choices": ["bank_statements", "pay_stubs", "employment_contract", "tax_returns", "other"] },
+    { "key": "role.employee.income_evidence_months", "depends_on": ["role.employee.income_evidence_types"], "label": "For how many months can you prove this income with those documents?", "input_type": "choice", "choices": ["3", "6", "9", "12"] },
+
+    { "key": "routing.dependents_count", "depends_on": ["routing.applicant_type"], "label": "How many dependents are included in your application?", "input_type": "number", "applies_when": { "equals": ["routing.applicant_type", "family"] } },
+    { "key": "routing.dependent_relationships", "depends_on": ["routing.dependents_count"], "label": "What is each dependent’s relationship to you?", "input_type": "text", "applies_when": { "equals": ["routing.applicant_type", "family"] } },
+    { "key": "routing.dependent_ages", "depends_on": ["routing.dependents_count"], "label": "What is the age of each dependent?", "input_type": "text", "applies_when": { "equals": ["routing.applicant_type", "family"] } },
+
+    { "key": "identity.nationality", "depends_on": [], "label": "What is your nationality?", "input_type": "text" },
+    { "key": "routing.passport_validity_months", "depends_on": [], "label": "How many months will your passport be valid from your intended entry date?", "input_type": "number" },
+    { "key": "routing.health_insurance_status", "depends_on": [], "label": "Do you have qualifying health insurance for Costa Rica, or will you obtain it?", "input_type": "choice", "choices": ["have_it", "will_obtain"] },
+
+    { "key": "routing.background_check_available", "depends_on": [], "label": "Can you obtain a criminal background check from your country of residence?", "input_type": "choice", "choices": ["yes", "no"] },
+    { "key": "routing.criminal_record_flag", "depends_on": ["routing.background_check_available"], "label": "Do you have any criminal convictions that may appear on your background check?", "input_type": "choice", "choices": ["yes", "no"] }
+  ]
 }
