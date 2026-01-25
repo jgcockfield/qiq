@@ -485,6 +485,8 @@
         row.appendChild(bubble);
         wrap.appendChild(row);
 
+        
+
         if(Array.isArray(m.choices) && m.choices.length){
           const choices = document.createElement("div");
           choices.className = "choices";
@@ -744,7 +746,8 @@
         setStatus("Error");
         chat.messages.push({
           role: "assistant",
-          text: `Engine call failed.\n${String(err.message || err)}`,
+          text: `Engine call failed.
+${String(err.message || err)}`,
         });
         chat.updated_at = nowIso();
         saveChats();
@@ -835,7 +838,8 @@
         setStatus("Error");
         chat.messages.push({
           role: "assistant",
-          text: `Engine call failed.\n${String(err.message || err)}`,
+          text: `Engine call failed.
+${String(err.message || err)}`,
         });
         chat.updated_at = nowIso();
         saveChats();
@@ -939,3 +943,9 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
