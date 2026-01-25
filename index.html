@@ -261,7 +261,7 @@
      *****************************************************************/
     // If /evaluate is served on the SAME origin as this page, leave API_URL = "".
     // If different origin (e.g., https://api.gonimbleai.com), set it here.
-    const API_URL = "http://127.0.0.1:8000";
+    const API_URL = "";
     const EVALUATE_PATH = "/evaluate"; // FastAPI endpoint
 
 
@@ -484,8 +484,6 @@
 
         row.appendChild(bubble);
         wrap.appendChild(row);
-
-        
 
         if(Array.isArray(m.choices) && m.choices.length){
           const choices = document.createElement("div");
@@ -746,8 +744,7 @@
         setStatus("Error");
         chat.messages.push({
           role: "assistant",
-          text: `Engine call failed.
-${String(err.message || err)}`,
+          text: `Engine call failed.\n${String(err.message || err)}`,
         });
         chat.updated_at = nowIso();
         saveChats();
@@ -838,8 +835,7 @@ ${String(err.message || err)}`,
         setStatus("Error");
         chat.messages.push({
           role: "assistant",
-          text: `Engine call failed.
-${String(err.message || err)}`,
+          text: `Engine call failed.\n${String(err.message || err)}`,
         });
         chat.updated_at = nowIso();
         saveChats();
@@ -943,8 +939,3 @@ ${String(err.message || err)}`,
   </script>
 </body>
 </html>
-
-
-
-
-
