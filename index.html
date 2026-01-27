@@ -424,6 +424,18 @@
 
 
     /*****************************************************************
+     * HELPER: Format choice labels
+     *****************************************************************/
+    function formatChoiceLabel(label){
+      if(!label) return label;
+      return String(label)
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+    }
+
+
+    /*****************************************************************
      * RENDER
      *****************************************************************/
     function renderChatList(){
@@ -506,7 +518,7 @@
             const chip = document.createElement("button");
             chip.className = "chip";
             chip.type = "button";
-            chip.textContent = choice;
+            chip.textContent = formatChoiceLabel(choice);
             chip.disabled = !isActiveQuestion;
 
             if(isMulti && chatState && fieldKey){
@@ -943,8 +955,3 @@ ${String(err.message || err)}`,
   </script>
 </body>
 </html>
-
-
-
-
-
