@@ -247,6 +247,7 @@
   <div class="app">
 
     <div class="topbar">
+      <button id="sidebarToggle" class="btn secondary" aria-label="Toggle menu">☰</button>
       <div class="brand"><span class="brand-dot"></span> QualifyIQ</div>
       <div class="topbar-spacer"></div>
       <div class="status" id="status">Disconnected</div>
@@ -968,6 +969,15 @@ ${String(err.message || err)}`,
       if(btn) btn.disabled = false;
       setStatus("Error");
     });
+
+    // Sidebar toggle (mobile)
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    if(toggleBtn && sidebar){
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+    }
 
     window.addEventListener("unhandledrejection", () => {
       const btn = document.getElementById("sendBtn");
