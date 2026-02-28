@@ -361,6 +361,14 @@
         .replaceAll("'","&#039;");
     }
 
+    // Display-only label normalization (keep raw values for the engine)
+    function displayChoiceLabel(v){
+      return String(v ?? "")
+        .replaceAll("_", " ")
+        .replaceAll(/\s+/g, " ")
+        .trim();
+    }
+
     function buildCompletionText(raw, exports){
       exports = exports || {};
       const meta = raw.meta || {};
@@ -548,7 +556,7 @@
             const chip = document.createElement("button");
             chip.className = "chip";
             chip.type = "button";
-            chip.textContent = choice;
+            chip.textContent = displayChoiceLabel(choice);
             chip.disabled = !isActiveQuestion;
 
             if(isMulti && chatState && fieldKey){
@@ -572,9 +580,7 @@
                 if(!isActiveQuestion) return;
                 // UI never infers next question. A chip click is just a convenience to submit a value.
                 const input = document.getElementById("textInput");
-                input.value = choice;
-                autosize(input);
-                sendCurrent();
+                sendValue(fieldKey, choice, displayChoiceLabel(choice));
               };
             }
 
@@ -819,7 +825,7 @@ ${String(err.message || err)}`,
       chat.pending_multi[fieldKey] = [];
       saveChats();
 
-      await sendValue(fieldKey, selected, selected.join(", "));
+      await sendValue(fieldKey, selected, selected.map(displayChoiceLabel).join(", "));
     }
 
     async function sendCurrent(){
