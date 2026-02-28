@@ -38,6 +38,19 @@
       border-bottom:1px solid var(--border);
       background:var(--bg);
     }
+    .iconbtn{
+      width:34px;
+      height:34px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:#111;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+      user-select:none;
+      display:none; /* mobile only */
+    }
+    .iconbtn:active{ transform:translateY(1px); }
     .brand{ display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; }
     .brand-dot{ width:18px; height:18px; border-radius:6px; background:#111; }
     .topbar-spacer{ flex:1; }
@@ -45,6 +58,32 @@
 
     /* Body split */
     .body{ flex:1; min-height:0; display:flex; }
+
+    .sidebar-scrim{
+      display:none;
+      position:fixed;
+      inset:44px 0 0 0;
+      background:rgba(0,0,0,0.18);
+      z-index:40;
+    }
+
+    /* Mobile sidebar toggle */
+    @media (max-width: 860px){
+      .iconbtn{ display:inline-flex; align-items:center; justify-content:center; }
+      .sidebar{
+        position:fixed;
+        top:44px;
+        left:0;
+        bottom:0;
+        width:260px;
+        transform:translateX(-110%);
+        transition:transform .18s ease;
+        z-index:50;
+        box-shadow:0 8px 28px rgba(0,0,0,0.18);
+      }
+      .body.sidebar-open .sidebar{ transform:translateX(0); }
+      .body.sidebar-open .sidebar-scrim{ display:block; }
+    }
 
     /* Sidebar */
     .sidebar{
@@ -224,18 +263,21 @@
   <div class="app">
 
     <div class="topbar">
+      <button class="iconbtn" id="sidebarToggle" aria-label="Toggle sidebar" title="Menu">☰</button>
       <div class="brand"><span class="brand-dot"></span> QualifyIQ</div>
       <div class="topbar-spacer"></div>
       <div class="status" id="status">Disconnected</div>
     </div>
 
-    <div class="body">
+    <div class="body" id="body">
 
       <aside class="sidebar">
         <button class="btn" id="newChatBtn">+ New Chat</button>
         <div class="chatlist" id="chatList"></div>
         <button class="btn secondary" id="clearStorageBtn" title="Local only">Clear local</button>
       </aside>
+
+      <div class="sidebar-scrim" id="sidebarScrim"></div>
 
       <main class="main">
         <div class="messages" id="messages"><div class="messages-inner" id="messagesInner"></div></div>
@@ -909,6 +951,22 @@ ${String(err.message || err)}`,
       activeChatId = null;
       refresh();
       bootstrapEngine();
+    });
+
+    // Mobile sidebar toggle (layout only)
+    const bodyEl = document.getElementById("body");
+    const toggleBtn = document.getElementById("sidebarToggle");
+    const scrimEl = document.getElementById("sidebarScrim");
+
+    function closeSidebar(){ bodyEl.classList.remove("sidebar-open"); }
+    function toggleSidebar(){ bodyEl.classList.toggle("sidebar-open"); }
+
+    if(toggleBtn) toggleBtn.addEventListener("click", toggleSidebar);
+    if(scrimEl) scrimEl.addEventListener("click", closeSidebar);
+
+    // Close sidebar after selecting a chat on mobile
+    document.getElementById("chatList").addEventListener("click", () => {
+      if(window.matchMedia && window.matchMedia("(max-width: 860px)").matches) closeSidebar();
     });
 
     /*****************************************************************
