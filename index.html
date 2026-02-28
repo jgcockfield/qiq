@@ -363,10 +363,13 @@
 
     // Display-only label normalization (keep raw values for the engine)
     function displayChoiceLabel(v){
-      return String(v ?? "")
+      const cleaned = String(v ?? "")
         .replaceAll("_", " ")
-        .replaceAll(/\s+/g, " ")
-        .trim();
+        .replaceAll(/\\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+      return cleaned.replace(/\\b\\w/g, c => c.toUpperCase());
     }
 
     function buildCompletionText(raw, exports){
