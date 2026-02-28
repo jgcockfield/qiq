@@ -97,8 +97,7 @@
       min-height:0;
       overflow:auto;
       padding:18px 0;
-      display:flex;
-      justify-content:center;
+      display:block; /* remove flex centering so bottom padding works */
       position:relative;
       background: url('https://qiq.gonimbleai.com/images/chatbot_bg.jpg') center center / cover no-repeat;
     }
@@ -115,7 +114,7 @@
       position:relative;
       width:100%;
       max-width:var(--composer-max);
-      padding:0 18px 180px; /* tuned for mobile (70% traffic) */ /* bottom space so last message clears composer */
+      padding:0 18px 180px; /* static mobile spacing */
       display:flex;
       flex-direction:column;
     }
@@ -566,6 +565,7 @@
       }
 
       // Auto-scroll the visible scroll container (#messages), not the inner wrapper.
+      
       const messagesEl = document.getElementById("messages");
       requestAnimationFrame(() => {
         messagesEl.scrollTop = messagesEl.scrollHeight;
