@@ -365,11 +365,11 @@
     function displayChoiceLabel(v){
       const cleaned = String(v ?? "")
         .replaceAll("_", " ")
-        .replaceAll(/\\s+/g, " ")
+        .replaceAll(/\s+/g, " ")
         .trim()
         .toLowerCase();
 
-      return cleaned.replace(/\\b\\w/g, c => c.toUpperCase());
+      return cleaned.replace(/\b\w/g, c => c.toUpperCase());
     }
 
     function buildCompletionText(raw, exports){
