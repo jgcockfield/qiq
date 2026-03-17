@@ -60,17 +60,23 @@ def _nav_response(res: Dict[str, Any]) -> Dict[str, Any]:
     """Navigation-only response (no eligibility, no exports)."""
 
     return {
-        "result": None,
-        "edr_id": None,
-        "edr_path": None,
-        "edr_filename": None,
-        "edr_url": None,
-        "pdf_url": None,
-        "next_field_key": res.get("next_field_key"),
-        "missing_fields": res.get("missing_fields", []),
-        "field": res.get("field"),
-        "overlay_work_type": res.get("overlay_work_type"),
-        "overlay_version": res.get("overlay_version"),
+        "result": ui_result,
+        "edr_id": (edr.decision_id if edr else None),
+        "edr_path": edr_path,
+        "edr_filename": edr_filename,
+        "edr_url": edr_url,
+        "pdf_url": pdf_url,
+        "run_id": run_id,
+        "export_error": export_error,
+        "chat_log": {
+            "input": data,
+            "response": ui_result,
+        },
+        "next_field_key": None,
+        "missing_fields": [],
+        "field": None,
+        "overlay_work_type": None,
+        "overlay_version": None,
     }
 
 
@@ -225,6 +231,10 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
             "answers_log": data.get("routing", {}),
             "pdf_url": pdf_url,
             "edr_id": edr.decision_id if edr else None,
+            "chat_log": {
+                "input": data,
+                "response": ui_result,
+            },
         }
 
         # Save run
