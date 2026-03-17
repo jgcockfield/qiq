@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1", interactive-widget="resizes-content"/> 
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QualifyIQ</title>
   <link rel="icon" href="data:," />
 
@@ -230,7 +230,7 @@
       border-radius:18px;
       padding:12px 14px;
       font-family:var(--font);
-      font-size:16px;
+      font-size:13px;
       outline:none;
       min-height:44px;
       max-height:140px;
@@ -465,7 +465,7 @@
         return `<a href="${abs}" target="_blank" rel="noopener" style="display:inline-block; padding:8px 10px; border-radius:999px; border:1px solid #111; background:#111; color:#fff; text-decoration:none; font-size:12px;">${label}</a>`;
       };
 
-      const edrLink = mkLink(exports.edr_url, "Download JSON");
+      const edrLink = mkLink("https://calendly.com/nimbleai/30min", "Book a Call");
       const pdfLink = mkLink(exports.pdf_url, "Download PDF");
 
       if(edrLink || pdfLink){
