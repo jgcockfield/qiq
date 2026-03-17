@@ -7,6 +7,7 @@ from typing import Any, Dict
 from fastapi import Body, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import RootModel
 
 from app.api.exports_routes import router as exports_router
@@ -26,6 +27,12 @@ from app.engine.output_builder import build_output
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+# Serve Chat UI at root
+@app.get("/")
+def serve_chat_ui():
+    return FileResponse("index.html")
+
 app.include_router(exports_router)
 app.include_router(reports_router)
 app.include_router(admin_router)
@@ -93,27 +100,31 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
             "routing": eligibility_raw.get("routing") or data.get("routing", {}),
         }
     )
-    
+
     print(f"DEBUG: ui_result type: {type(ui_result)}")
-    print(f"DEBUG: ui_result keys: {ui_result.keys() if isinstance(ui_result, dict) else 'NOT A DICT'}")
-    if isinstance(ui_result, dict) and 'meta' in ui_result:
+    print(
+        f"DEBUG: ui_result keys: {ui_result.keys() if isinstance(ui_result, dict) else 'NOT A DICT'}"
+    )
+    if isinstance(ui_result, dict) and "meta" in ui_result:
         print(f"DEBUG: ui_result.meta.status = {ui_result.get('meta', {}).get('status')}")
     print(f"DEBUG: eligibility_raw.eligibility_status BEFORE fix = {eligibility_raw.get('eligibility_status')}")
-    
+
     # FIX: Map ui_result.meta.status back to eligibility_raw for EDR validation
     # This prevents "eligibility_status must be 'eligible', 'needs_review', or 'not_eligible'" error
     if eligibility_raw.get("eligibility_status") is None and ui_result:
         meta_status = ui_result.get("meta", {}).get("status")
         if meta_status:
-            logger.info(f"Mapping ui_result.meta.status='{meta_status}' to eligibility_raw.eligibility_status")
+            logger.info(
+                f"Mapping ui_result.meta.status='{meta_status}' to eligibility_raw.eligibility_status"
+            )
             eligibility_raw["eligibility_status"] = meta_status
         else:
             logger.warning("No status in ui_result.meta, defaulting eligibility_status='needs_review'")
             eligibility_raw["eligibility_status"] = "needs_review"
-    
+
     print(f"DEBUG: eligibility_raw.eligibility_status AFTER fix = {eligibility_raw.get('eligibility_status')}")
     print("=" * 80)
-    
+
     # 5) Build + persist EDR + PDF
     edr = None
     edr_path = None
@@ -125,7 +136,7 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
     # 5a) Build + persist EDR with comprehensive error handling
     try:
         logger.info("Building EDR from evaluator...")
-        
+
         edr = build_edr_from_evaluator(
             request_like=data,
             eligibility_result_like=eligibility_raw,
@@ -140,7 +151,7 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
         edr_filename = os.path.basename(edr_path)
         edr_url = f"/exports/{edr_filename}"
         logger.info(f"✓ EDR created successfully: {edr_filename}")
-        
+
     except ImportError as e:
         error_msg = f"EDR module import failed: {e}"
         logger.error(error_msg, exc_info=True)
@@ -161,11 +172,13 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
     # 5b) Generate PDF only if EDR exists - with comprehensive error handling
     if edr is not None:
         try:
-            logger.info(f"Generating PDF for EDR: {edr.decision_id if hasattr(edr, 'decision_id') else 'unknown'}...")
+            logger.info(
+                f"Generating PDF for EDR: {edr.decision_id if hasattr(edr, 'decision_id') else 'unknown'}..."
+            )
             pdf_filename, _pdf_path = render_pdf(edr)
             pdf_url = f"/reports/{pdf_filename}"
             logger.info(f"✓ PDF generated successfully: {pdf_filename}")
-            
+
         except ImportError as e:
             error_msg = f"PDF library missing (install required dependencies): {e}"
             logger.error(error_msg, exc_info=True)
@@ -199,7 +212,7 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
         session_id = data.get("session_id")
         if session_id:
             session = get_session(session_id)
-        
+
         # Build run record
         run = {
             "session_id": session_id,
@@ -213,7 +226,7 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
             "pdf_url": pdf_url,
             "edr_id": edr.decision_id if edr else None,
         }
-        
+
         # Save run
         try:
             run_id = save_run(run)
