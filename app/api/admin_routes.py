@@ -83,4 +83,24 @@ async def get_edr(edr_id: str) -> Dict[str, Any]:
 @router.get("/runs")
 def list_runs_api():
     """List completed eligibility runs (records table source)."""
-    return list_runs()
+    runs = list_runs()
+
+    # Ensure chat_log is included for UI access
+    for r in runs:
+        if "chat_log" not in r:
+            r["chat_log"] = None
+
+    return runs
+
+
+@router.get("/runs/{run_id}")
+def get_run(run_id: str):
+    """Get a single run including chat history."""
+    runs = list_runs()
+    for r in runs:
+        if str(r.get("id") or r.get("run_id")) == run_id:
+            return r
+    raise HTTPException(status_code=404, detail="Run not found")
+
+
+
