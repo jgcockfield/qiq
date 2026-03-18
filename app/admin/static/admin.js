@@ -81,6 +81,7 @@ function renderRunsTable(runs) {
 
         // CLICK → load chat history
         row.addEventListener('click', async () => {
+            console.log("ROW CLICKED", run);
             try {
                 const id = run.id || run.run_id;
                 const res = await fetch(`/admin/api/runs/${id}`);
