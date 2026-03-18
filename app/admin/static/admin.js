@@ -113,9 +113,7 @@ async function openChatModal(run) {
         const res = await fetch(`/admin/api/runs/${id}`);
         const data = await res.json();
 
-        const chatLog = data.chat_log;
-        const input = chatLog?.input || {};
-        const routing = input.routing || {};
+        const routing = data.answers_log || data.chat_log?.input?.routing || {};
         const entries = Object.entries(routing);
 
         if (entries.length === 0) {
