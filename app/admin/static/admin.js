@@ -3,19 +3,16 @@
  * Runs-based Records table (source: /admin/api/runs)
  */
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadRuns();
 
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', loadRuns);
 
-    // Close modal on backdrop click
     document.getElementById('chat-modal').addEventListener('click', (e) => {
         if (e.target === document.getElementById('chat-modal')) closeModal();
     });
 
-    // Close modal on Escape
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeModal();
     });
@@ -49,7 +46,6 @@ function renderRunsTable(runs) {
     const listContainer = document.getElementById('edr-list');
     listContainer.innerHTML = '';
 
-    // Header row
     const header = document.createElement('div');
     header.className = 'edr-item';
     header.innerHTML = `
@@ -63,14 +59,12 @@ function renderRunsTable(runs) {
     `;
     listContainer.appendChild(header);
 
-    // Data rows
     runs.forEach((run) => {
         const row = document.createElement('div');
         row.className = 'edr-item';
 
         const status = (run.eligibility_status || 'unknown');
         const statusClass = `status-${String(status).replace('_', '-')}`;
-
         const created = run.created_at ? new Date(run.created_at).toLocaleString() : '—';
         const fullName = run.full_name || '—';
         const email = run.email || '—';
@@ -85,7 +79,6 @@ function renderRunsTable(runs) {
             </div>
         `;
 
-        // View link click -> open chat modal
         row.querySelector('.view-chat-link').addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -113,8 +106,23 @@ async function openChatModal(run) {
         const res = await fetch(`/admin/api/runs/${id}`);
         const data = await res.json();
 
-        const routing = data.answers_log || data.chat_log?.input?.routing || {};
-        const entries = Object.entries(routing);
+        // Collect all answers from routing + role sections
+        const input = data.chat_log?.input || {};
+        const routing = input.routing || {};
+        const role = input.role || {};
+
+        // Flatten role fields (e.g. role.contractor.monthly_income_usd)
+        const roleFields = {};
+        for (const [roleKey, roleData] of Object.entries(role)) {
+            if (typeof roleData === 'object' && roleData !== null) {
+                for (const [k, v] of Object.entries(roleData)) {
+                    roleFields[k] = v;
+                }
+            }
+        }
+
+        const allAnswers = { ...routing, ...roleFields };
+        const entries = Object.entries(allAnswers);
 
         if (entries.length === 0) {
             modalBody.innerHTML = '<p style="color:#666;padding:20px;">No answers recorded for this session.</p>';
