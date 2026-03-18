@@ -79,6 +79,20 @@ function renderRunsTable(runs) {
             </div>
         `;
 
+        // CLICK → load chat history
+        row.addEventListener('click', async () => {
+            try {
+                const id = run.id || run.run_id;
+                const res = await fetch(`/admin/api/runs/${id}`);
+                const data = await res.json();
+
+                console.log('CHAT LOG:', data.chat_log);
+                alert('Check console for chat history');
+            } catch (e) {
+                console.error('Failed to load run detail', e);
+            }
+        });
+
         listContainer.appendChild(row);
     });
 }
