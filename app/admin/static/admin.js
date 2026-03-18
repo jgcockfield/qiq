@@ -9,6 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) refreshBtn.addEventListener('click', loadRuns);
+
+    // Close modal on backdrop click
+    document.getElementById('chat-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('chat-modal')) closeModal();
+    });
+
+    // Close modal on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
 });
 
 async function loadRuns() {
@@ -65,37 +75,85 @@ function renderRunsTable(runs) {
         const fullName = run.full_name || '—';
         const email = run.email || '—';
 
-        const pdfCell = run.pdf_url
-            ? `<a href="${run.pdf_url}" target="_blank" rel="noopener noreferrer">View</a>`
-            : '—';
-
         row.innerHTML = `
             <div class="edr-item-header" style="display:grid;grid-template-columns:140px 220px 1fr 1fr 80px;gap:12px;align-items:center;">
                 <span class="badge ${statusClass}">${status}</span>
                 <span>${created}</span>
                 <span>${escapeHtml(fullName)}</span>
                 <span>${escapeHtml(email)}</span>
-                <span>${pdfCell}</span>
+                <span><a href="#" class="view-chat-link">View</a></span>
             </div>
         `;
 
-        // CLICK → load chat history
-        row.addEventListener('click', async () => {
-            console.log("ROW CLICKED", run);
-            try {
-                const id = run.id || run.run_id;
-                const res = await fetch(`/admin/api/runs/${id}`);
-                const data = await res.json();
-
-                console.log('CHAT LOG:', data.chat_log);
-                alert('Check console for chat history');
-            } catch (e) {
-                console.error('Failed to load run detail', e);
-            }
+        // View link click -> open chat modal
+        row.querySelector('.view-chat-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            await openChatModal(run);
         });
 
         listContainer.appendChild(row);
     });
+}
+
+async function openChatModal(run) {
+    const modal = document.getElementById('chat-modal');
+    const modalBody = document.getElementById('chat-modal-body');
+    const modalTitle = document.getElementById('chat-modal-title');
+
+    modalBody.innerHTML = '<p style="color:#666;padding:20px;">Loading...</p>';
+    modal.style.display = 'flex';
+
+    const created = run.created_at ? new Date(run.created_at).toLocaleString() : '—';
+    const status = run.eligibility_status || 'unknown';
+    modalTitle.textContent = `${run.full_name || 'Anonymous'} — ${created} — ${status}`;
+
+    try {
+        const id = run.id || run.run_id;
+        const res = await fetch(`/admin/api/runs/${id}`);
+        const data = await res.json();
+
+        const chatLog = data.chat_log;
+        const input = chatLog?.input || {};
+        const routing = input.routing || {};
+        const entries = Object.entries(routing);
+
+        if (entries.length === 0) {
+            modalBody.innerHTML = '<p style="color:#666;padding:20px;">No answers recorded for this session.</p>';
+            return;
+        }
+
+        let html = '<div style="display:flex;flex-direction:column;gap:12px;">';
+
+        entries.forEach(([key, value]) => {
+            const label = formatKey(key);
+            const answer = Array.isArray(value) ? value.join(', ') : String(value ?? '—');
+            html += `
+                <div style="border-bottom:1px solid #f0f0f0;padding-bottom:12px;">
+                    <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">${escapeHtml(label)}</div>
+                    <div style="font-size:14px;color:#111;font-weight:500;">${escapeHtml(answer)}</div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        modalBody.innerHTML = html;
+
+    } catch (e) {
+        console.error('Failed to load run detail', e);
+        modalBody.innerHTML = '<p style="color:#ef4444;padding:20px;">Failed to load chat log.</p>';
+    }
+}
+
+function closeModal() {
+    document.getElementById('chat-modal').style.display = 'none';
+}
+
+function formatKey(key) {
+    return String(key)
+        .replace(/_/g, ' ')
+        .replace(/\./g, ' > ')
+        .replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function escapeHtml(value) {
