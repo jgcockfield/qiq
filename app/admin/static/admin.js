@@ -48,7 +48,7 @@ function renderRunsTable(runs) {
             <strong>Created</strong>
             <strong>Name</strong>
             <strong>Email</strong>
-            <strong>PDF</strong>
+            <strong>Chat Log</strong>
         </div>
     `;
     listContainer.appendChild(header);
@@ -66,7 +66,7 @@ function renderRunsTable(runs) {
         const email = run.email || '—';
 
         const pdfCell = run.pdf_url
-            ? `<a href="${run.pdf_url}" target="_blank" rel="noopener noreferrer">PDF</a>`
+            ? `<a href="${run.pdf_url}" target="_blank" rel="noopener noreferrer">View</a>`
             : '—';
 
         row.innerHTML = `
