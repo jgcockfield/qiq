@@ -1,32 +1,28 @@
 /**
  * QIQ Widget — Embed Script
  *
- * Drop this ONE tag anywhere on a client page:
+ * Add one <div> per widget and a single <script> tag anywhere on the page:
  *
- *   <script src="https://your-host/widget/embed.js"
- *           data-api-base="https://your-api.com"
- *           data-calendly-url="https://calendly.com/your-link"
- *           data-pathway="portugal_d7"
- *           data-company-name="Great Expatations">
- *   </script>
+ *   <div data-qiq-widget
+ *        data-api-base="https://your-api.com"
+ *        data-calendly-url="https://calendly.com/your-link"
+ *        data-pathway="portugal_d7"
+ *        data-company-name="Great Expatations">
+ *   </div>
+ *   <script src="https://your-host/widget/embed.js"></script>
  *
- * Optional: target an existing element instead of auto-inserting:
- *           data-container="#my-div"
- *
- * Multiple instances on the same page are supported — each gets isolated
- * element refs via data-qiq-ref scoped to its root element.
+ * Multiple [data-qiq-widget] elements on the same page are supported — each
+ * reads its own data attributes and gets isolated element refs via data-qiq-ref.
  */
 (function () {
   "use strict";
 
   console.log('[QIQ embed] Script loaded, readyState:', document.readyState);
 
-  // Capture currentScript synchronously — it's null once the IIFE returns
+  // Capture currentScript synchronously — needed for baseUrl(), null once IIFE returns
   var SCRIPT_EL = document.currentScript;
 
   // ── Widget HTML template ────────────────────────────────────────────────────
-  // data-qiq-ref attributes are the binding points; no id= collisions between
-  // multiple instances on the same page.
   var WIDGET_HTML = [
     '<div class="qiq-header">',
     '  <div class="qiq-header-logo">Q</div>',
@@ -88,10 +84,6 @@
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
-  function attr(name, fallback) {
-    return (SCRIPT_EL && SCRIPT_EL.getAttribute(name)) || fallback;
-  }
-
   function baseUrl() {
     // Derive asset root from this script's own src URL
     var src = (SCRIPT_EL && SCRIPT_EL.src) || "";
@@ -116,43 +108,41 @@
     document.head.appendChild(s);
   }
 
+  function initWidget(el) {
+    var apiBase     = el.getAttribute("data-api-base")     || "";
+    var calendlyUrl = el.getAttribute("data-calendly-url") || "#";
+    var pathway     = el.getAttribute("data-pathway")      || null;
+    var companyName = el.getAttribute("data-company-name") || "";
+
+    el.classList.add("qiq-widget");
+    el.innerHTML = WIDGET_HTML;
+
+    new window.QIQWidget(el, {
+      apiBase:     apiBase,
+      calendlyUrl: calendlyUrl,
+      pathway:     pathway,
+      companyName: companyName,
+    });
+  }
+
   // ── Main init ───────────────────────────────────────────────────────────────
 
   function init() {
-    var base        = baseUrl();
+    var base    = baseUrl();
+    var targets = document.querySelectorAll("[data-qiq-widget]");
     console.log('[QIQ embed] init() called, base:', base);
-    var apiBase     = attr("data-api-base",     "");
-    var calendlyUrl = attr("data-calendly-url", "#");
-    var pathway     = attr("data-pathway",      null);
-    var companyName = attr("data-company-name", "");
-    var container   = attr("data-container",    null);
+    console.log('[QIQ embed] found', targets.length, 'widget target(s)');
+
+    if (!targets.length) return;
 
     injectCSS(base);
     console.log('[QIQ embed] CSS injected');
 
-    // Build the widget root element
-    var widget       = document.createElement("div");
-    widget.className = "qiq-widget";
-    widget.innerHTML = WIDGET_HTML;
-
-    // Insert into specified container or directly after the script tag
-    if (container) {
-      var target = document.querySelector(container);
-      if (target) { target.appendChild(widget); }
-      else { console.warn("[QIQ embed] container not found:", container); return; }
-    } else {
-      SCRIPT_EL.parentNode.insertBefore(widget, SCRIPT_EL.nextSibling);
-    }
-
-    // Load widget.js and initialize
     loadJS(base, function () {
       console.log('[QIQ embed] widget.js loaded, QIQWidget:', window.QIQWidget);
-      new window.QIQWidget(widget, {
-        apiBase:     apiBase,
-        calendlyUrl: calendlyUrl,
-        pathway:     pathway,
-        companyName: companyName,
-      });
+      for (var i = 0; i < targets.length; i++) {
+        initWidget(targets[i]);
+      }
     });
   }
 
