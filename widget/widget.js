@@ -234,6 +234,9 @@ class QIQWidget {
 
     this._logRequest(payload);
 
+    console.log('[QIQ DEBUG] this.opts.apiBase:', this.opts.apiBase);
+    console.log('[QIQ DEBUG] Calling fetch with URL:', `${this.opts.apiBase}/evaluate`);
+
     try {
       const res = await fetch(`${this.opts.apiBase}/evaluate`, {
         method: "POST",
