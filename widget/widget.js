@@ -580,3 +580,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// Expose to global scope for embed.js
+window.QIQWidget = QIQWidget;
