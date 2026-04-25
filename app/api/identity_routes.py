@@ -52,7 +52,7 @@ async def identity_intake(request: IdentityIntakeRequest):
     # Build redirect URL (update domain for production)
     # For local dev: http://127.0.0.1:8000/chat?sid={session_id}
     # For production: https://qiq.gonimbleai.com/chat?sid={session_id}
-    redirect_url = f"http://127.0.0.1:8000/chat?sid={session_id}"
+    redirect_url = f"https://qiq.gonimbleai.com/chat?sid={session_id}"
     
     return IdentityIntakeResponse(
         session_id=session_id,

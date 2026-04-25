@@ -3,3 +3,10 @@ __pycache__/
 *.pyc
 .env
 .venv/
+
+# Generated exports — never commit run data or PDFs
+exports/reports/*.pdf
+exports/reports/*.json
+exports/*.json
+data/runs/*.json
+data/sessions/*.json

@@ -1,0 +1,600 @@
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.qiq-widget {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  color: #1a1a2e;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Header ── */
+.qiq-header {
+  background: #6920b7;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.qiq-header-logo {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.qiq-header-text h2 {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.qiq-header-text p {
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* ── Layer management ── */
+.qiq-layer { display: none; }
+.qiq-layer.active { display: flex; flex-direction: column; }
+
+/* ── Layer 1: Email Capture ── */
+.qiq-layer-1 {
+  padding: 32px 28px 28px;
+  gap: 24px;
+}
+
+.qiq-intro {
+  text-align: center;
+}
+
+.qiq-intro h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 8px;
+}
+
+.qiq-intro p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.qiq-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.qiq-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qiq-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.qiq-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #1a1a2e;
+  background: #fafafa;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.qiq-field input:focus {
+  border-color: #6920b7;
+  background: #fff;
+}
+
+.qiq-field input.error {
+  border-color: #ef4444;
+}
+
+.qiq-field .field-error {
+  font-size: 12px;
+  color: #ef4444;
+  display: none;
+}
+
+.qiq-field.has-error .field-error { display: block; }
+.qiq-field.has-error input { border-color: #ef4444; }
+
+.qiq-btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: #6920b7;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.qiq-btn-primary:hover { background: #5a1a9e; }
+.qiq-btn-primary:active { transform: scale(0.99); }
+.qiq-btn-primary:disabled { background: #c4b5d9; cursor: not-allowed; }
+
+.qiq-disclaimer {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Layer 2: Chat Dialog ── */
+.qiq-layer-2 {
+  height: 520px;
+}
+
+.qiq-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+.qiq-chat-messages::-webkit-scrollbar { width: 4px; }
+.qiq-chat-messages::-webkit-scrollbar-track { background: transparent; }
+.qiq-chat-messages::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 4px; }
+
+/* Message bubbles */
+.qiq-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  animation: msgIn 0.2s ease-out;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.qiq-msg.bot { align-self: flex-start; }
+.qiq-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+.qiq-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #6920b7;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Content wrapper — holds bubble + optional choice chips */
+.qiq-msg-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 82%;
+}
+
+.qiq-msg.user .qiq-msg-content { align-items: flex-end; }
+
+.qiq-msg-bubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.qiq-msg.bot .qiq-msg-bubble {
+  background: #f3f4f6;
+  color: #1a1a2e;
+  border-bottom-left-radius: 4px;
+}
+
+.qiq-msg.user .qiq-msg-bubble {
+  background: #6920b7;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+/* ── Choice chips ── */
+.qiq-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-top: 2px;
+}
+
+.qiq-choice-btn {
+  padding: 7px 14px;
+  background: #fff;
+  border: 1.5px solid #6920b7;
+  border-radius: 20px;
+  color: #6920b7;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, opacity 0.12s;
+  white-space: nowrap;
+}
+
+.qiq-choice-btn:hover:not(:disabled) {
+  background: #6920b7;
+  color: #fff;
+}
+
+.qiq-choice-btn.selected {
+  background: #6920b7;
+  color: #fff;
+}
+
+.qiq-choice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.qiq-choice-confirm {
+  padding: 7px 16px;
+  background: #1a1a2e;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: background 0.12s;
+}
+
+.qiq-choice-confirm:hover:not(:disabled) { background: #2d2d4e; }
+.qiq-choice-confirm:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Typing indicator */
+.qiq-typing .qiq-msg-content .qiq-msg-bubble {
+  background: #f3f4f6;
+  padding: 12px 16px;
+}
+
+.qiq-typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.qiq-typing-dots span {
+  width: 6px;
+  height: 6px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: typingDot 1.2s infinite ease-in-out;
+}
+
+.qiq-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.qiq-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Chat input */
+.qiq-chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.qiq-chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 24px;
+  font-size: 14px;
+  outline: none;
+  color: #1a1a2e;
+  background: #fafafa;
+  transition: border-color 0.15s;
+  resize: none;
+  height: 42px;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.qiq-chat-input:focus {
+  border-color: #6920b7;
+  background: #fff;
+}
+
+.qiq-chat-send {
+  width: 40px;
+  height: 40px;
+  background: #6920b7;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.qiq-chat-send:hover { background: #5a1a9e; }
+.qiq-chat-send:disabled { background: #c4b5d9; cursor: not-allowed; }
+
+.qiq-chat-send svg { fill: #fff; }
+
+/* ── Layer 3: Results ── */
+.qiq-layer-3 {
+  background: #f3f4f6;
+  flex-direction: column;
+  padding: 0;
+  overflow-y: auto;
+  max-height: 620px;
+  gap: 0;
+  align-items: stretch;
+}
+
+.qiq-layer-3::-webkit-scrollbar { width: 4px; }
+.qiq-layer-3::-webkit-scrollbar-track { background: transparent; }
+.qiq-layer-3::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+/* Scrollable content area */
+.qiq-result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 16px 4px;
+}
+
+/* Eligibility Summary block */
+.qiq-summary-block {
+  background: #e9eaec;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.qiq-summary-block h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 8px;
+}
+
+.qiq-summary-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.qiq-summary-meta span {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.qiq-summary-sentence {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Clarifications section */
+.qiq-clars-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 4px 0 0;
+}
+
+.qiq-clars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Individual clarification card */
+.qiq-clar-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-left: 3px solid #1a1a2e;
+  border-radius: 4px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qiq-clar-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.qiq-clar-body {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Sub-section label ("Police clearance requirements:", "How this is handled:", etc.) */
+.qiq-sub-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 6px 0 3px;
+}
+
+/* Bullet list inside clarifications */
+.qiq-clar-list {
+  margin: 0 0 2px 18px;
+  padding: 0;
+}
+
+.qiq-clar-list li {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.45;
+  margin-bottom: 3px;
+}
+
+/* Key-value pairs (handling, boundary) */
+.qiq-kv {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+  margin: 2px 0;
+}
+
+.qiq-kv strong { font-weight: 700; }
+
+/* Plain paragraph inside a subsection (no bold label) */
+.qiq-sub-para {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+  margin: 2px 0;
+}
+
+/* Secondary evidence indent block */
+.qiq-evidence-block {
+  border-left: 2px solid #e5e7eb;
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.qiq-ev-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 2px;
+}
+
+.qiq-ev-desc {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.45;
+  margin: 0 0 3px;
+}
+
+.qiq-ev-sublabel {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 4px 0 2px;
+}
+
+/* ── Result footer (CTA + buttons) ── */
+.qiq-result-footer {
+  padding: 16px;
+  background: #e9eaec;
+  border-top: 1px solid #d1d5db;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.qiq-result-footer p {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.qiq-book-consult-link {
+  font-size: 13px;
+  color: #1a1a2e;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.qiq-book-consult-link:hover { text-decoration: underline; }
+
+.qiq-result-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.qiq-btn-dark {
+  padding: 10px 20px;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.qiq-btn-dark:hover { background: #2d2d4e; }
+
+/* ── Progress bar ── */
+.qiq-progress {
+  height: 3px;
+  background: #f3f4f6;
+}
+
+.qiq-progress-bar {
+  height: 100%;
+  background: #6920b7;
+  transition: width 0.4s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .qiq-widget { border-radius: 0; border-left: none; border-right: none; }
+  .qiq-layer-1 { padding: 24px 20px 20px; }
+  .qiq-layer-2 { height: 480px; }
+  .qiq-layer-3 { padding: 24px 20px 28px; }
+}

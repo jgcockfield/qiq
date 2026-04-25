@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QIQ Embed Test — Simulated Client Page</title>
+  <style>
+    /* Simulated client website — deliberately different styles to confirm widget isolation */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: Georgia, serif;
+      background: #1a2744;
+      color: #eee;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    h1 { font-size: 28px; margin-bottom: 4px; }
+    .tagline { color: #94a3b8; margin-bottom: 40px; font-style: italic; }
+    .page-section { max-width: 700px; margin: 0 auto; }
+    hr { border: none; border-top: 1px solid #334; margin: 48px 0; }
+    .test-label {
+      display: inline-block;
+      background: #334;
+      color: #7dd3fc;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    p.note { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="page-section">
+  <h1>Great Expatations</h1>
+  <p class="tagline">Your relocation specialists</p>
+
+  <!-- ═══════════════════════════════════════════════
+       TEST 1 — Minimal embed (auto-inserts after tag)
+       No data-container, no optional attributes
+       ═══════════════════════════════════════════════ -->
+  <span class="test-label">TEST 1 — auto-insert, minimal config</span>
+  <p class="note">
+    Widget injected directly after the &lt;script&gt; tag.
+    Only api-base is set; calendly/pathway/company use defaults.
+  </p>
+
+  <script
+    src="http://localhost:8000/widget/embed.js"
+    data-api-base="http://localhost:8000">
+  </script>
+
+  <hr>
+
+  <!-- ═══════════════════════════════════════════════
+       TEST 2 — Full config, targeted container
+       data-container targets a pre-existing div
+       ═══════════════════════════════════════════════ -->
+  <span class="test-label">TEST 2 — targeted container, full config</span>
+  <p class="note">
+    Widget injected into <code>#widget-slot</code>.
+    Different company name and Calendly link.
+    Both widgets run simultaneously with isolated state.
+  </p>
+
+  <div id="widget-slot"></div>
+
+  <script
+    src="http://localhost:8000/widget/embed.js"
+    data-api-base="http://localhost:8000"
+    data-calendly-url="https://calendly.com/great-expatations/consult"
+    data-pathway="portugal_d7"
+    data-company-name="Great Expatations"
+    data-container="#widget-slot">
+  </script>
+
+  <hr>
+
+  <!-- ═══════════════════════════════════════════════
+       TEST 3 — Side-by-side (two-col grid)
+       Two separate instances with different pathways
+       ═══════════════════════════════════════════════ -->
+  <span class="test-label">TEST 3 — two instances side-by-side</span>
+  <p class="note">
+    Both widgets on the same page. Each should have fully isolated
+    conversation state and element bindings.
+  </p>
+
+  <div class="two-col">
+    <div id="slot-a"></div>
+    <div id="slot-b"></div>
+  </div>
+
+  <script
+    src="http://localhost:8000/widget/embed.js"
+    data-api-base="http://localhost:8000"
+    data-company-name="Expat Co A"
+    data-container="#slot-a">
+  </script>
+
+  <script
+    src="http://localhost:8000/widget/embed.js"
+    data-api-base="http://localhost:8000"
+    data-company-name="Expat Co B"
+    data-container="#slot-b">
+  </script>
+
+</div><!-- /page-section -->
+
+<!-- Automated checks — runs in browser console after load -->
+<script>
+window.addEventListener("load", function () {
+  var results = [];
+
+  function check(label, pass) {
+    var icon = pass ? "PASS" : "FAIL";
+    console.log("[QIQ embed test] " + icon + " — " + label);
+    results.push({ label: label, pass: pass });
+  }
+
+  // Give embed.js a moment to inject and initialize
+  setTimeout(function () {
+
+    var widgets = document.querySelectorAll(".qiq-widget");
+    check("4 widget instances injected", widgets.length === 4);
+
+    // Each widget should have its own Layer 1 active
+    var activeLayers = document.querySelectorAll(".qiq-layer-1.active");
+    check("4 Layer 1 elements are active", activeLayers.length === 4);
+
+    // CSS loaded once
+    var cssLinks = document.querySelectorAll("[data-qiq-css]");
+    check("widget.css loaded exactly once", cssLinks.length === 1);
+
+    // data-qiq-ref elements exist in each widget (not shared IDs)
+    widgets.forEach(function (w, i) {
+      var nameEl  = w.querySelector("[data-qiq-ref='name']");
+      var emailEl = w.querySelector("[data-qiq-ref='email']");
+      check("widget " + (i+1) + ": name input found via data-qiq-ref",  !!nameEl);
+      check("widget " + (i+1) + ": email input found via data-qiq-ref", !!emailEl);
+    });
+
+    // No duplicate element IDs that would cause binding conflicts
+    var allIds = Array.from(document.querySelectorAll("[id]")).map(function (el) { return el.id; });
+    var widgetIds = allIds.filter(function (id) { return id.startsWith("qiq-"); });
+    check("no qiq- IDs in document (all use data-qiq-ref)", widgetIds.length === 0);
+
+    // Test 2 widget landed in #widget-slot
+    var slotContent = document.querySelector("#widget-slot .qiq-widget");
+    check("TEST 2: widget injected into #widget-slot", !!slotContent);
+
+    // Test 3 both slots populated
+    check("TEST 3: #slot-a has a widget", !!document.querySelector("#slot-a .qiq-widget"));
+    check("TEST 3: #slot-b has a widget", !!document.querySelector("#slot-b .qiq-widget"));
+
+    // Summary
+    var passed = results.filter(function (r) { return r.pass; }).length;
+    console.log("\n[QIQ embed test] " + passed + "/" + results.length + " checks passed");
+    if (passed < results.length) {
+      console.warn("[QIQ embed test] Some checks FAILED — review above");
+    } else {
+      console.info("[QIQ embed test] All checks passed");
+    }
+
+  }, 800); // wait for embed.js async init
+});
+</script>
+
+</body>
+</html>

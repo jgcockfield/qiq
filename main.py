@@ -49,6 +49,9 @@ app.add_middleware(
 # Mount admin static files
 app.mount("/admin", StaticFiles(directory="app/admin/static", html=True), name="admin")
 
+# Serve embeddable widget files at /widget/*
+app.mount("/widget", StaticFiles(directory="widget"), name="widget")
+
 
 class EvaluatePayload(RootModel[Dict[str, Any]]):
     """Accept arbitrary intake payloads during Build 2."""
