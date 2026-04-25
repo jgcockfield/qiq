@@ -19,6 +19,8 @@
 (function () {
   "use strict";
 
+  console.log('[QIQ embed] Script loaded, readyState:', document.readyState);
+
   // Capture currentScript synchronously — it's null once the IIFE returns
   var SCRIPT_EL = document.currentScript;
 
@@ -118,6 +120,7 @@
 
   function init() {
     var base        = baseUrl();
+    console.log('[QIQ embed] init() called, base:', base);
     var apiBase     = attr("data-api-base",     "");
     var calendlyUrl = attr("data-calendly-url", "#");
     var pathway     = attr("data-pathway",      null);
@@ -125,6 +128,7 @@
     var container   = attr("data-container",    null);
 
     injectCSS(base);
+    console.log('[QIQ embed] CSS injected');
 
     // Build the widget root element
     var widget       = document.createElement("div");
@@ -142,6 +146,7 @@
 
     // Load widget.js and initialize
     loadJS(base, function () {
+      console.log('[QIQ embed] widget.js loaded, QIQWidget:', window.QIQWidget);
       new window.QIQWidget(widget, {
         apiBase:     apiBase,
         calendlyUrl: calendlyUrl,
