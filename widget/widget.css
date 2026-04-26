@@ -21,7 +21,7 @@
 /* ── Layer 1: Email Capture ── */
 .qiq-layer-1 {
   height: 530px;
-  padding: 44px 36px 36px;
+  padding: 44px 36px 0;
   gap: 28px;
   justify-content: center;
 }
@@ -122,7 +122,7 @@
   border-radius: 100px;
   padding: 9px 20px;
   margin-top: 28px;
-  margin-bottom: 50px;
+  margin-bottom: 50px !important;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
