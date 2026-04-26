@@ -61,11 +61,11 @@
 .qiq-field input {
   width: 100%;
   padding: 14px 18px;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #d1d5db;
   border-radius: 12px;
   font-size: 15px;
-  color: #374151;
-  background: #f5f5f5;
+  color: #6b7280;
+  background: #ffffff;
   outline: none;
   transition: all 0.2s;
   font-family: inherit;
