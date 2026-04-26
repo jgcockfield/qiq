@@ -20,10 +20,11 @@
 
 /* ── Layer 1: Email Capture ── */
 .qiq-layer-1 {
-  height: 530px;
-  padding: 44px 36px 0;
+  min-height: 530px;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 32px 50px 32px;
   gap: 28px;
-  justify-content: center;
 }
 
 .qiq-intro {
@@ -121,8 +122,8 @@
   color: #fff;
   border-radius: 100px;
   padding: 9px 20px;
-  margin-top: 28px;
-  margin-bottom: 50px !important;
+  margin-top: 32px;
+  margin-bottom: 0;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
