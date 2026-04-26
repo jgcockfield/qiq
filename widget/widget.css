@@ -15,8 +15,8 @@
 }
 
 /* ── Layer management ── */
-.qiq-layer { display: none; }
-.qiq-layer.active { display: flex; }
+.qiq-layer { display: none !important; }
+.qiq-layer.active { display: flex !important; flex-direction: column; }
 
 /* ── Layer 1: Email Capture ── */
 .qiq-layer-1 {
@@ -150,7 +150,6 @@
 /* ── Layer 2: Chat Dialog ── */
 .qiq-layer-2 {
   height: 530px;
-  flex-direction: column;
 }
 
 .qiq-chat-messages {
