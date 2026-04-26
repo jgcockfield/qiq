@@ -27,7 +27,7 @@
     // Layer 1
     '<div class="qiq-layer qiq-layer-1 active">',
     '  <div class="qiq-intro">',
-    '    <h3>Check Your Digital Nomad Visa Eligibility in Just 1 Minute</h3>',
+    '    <h3>Check Your Visa<br>Eligibility in 1 Minute</h3>',
     '    <p>Simply enter your name and email to get started</p>',
     '  </div>',
     '  <form class="qiq-form" onsubmit="return false">',
