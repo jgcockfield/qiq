@@ -90,22 +90,22 @@
 
 .qiq-btn-primary {
   width: 100%;
-  padding: 14px;
-  background: #c4b5fd;
-  color: #fff;
-  border: none;
+  padding: 14px 32px;
+  background: transparent;
+  color: #6b7280;
+  border: 2px solid #d1d5db;
   border-radius: 100px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  transition: all 0.2s;
   margin-top: 4px;
   font-family: inherit;
 }
 
-.qiq-btn-primary:hover { background: #a78bfa; }
+.qiq-btn-primary:hover { background: #f9fafb; border-color: #9ca3af; }
 .qiq-btn-primary:active { transform: scale(0.99); }
-.qiq-btn-primary:disabled { background: #ddd6fe; cursor: not-allowed; }
+.qiq-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Trust badge */
 .qiq-badge {
