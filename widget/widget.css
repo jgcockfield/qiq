@@ -16,7 +16,7 @@
 
 /* ── Layer management ── */
 .qiq-layer { display: none; }
-.qiq-layer.active { display: flex; flex-direction: column; }
+.qiq-layer.active { display: flex; }
 
 /* ── Layer 1: Email Capture ── */
 .qiq-layer-1 {
@@ -69,8 +69,8 @@
   border: 2px solid #d1d5db;
   border-radius: 12px;
   font-size: 15px;
-  color: #6b7280;
-  background: #ffffff;
+  color: #1f2937;
+  background: #ffffff !important;
   outline: none;
   transition: all 0.2s;
   font-family: inherit;
@@ -99,7 +99,7 @@
   padding: 14px 48px;
   background: #d1d2ff;
   color: #1f2937;
-  border: none;
+  border: none !important;
   border-radius: 100px;
   font-size: 16px;
   font-weight: 600;
@@ -150,6 +150,7 @@
 /* ── Layer 2: Chat Dialog ── */
 .qiq-layer-2 {
   height: 530px;
+  flex-direction: column;
 }
 
 .qiq-chat-messages {
