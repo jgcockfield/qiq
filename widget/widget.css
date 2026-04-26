@@ -358,9 +358,10 @@
 .qiq-layer-3 {
   background: #f3f4f6;
   flex-direction: column;
-  padding: 0;
+  height: 530px;
   overflow-y: auto;
-  max-height: 620px;
+  overflow-x: hidden;
+  padding: 32px;
   gap: 0;
   align-items: stretch;
 }
@@ -371,10 +372,12 @@
 
 /* Scrollable content area */
 .qiq-result-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px 16px 4px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 /* Eligibility Summary block */
@@ -521,13 +524,14 @@
 
 /* ── Result footer (CTA + buttons) ── */
 .qiq-result-footer {
-  padding: 16px;
+  flex-shrink: 0;
+  padding-top: 24px;
   background: #e9eaec;
-  border-top: 1px solid #d1d5db;
+  border-top: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 14px;
+  margin-top: 24px;
 }
 
 .qiq-result-footer p {
