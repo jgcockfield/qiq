@@ -130,7 +130,7 @@
   margin-left: -32px;
   margin-right: -32px;
   flex-shrink: 0;
-  border-radius: 0;
+  border-radius: 0 0 14px 14px;
 }
 
 .qiq-badge-check {
