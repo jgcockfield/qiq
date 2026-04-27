@@ -327,7 +327,6 @@ class QIQWidget {
     }
 
     msg.innerHTML = `
-      <div class="qiq-msg-avatar">Q</div>
       <div class="qiq-msg-content">
         <div class="qiq-msg-bubble">${this._escapeHtml(text)}</div>
         ${choiceHtml}
