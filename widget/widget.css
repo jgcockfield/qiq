@@ -23,8 +23,7 @@
   min-height: 530px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 30px 32px 50px 32px;
+  padding: 30px 32px 0 32px;
   gap: 28px;
 }
 
@@ -126,8 +125,10 @@
   font-weight: 600;
   color: #1f2937;
   letter-spacing: 0.05em;
-  border-radius: 0 0 18px 18px;
+  border-radius: 0 0 14px 14px;
   margin-top: auto;
+  margin-left: -32px;
+  margin-right: -32px;
 }
 
 .qiq-badge-check {
