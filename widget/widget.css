@@ -115,22 +115,19 @@
 
 /* Trust badge */
 .qiq-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #1a1a2e;
-  color: #fff;
-  border-radius: 100px;
-  padding: 9px 20px;
-  margin-top: 32px;
-  margin-bottom: 0;
+  display: none;
+}
+
+.qiq-footer {
+  background: #d1d2ff;
+  padding: 16px 24px;
+  text-align: center;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  align-self: center;
-  white-space: nowrap;
+  font-weight: 600;
+  color: #1f2937;
+  letter-spacing: 0.05em;
+  border-radius: 0 0 18px 18px;
+  margin-top: auto;
 }
 
 .qiq-badge-check {

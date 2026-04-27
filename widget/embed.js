@@ -43,9 +43,9 @@
     '    </div>',
     '    <button data-qiq-ref="submit" class="qiq-btn-primary" type="button">Submit</button>',
     '  </form>',
-    '  <div class="qiq-badge">',
-    '    <span class="qiq-badge-check">&#10003;</span>',
-    '    <span>2000+ VISAS APPROVED WITH ROOTS GLOBAL</span>',
+    '  <div class="qiq-footer">',
+    '    <span style="color: #10b981; margin-right: 6px;">&#10003;</span>',
+    '    2000+ VISAS APPROVED WITH ROOTS GLOBAL',
     '  </div>',
     '</div>',
     // Layer 2
