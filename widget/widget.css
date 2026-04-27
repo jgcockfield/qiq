@@ -138,12 +138,6 @@
   border-radius: 0 0 14px 14px;
 }
 
-.qiq-layer-2 .qiq-footer,
-.qiq-layer-3 .qiq-footer {
-  margin-top: auto;
-  flex-shrink: 0;
-}
-
 .qiq-badge-check {
   width: 18px;
   height: 18px;
@@ -160,11 +154,8 @@
 
 /* ── Layer 2: Chat Dialog ── */
 .qiq-layer-2 {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
   padding: 24px;
+  overflow-y: auto;
 }
 
 .qiq-chat-messages {
@@ -380,14 +371,8 @@
 /* ── Layer 3: Results ── */
 .qiq-layer-3 {
   background: #f3f4f6;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
   padding: 32px;
-  gap: 0;
-  align-items: stretch;
+  overflow-y: auto;
 }
 
 .qiq-layer-3::-webkit-scrollbar { width: 4px; }
