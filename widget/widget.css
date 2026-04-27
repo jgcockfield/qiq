@@ -156,6 +156,13 @@
 .qiq-layer-2 {
   padding: 24px;
   overflow-y: auto;
+  overflow-x: hidden;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.qiq-layer-2::-webkit-scrollbar {
+  display: none;
 }
 
 .qiq-chat-messages {
@@ -375,9 +382,14 @@
   overflow-y: auto;
 }
 
-.qiq-layer-3::-webkit-scrollbar { width: 4px; }
-.qiq-layer-3::-webkit-scrollbar-track { background: transparent; }
-.qiq-layer-3::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+.qiq-layer-3 {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.qiq-layer-3::-webkit-scrollbar {
+  display: none;
+}
 
 /* Scrollable content area */
 .qiq-result-content {
