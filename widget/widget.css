@@ -13,6 +13,8 @@
   max-width: 100%;
   overflow: hidden !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Layer management ── */
@@ -74,6 +76,9 @@
   outline: none;
   transition: all 0.2s;
   font-family: inherit;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 .qiq-field input::placeholder { color: #9ca3af; }
