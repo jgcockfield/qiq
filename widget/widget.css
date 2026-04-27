@@ -20,7 +20,7 @@
 
 /* ── Layer 1: Email Capture ── */
 .qiq-layer-1 {
-  min-height: 530px;
+  height: 530px;
   display: flex;
   flex-direction: column;
   padding: 30px 32px 0 32px;
