@@ -252,11 +252,20 @@
 }
 
 .qiq-choice-btn.selected {
-  background: #6920b7;
-  color: #fff;
+  background: #d1d2ff !important;
+  border-color: #d1d2ff !important;
+  color: #1f2937 !important;
+  opacity: 1 !important;
 }
 
 .qiq-choice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.qiq-choice-btn:disabled.selected {
+  background: #d1d2ff !important;
+  border-color: #d1d2ff !important;
+  color: #1f2937 !important;
+  opacity: 0.7 !important;
+}
 
 .qiq-choice-confirm {
   padding: 7px 16px;
