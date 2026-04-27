@@ -178,7 +178,7 @@
 
     .choices{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .chip{
-      border:1px solid var(--border);
+      border:1px solid #80bcf9;
       background:#fff;
       padding:7px 10px;
       border-radius:999px;
@@ -186,9 +186,9 @@
       cursor:pointer;
       box-shadow:var(--shadow);
       user-select:none;
-      text-transform:capitalize;
+      color:#80bcf9;
     }
-    .chip:hover{ background:var(--panel); }
+    .chip:hover{ background:#f0f8ff; }
     .chip.selected{ background:#111; color:#fff; border-color:#111; }
     .chip:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none; }
     .chip:disabled:hover{ background:#fff; }
@@ -364,13 +364,13 @@
 
     // Display-only label normalization (keep raw values for the engine)
     function displayChoiceLabel(v){
-      const cleaned = String(v ?? "")
+      return String(v ?? "")
         .replaceAll("_", " ")
         .replaceAll(/\s+/g, " ")
         .trim()
-        .toLowerCase();
-
-      return cleaned.replace(/\b\w/g, c => c.toUpperCase());
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
     }
 
     function buildCompletionText(raw, exports){

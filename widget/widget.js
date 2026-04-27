@@ -3,6 +3,17 @@
  * Layers: 1 = Email Capture, 2 = Guided Dialog, 3 = Results
  */
 
+// ── Choice label formatter ────────────────────────────────────────────────────
+function _qiqDisplayChoiceLabel(v) {
+  return String(v ?? "")
+    .replaceAll("_", " ")
+    .replaceAll(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
 // ── UUID helper (crypto.randomUUID with legacy fallback) ──────────────────────
 function _qiqUUID() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -310,7 +321,7 @@ class QIQWidget {
       const btnClass = isMulti ? "qiq-choice-btn qiq-choice-multi" : "qiq-choice-btn";
       choiceHtml = `
         <div class="qiq-choices" data-multi="${isMulti}">
-          ${choices.map(c => `<button class="${btnClass}" data-value="${this._escapeHtml(c)}">${this._escapeHtml(c)}</button>`).join("")}
+          ${choices.map(c => `<button class="${btnClass}" data-value="${this._escapeHtml(c)}">${this._escapeHtml(_qiqDisplayChoiceLabel(c))}</button>`).join("")}
           ${isMulti ? `<button class="qiq-choice-confirm" style="display:none">Confirm selection</button>` : ""}
         </div>`;
     }
