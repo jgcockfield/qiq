@@ -154,15 +154,30 @@
 
 /* ── Layer 2: Chat Dialog ── */
 .qiq-layer-2 {
+  height: 100%;
   padding: 24px;
   overflow-y: auto;
   overflow-x: hidden;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d2ff transparent;
 }
 
 .qiq-layer-2::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+  display: block;
+}
+
+.qiq-layer-2::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.qiq-layer-2::-webkit-scrollbar-thumb {
+  background: #d1d2ff;
+  border-radius: 3px;
+}
+
+.qiq-layer-2::-webkit-scrollbar-thumb:hover {
+  background: #c4b5fd;
 }
 
 .qiq-chat-messages {
