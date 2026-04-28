@@ -183,7 +183,7 @@
 .qiq-chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 20px 8px;
+  padding: 20px 20px 40px;
   display: flex;
   flex-direction: column;
   gap: 12px;
