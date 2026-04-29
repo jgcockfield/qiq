@@ -51,7 +51,12 @@ class QIQWidget {
     this._log("init", { instanceId: this.instanceId, opts: this.opts });
 
     this._bindElements();
-    this._showLayer(1);
+    if (this.root.dataset.entryMode === "consultation") {
+      this._initLayer0();
+      this._showLayer(0);
+    } else {
+      this._showLayer(1);
+    }
   }
 
   // ── Logging ───────────────────────────────────────────────────
@@ -96,6 +101,9 @@ class QIQWidget {
 
     this.els = {
       progress:      r.querySelector(".qiq-progress-bar"),
+
+      // Layer 0 (consultation mode only — built dynamically in _initLayer0)
+      layer0: null,
 
       // Layer 1
       layer1:        r.querySelector(".qiq-layer-1"),
@@ -150,12 +158,55 @@ class QIQWidget {
   _showLayer(n) {
     const prev = this.currentLayer;
     this.currentLayer = n;
-    [this.els.layer1, this.els.layer2, this.els.layer3].forEach((el, i) => {
-      el.classList.toggle("active", i + 1 === n);
-    });
-    const pct = { 1: "10%", 2: "55%", 3: "100%" }[n];
+    [[0, this.els.layer0], [1, this.els.layer1], [2, this.els.layer2], [3, this.els.layer3]]
+      .forEach(([i, el]) => { if (el) el.classList.toggle("active", i === n); });
+    const pct = { 0: "5%", 1: "10%", 2: "55%", 3: "100%" }[n];
     if (this.els.progress) this.els.progress.style.width = pct;
     this._log(`layer transition ${prev} -> ${n}`, { progress: pct });
+  }
+
+  _initLayer0() {
+    const div = document.createElement("div");
+    div.className = "qiq-layer qiq-layer-0";
+    div.innerHTML = `
+      <div class="qiq-layer-0-content">
+        <h2 class="qiq-layer-0-headline">
+          Complete the <span class="highlight">1-minute eligibility check</span> to book your free consultation.
+        </h2>
+        <input type="text"  class="qiq-layer-0-input" placeholder="Your name" />
+        <input type="email" class="qiq-layer-0-input" placeholder="Your email address" />
+        <button class="qiq-layer-0-button">Book a free consultation</button>
+        <p class="qiq-layer-0-note">→ Choose a meeting time in the next step.</p>
+      </div>
+      <div class="qiq-footer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:inline-block;vertical-align:middle;margin-right:8px;">
+          <circle cx="12" cy="12" r="10" fill="#10b981"/>
+          <path d="M8 12l3 3 5-6" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>2000+ VISAS APPROVED WITH ROOTS GLOBAL</span>
+      </div>`;
+
+    this.root.prepend(div);
+    this.els.layer0 = div;
+
+    const inputs    = div.querySelectorAll(".qiq-layer-0-input");
+    const nameInput  = inputs[0];
+    const emailInput = inputs[1];
+    const btn        = div.querySelector(".qiq-layer-0-button");
+
+    const submit = () => {
+      const name  = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+      this.session.name  = name;
+      this.session.email = email;
+      this._showLayer(2);
+      this._startChat();
+    };
+
+    btn.addEventListener("click", submit);
+    nameInput.addEventListener("keydown",  e => { if (e.key === "Enter") emailInput.focus(); });
+    emailInput.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
   }
 
   // ── Layer 1: Email Capture ────────────────────────────────────

@@ -158,7 +158,72 @@
   overflow: hidden;
 }
 
-/* Footer has negative margins to escape Layer 1's 32px padding — zero them on L2/L3 */
+/* ── Layer 0: Consultation CTA ── */
+.qiq-layer-0 {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.qiq-layer-0-content {
+  flex: 1;
+  padding: 32px 24px;
+  overflow-y: auto;
+}
+
+.qiq-layer-0-headline {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+
+.qiq-layer-0-headline .highlight {
+  color: #6920b7;
+}
+
+.qiq-layer-0-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+}
+
+.qiq-layer-0-input::placeholder {
+  color: #9ca3af;
+}
+
+.qiq-layer-0-button {
+  width: 100%;
+  padding: 16px 24px;
+  background: #d1d2ff;
+  color: #1f2937;
+  border: none;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-family: inherit;
+}
+
+.qiq-layer-0-button:hover {
+  background: #c4b5fd;
+}
+
+.qiq-layer-0-note {
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* Footer has negative margins to escape Layer 1's 32px padding — zero them on L0/L2/L3 */
+.qiq-layer-0 .qiq-footer,
 .qiq-layer-2 .qiq-footer,
 .qiq-layer-3 .qiq-footer {
   margin-left: 0;
