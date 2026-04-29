@@ -284,7 +284,7 @@ class QIQWidget {
       this._pendingFieldKey = nextKey;
       const field    = data.field || {};
       const question = field.label || field.prompt || nextKey;
-      const itype    = field.input_type || "text";
+      const itype    = (field.input_type || "text").toLowerCase().replace(/-/g, "_");
       const choices  = field.choices    || [];
 
       this._pendingInputType = itype;
