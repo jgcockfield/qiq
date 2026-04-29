@@ -590,6 +590,8 @@
   flex-direction: row;
   gap: 10px;
   margin-top: 6px;
+  justify-content: center;
+  align-items: center;
 }
 
 .qiq-btn-dark {
