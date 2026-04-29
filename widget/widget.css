@@ -239,6 +239,11 @@
   margin-right: 0;
 }
 
+.qiq-layer-0 .qiq-footer {
+  background: #000000;
+  color: #ffffff;
+}
+
 .qiq-chat-messages {
   flex: 1;
   overflow-y: auto;
