@@ -299,7 +299,10 @@ class QIQWidget {
   }
 
   _setInputMode(itype) {
-    if (itype === "number") {
+    if (itype === "choice" || itype === "multi_choice") {
+      this.els.chatInput.setAttribute("type", "text");
+      this.els.chatInput.placeholder = "Select from options above";
+    } else if (itype === "number") {
       this.els.chatInput.setAttribute("type", "number");
       this.els.chatInput.placeholder = "Enter a number...";
     } else {
