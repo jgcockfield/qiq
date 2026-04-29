@@ -212,9 +212,10 @@ class QIQWidget {
     this._submitAnswer(text);
   }
 
-  // Called by both text input and choice button clicks
-  _submitAnswer(value) {
-    this._addUserMessage(value);
+  // Called by both text input and choice button clicks.
+  // displayValue is shown in the user bubble; value is stored/sent to backend.
+  _submitAnswer(value, displayValue) {
+    this._addUserMessage(displayValue ?? value);
     if (this._pendingFieldKey) {
       this._setDotted(this.answers, this._pendingFieldKey, value);
       this._log("answer stored", {
@@ -345,7 +346,7 @@ class QIQWidget {
           if (this.isWaiting) return;
           btns.forEach(b => { b.disabled = true; b.classList.remove("selected"); });
           btn.classList.add("selected");
-          this._submitAnswer(btn.dataset.value);
+          this._submitAnswer(btn.dataset.value, _qiqDisplayChoiceLabel(btn.dataset.value));
         });
       });
     } else {
@@ -362,13 +363,13 @@ class QIQWidget {
       if (confirm) {
         confirm.addEventListener("click", () => {
           if (this.isWaiting) return;
-          const selected = [...btns]
-            .filter(b => b.classList.contains("selected"))
-            .map(b => b.dataset.value);
-          if (!selected.length) return;
+          const selectedBtns = [...btns].filter(b => b.classList.contains("selected"));
+          if (!selectedBtns.length) return;
           btns.forEach(b => b.disabled = true);
           confirm.disabled = true;
-          this._submitAnswer(selected.join(", "));
+          const rawValues     = selectedBtns.map(b => b.dataset.value);
+          const displayLabels = selectedBtns.map(b => _qiqDisplayChoiceLabel(b.dataset.value));
+          this._submitAnswer(rawValues.join(", "), displayLabels.join(", "));
         });
       }
     }
