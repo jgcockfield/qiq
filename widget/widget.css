@@ -369,10 +369,8 @@
   transition: background 0.15s;
 }
 
-.qiq-chat-send:hover { background: #dcdeff; }
 .qiq-chat-send:disabled { background: #e5e7ff; cursor: not-allowed; }
 .qiq-chat-send.active { background: #cacdff; }
-.qiq-chat-send.active:hover { background: #b8bbff; }
 
 .qiq-chat-send svg { fill: #fff; }
 
