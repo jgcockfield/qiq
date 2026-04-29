@@ -280,9 +280,9 @@
 }
 
 .qiq-choice-btn.selected {
-  background: transparent;
-  border-color: #80bcf9;
-  color: #80bcf9;
+  background: #d1d2ff;
+  border-color: #d1d2ff;
+  color: #1f2937;
 }
 
 .qiq-choice-btn:disabled { opacity: 0.45; cursor: not-allowed; }
