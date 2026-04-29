@@ -176,7 +176,7 @@ class QIQWidget {
         <input type="text"  class="qiq-layer-0-input" placeholder="Your name" />
         <input type="email" class="qiq-layer-0-input" placeholder="Your email address" />
         <button class="qiq-layer-0-button">Book a free consultation</button>
-        <p class="qiq-layer-0-note">→ Choose a meeting time in the next step.</p>
+        <p class="qiq-layer-0-note">This is a preliminary screening, results do not constitute legal advice.</p>
       </div>
       <div class="qiq-footer">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:inline-block;vertical-align:middle;margin-right:8px;">
