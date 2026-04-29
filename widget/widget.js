@@ -127,9 +127,7 @@ class QIQWidget {
     this.els.chatInput.addEventListener("keydown", e => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this._handleChatSend(); }
     });
-    this.els.chatInput.addEventListener("input", () => {
-      this.els.sendBtn.classList.toggle("active", this.els.chatInput.value.trim().length > 0);
-    });
+    this.els.chatInput.addEventListener("input", () => this._updateSendButton());
   }
 
   // ── Dotted key helper ─────────────────────────────────────────
@@ -293,9 +291,16 @@ class QIQWidget {
       this._pendingInputType = itype;
       this._addBotMessage(question, itype, choices);
       this._setInputMode(itype);
+      this._updateSendButton();
     } else {
       this._showResults(data);
     }
+  }
+
+  _updateSendButton() {
+    const hasText    = this.els.chatInput.value.trim().length > 0;
+    const hasChoices = !!this.els.messages.querySelector(".qiq-choice-btn.selected");
+    this.els.sendBtn.classList.toggle("active", hasText || hasChoices);
   }
 
   _setInputMode(itype) {
@@ -352,6 +357,7 @@ class QIQWidget {
           if (this.isWaiting) return;
           btns.forEach(b => { b.disabled = true; b.classList.remove("selected"); });
           btn.classList.add("selected");
+          this._updateSendButton();
           this._submitAnswer(btn.dataset.value, _qiqDisplayChoiceLabel(btn.dataset.value));
         });
       });
@@ -363,6 +369,7 @@ class QIQWidget {
           btn.classList.toggle("selected");
           const anySelected = [...btns].some(b => b.classList.contains("selected"));
           if (confirm) confirm.style.display = anySelected ? "" : "none";
+          this._updateSendButton();
         });
       });
 
