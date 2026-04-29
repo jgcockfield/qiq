@@ -352,12 +352,12 @@
 .qiq-chat-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid #d1d5db;
   border-radius: 24px;
   font-size: 14px;
   outline: none;
   color: #1a1a2e;
-  background: #fafafa;
+  background: #ffffff;
   transition: border-color 0.15s;
   resize: none;
   height: 42px;
@@ -366,14 +366,14 @@
 }
 
 .qiq-chat-input:focus {
-  border-color: #6920b7;
+  border-color: #d1d2ff;
   background: #fff;
 }
 
 .qiq-chat-send {
   width: 40px;
   height: 40px;
-  background: #6920b7;
+  background: #d1d2ff;
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -384,8 +384,8 @@
   transition: background 0.15s;
 }
 
-.qiq-chat-send:hover { background: #5a1a9e; }
-.qiq-chat-send:disabled { background: #c4b5d9; cursor: not-allowed; }
+.qiq-chat-send:hover { background: #c4b5fd; }
+.qiq-chat-send:disabled { background: #e5e7ff; cursor: not-allowed; }
 
 .qiq-chat-send svg { fill: #fff; }
 
