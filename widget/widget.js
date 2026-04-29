@@ -299,7 +299,7 @@ class QIQWidget {
 
   _updateSendButton() {
     const hasText    = this.els.chatInput.value.trim().length > 0;
-    const hasChoices = !!this.els.messages.querySelector(".qiq-choice-btn.selected");
+    const hasChoices = !!this.els.messages.querySelector(".qiq-choice-btn:not(:disabled).selected");
     this.els.sendBtn.classList.toggle("active", hasText || hasChoices);
   }
 
