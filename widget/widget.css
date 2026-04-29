@@ -371,6 +371,8 @@
 
 .qiq-chat-send:hover { background: #c4b5fd; }
 .qiq-chat-send:disabled { background: #e5e7ff; cursor: not-allowed; }
+.qiq-chat-send.active { background: #6920b7; }
+.qiq-chat-send.active:hover { background: #5a1a9e; }
 
 .qiq-chat-send svg { fill: #fff; }
 

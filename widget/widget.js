@@ -127,6 +127,9 @@ class QIQWidget {
     this.els.chatInput.addEventListener("keydown", e => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this._handleChatSend(); }
     });
+    this.els.chatInput.addEventListener("input", () => {
+      this.els.sendBtn.classList.toggle("active", this.els.chatInput.value.trim().length > 0);
+    });
   }
 
   // ── Dotted key helper ─────────────────────────────────────────
