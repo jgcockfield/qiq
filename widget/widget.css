@@ -562,7 +562,6 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 24px;
 }
 
 .qiq-result-footer p {
