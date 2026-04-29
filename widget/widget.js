@@ -294,11 +294,7 @@ class QIQWidget {
     }
   }
 
-  // Show or hide the text input row based on field type
   _setInputMode(itype) {
-    const isTextInput = itype === "text" || itype === "number";
-    this.els.chatInput.style.display  = isTextInput ? "" : "none";
-    this.els.sendBtn.style.display    = isTextInput ? "" : "none";
     if (itype === "number") {
       this.els.chatInput.setAttribute("type", "number");
       this.els.chatInput.placeholder = "Enter a number...";
