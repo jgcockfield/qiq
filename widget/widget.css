@@ -217,7 +217,8 @@
 }
 
 .qiq-layer-0-note {
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 20px;
   color: #6b7280;
   text-align: center;
 }
