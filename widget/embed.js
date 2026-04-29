@@ -42,6 +42,7 @@
     '      <span class="field-error"></span>',
     '    </div>',
     '    <button data-qiq-ref="submit" class="qiq-btn-primary" type="button">Submit</button>',
+    '    <p class="qiq-layer-1-disclaimer">This is a preliminary screening, results do not constitute legal advice.</p>',
     '  </form>',
     '  <div class="qiq-footer">',
     '    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:inline-block; vertical-align:middle; margin-right:8px;">',
