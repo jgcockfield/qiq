@@ -155,29 +155,14 @@
 /* ── Layer 2: Chat Dialog ── */
 .qiq-layer-2 {
   height: 100%;
-  padding: 24px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: #d1d2ff transparent;
+  overflow: hidden;
 }
 
-.qiq-layer-2::-webkit-scrollbar {
-  width: 6px;
-  display: block;
-}
-
-.qiq-layer-2::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.qiq-layer-2::-webkit-scrollbar-thumb {
-  background: #d1d2ff;
-  border-radius: 3px;
-}
-
-.qiq-layer-2::-webkit-scrollbar-thumb:hover {
-  background: #c4b5fd;
+/* Footer has negative margins to escape Layer 1's 32px padding — zero them on L2/L3 */
+.qiq-layer-2 .qiq-footer,
+.qiq-layer-3 .qiq-footer {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .qiq-chat-messages {
