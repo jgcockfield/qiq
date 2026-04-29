@@ -556,7 +556,7 @@
 /* ── Result footer (CTA + buttons) ── */
 .qiq-result-footer {
   flex-shrink: 0;
-  padding-top: 24px;
+  padding: 24px;
   background: #e9eaec;
   border-top: 1px solid #e5e7eb;
   display: flex;
