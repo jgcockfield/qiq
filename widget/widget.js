@@ -646,6 +646,16 @@ class QIQWidget {
 // Auto-init elements marked data-qiq-widget (only when loaded directly, not via embed.js)
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-qiq-widget]").forEach(el => {
+    const borderColor = el.getAttribute("data-border-color");
+    const buttonColor = el.getAttribute("data-button-color");
+    const footerBg    = el.getAttribute("data-footer-bg");
+    const footerText  = el.getAttribute("data-footer-text-color");
+
+    if (borderColor) el.style.setProperty("--qiq-border-color", borderColor);
+    if (buttonColor) el.style.setProperty("--qiq-button-color", buttonColor);
+    if (footerBg)    el.style.setProperty("--qiq-footer-bg",    footerBg);
+    if (footerText)  el.style.setProperty("--qiq-footer-text",  footerText);
+
     new QIQWidget(el, {
       apiBase:     el.dataset.apiBase     || "",
       calendlyUrl: el.dataset.calendlyUrl || "#",

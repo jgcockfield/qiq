@@ -120,7 +120,17 @@
     var pathway     = el.getAttribute("data-pathway")      || null;
     var companyName = el.getAttribute("data-company-name") || "";
 
+    var borderColor = el.getAttribute("data-border-color");
+    var buttonColor = el.getAttribute("data-button-color");
+    var footerBg    = el.getAttribute("data-footer-bg");
+    var footerText  = el.getAttribute("data-footer-text-color");
+
     el.classList.add("qiq-widget");
+    if (borderColor) el.style.setProperty("--qiq-border-color", borderColor);
+    if (buttonColor) el.style.setProperty("--qiq-button-color", buttonColor);
+    if (footerBg)    el.style.setProperty("--qiq-footer-bg",    footerBg);
+    if (footerText)  el.style.setProperty("--qiq-footer-text",  footerText);
+
     el.innerHTML = WIDGET_HTML;
 
     new window.QIQWidget(el, {
