@@ -131,6 +131,10 @@
   display: none;
 }
 
+.qiq-footer-badge {
+  fill: var(--qiq-badge-color, #10b981);
+}
+
 .qiq-footer {
   background: var(--qiq-footer-bg, #d1d2ff);
   padding: 16px 0;
