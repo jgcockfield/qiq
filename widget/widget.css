@@ -6,13 +6,13 @@
   font-size: 16px;
   color: #1a1a2e;
   background: #fff;
-  border: 4px solid var(--qiq-border-color, #d1d2ff);
+  border: 1px solid var(--qiq-border-color, #afafaf);
   border-radius: 18px;
   width: 430px;
   height: 530px;
   max-width: 100%;
   overflow: hidden !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   position: relative;
   z-index: 1;
 }
