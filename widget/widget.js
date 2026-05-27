@@ -646,19 +646,21 @@ class QIQWidget {
 // Auto-init elements marked data-qiq-widget (only when loaded directly, not via embed.js)
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-qiq-widget]").forEach(el => {
-    const borderColor    = el.getAttribute("data-border-color");
-    const buttonColor    = el.getAttribute("data-button-color");
-    const highlightColor = el.getAttribute("data-highlight-color");
-    const footerBg       = el.getAttribute("data-footer-bg");
-    const footerText     = el.getAttribute("data-footer-text-color");
-    const badgeColor     = el.getAttribute("data-badge-color");
+    const borderColor     = el.getAttribute("data-border-color");
+    const buttonColor     = el.getAttribute("data-button-color");
+    const buttonTextColor = el.getAttribute("data-button-text-color");
+    const highlightColor  = el.getAttribute("data-highlight-color");
+    const footerBg        = el.getAttribute("data-footer-bg");
+    const footerText      = el.getAttribute("data-footer-text-color");
+    const badgeColor      = el.getAttribute("data-badge-color");
 
-    if (borderColor)    el.style.setProperty("--qiq-border-color",    borderColor);
-    if (buttonColor)    el.style.setProperty("--qiq-button-color",    buttonColor);
-    if (highlightColor) el.style.setProperty("--qiq-highlight-color", highlightColor);
-    if (footerBg)       el.style.setProperty("--qiq-footer-bg",       footerBg);
-    if (footerText)     el.style.setProperty("--qiq-footer-text",     footerText);
-    if (badgeColor)     el.style.setProperty("--qiq-badge-color",     badgeColor);
+    if (borderColor)     el.style.setProperty("--qiq-border-color",    borderColor);
+    if (buttonColor)     el.style.setProperty("--qiq-button-color",    buttonColor);
+    if (buttonTextColor) el.style.setProperty("--qiq-button-text",     buttonTextColor);
+    if (highlightColor)  el.style.setProperty("--qiq-highlight-color", highlightColor);
+    if (footerBg)        el.style.setProperty("--qiq-footer-bg",       footerBg);
+    if (footerText)      el.style.setProperty("--qiq-footer-text",     footerText);
+    if (badgeColor)      el.style.setProperty("--qiq-badge-color",     badgeColor);
 
     new QIQWidget(el, {
       apiBase:     el.dataset.apiBase     || "",

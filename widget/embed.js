@@ -120,20 +120,22 @@
     var pathway     = el.getAttribute("data-pathway")      || null;
     var companyName = el.getAttribute("data-company-name") || "";
 
-    var borderColor    = el.getAttribute("data-border-color");
-    var buttonColor    = el.getAttribute("data-button-color");
-    var highlightColor = el.getAttribute("data-highlight-color");
-    var footerBg       = el.getAttribute("data-footer-bg");
-    var footerText     = el.getAttribute("data-footer-text-color");
-    var badgeColor     = el.getAttribute("data-badge-color");
+    var borderColor     = el.getAttribute("data-border-color");
+    var buttonColor     = el.getAttribute("data-button-color");
+    var buttonTextColor = el.getAttribute("data-button-text-color");
+    var highlightColor  = el.getAttribute("data-highlight-color");
+    var footerBg        = el.getAttribute("data-footer-bg");
+    var footerText      = el.getAttribute("data-footer-text-color");
+    var badgeColor      = el.getAttribute("data-badge-color");
 
     el.classList.add("qiq-widget");
-    if (borderColor)    el.style.setProperty("--qiq-border-color",    borderColor);
-    if (buttonColor)    el.style.setProperty("--qiq-button-color",    buttonColor);
-    if (highlightColor) el.style.setProperty("--qiq-highlight-color", highlightColor);
-    if (footerBg)       el.style.setProperty("--qiq-footer-bg",       footerBg);
-    if (footerText)     el.style.setProperty("--qiq-footer-text",     footerText);
-    if (badgeColor)     el.style.setProperty("--qiq-badge-color",     badgeColor);
+    if (borderColor)     el.style.setProperty("--qiq-border-color",    borderColor);
+    if (buttonColor)     el.style.setProperty("--qiq-button-color",    buttonColor);
+    if (buttonTextColor) el.style.setProperty("--qiq-button-text",     buttonTextColor);
+    if (highlightColor)  el.style.setProperty("--qiq-highlight-color", highlightColor);
+    if (footerBg)        el.style.setProperty("--qiq-footer-bg",       footerBg);
+    if (footerText)      el.style.setProperty("--qiq-footer-text",     footerText);
+    if (badgeColor)      el.style.setProperty("--qiq-badge-color",     badgeColor);
 
     el.innerHTML = WIDGET_HTML;
 
