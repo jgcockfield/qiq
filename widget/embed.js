@@ -125,8 +125,9 @@
     var buttonTextColor = el.getAttribute("data-button-text-color");
     var highlightColor  = el.getAttribute("data-highlight-color");
     var footerBg        = el.getAttribute("data-footer-bg");
-    var footerText      = el.getAttribute("data-footer-text-color");
+    var footerTextColor = el.getAttribute("data-footer-text-color");
     var badgeColor      = el.getAttribute("data-badge-color");
+    var footerText      = el.getAttribute("data-footer-text");
 
     el.classList.add("qiq-widget");
     if (borderColor)     el.style.setProperty("--qiq-border-color",    borderColor);
@@ -134,13 +135,14 @@
     if (buttonTextColor) el.style.setProperty("--qiq-button-text",     buttonTextColor);
     if (highlightColor)  el.style.setProperty("--qiq-highlight-color", highlightColor);
     if (footerBg)        el.style.setProperty("--qiq-footer-bg",       footerBg);
-    if (footerText)      el.style.setProperty("--qiq-footer-text",     footerText);
+    if (footerTextColor) el.style.setProperty("--qiq-footer-text",     footerTextColor);
     if (badgeColor)      el.style.setProperty("--qiq-badge-color",     badgeColor);
 
     el.innerHTML = WIDGET_HTML;
 
-    if (companyName) {
-      var footerLabel = "2000+ VISAS APPROVED WITH " + companyName.toUpperCase();
+    var footerLabel = footerText ||
+      (companyName ? "2000+ VISAS APPROVED WITH " + companyName.toUpperCase() : null);
+    if (footerLabel) {
       var footerSpans = el.querySelectorAll(".qiq-footer span");
       for (var i = 0; i < footerSpans.length; i++) {
         footerSpans[i].textContent = footerLabel;
@@ -152,6 +154,7 @@
       calendlyUrl: calendlyUrl,
       pathway:     pathway,
       companyName: companyName,
+      footerText:  footerText,
     });
   }
 

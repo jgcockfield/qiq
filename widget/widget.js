@@ -33,6 +33,7 @@ class QIQWidget {
       calendlyUrl: options.calendlyUrl || "#",
       pathway:     options.pathway     || null,
       companyName: options.companyName || "",
+      footerText:  options.footerText  || "",
     };
 
     // Unique per widget instance — not per page load, not tied to email.
@@ -183,7 +184,7 @@ class QIQWidget {
           <circle class="qiq-footer-badge" cx="12" cy="12" r="10"/>
           <path d="M8 12l3 3 5-6" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span>2000+ VISAS APPROVED WITH ${this.opts.companyName ? this.opts.companyName.toUpperCase() : "ROOTS GLOBAL"}</span>
+        <span>${this.opts.footerText || (this.opts.companyName ? "2000+ VISAS APPROVED WITH " + this.opts.companyName.toUpperCase() : "2000+ VISAS APPROVED WITH ROOTS GLOBAL")}</span>
       </div>`;
 
     this.root.prepend(div);
@@ -651,15 +652,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const buttonTextColor = el.getAttribute("data-button-text-color");
     const highlightColor  = el.getAttribute("data-highlight-color");
     const footerBg        = el.getAttribute("data-footer-bg");
-    const footerText      = el.getAttribute("data-footer-text-color");
+    const footerTextColor = el.getAttribute("data-footer-text-color");
     const badgeColor      = el.getAttribute("data-badge-color");
+    const footerText      = el.getAttribute("data-footer-text");
 
     if (borderColor)     el.style.setProperty("--qiq-border-color",    borderColor);
     if (buttonColor)     el.style.setProperty("--qiq-button-color",    buttonColor);
     if (buttonTextColor) el.style.setProperty("--qiq-button-text",     buttonTextColor);
     if (highlightColor)  el.style.setProperty("--qiq-highlight-color", highlightColor);
     if (footerBg)        el.style.setProperty("--qiq-footer-bg",       footerBg);
-    if (footerText)      el.style.setProperty("--qiq-footer-text",     footerText);
+    if (footerTextColor) el.style.setProperty("--qiq-footer-text",     footerTextColor);
     if (badgeColor)      el.style.setProperty("--qiq-badge-color",     badgeColor);
 
     new QIQWidget(el, {
@@ -667,6 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
       calendlyUrl: el.dataset.calendlyUrl || "#",
       pathway:     el.dataset.pathway     || null,
       companyName: el.dataset.companyName || "",
+      footerText:  footerText             || "",
     });
   });
 });
