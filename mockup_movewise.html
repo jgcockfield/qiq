@@ -134,8 +134,21 @@
     .stats-row {
       display: flex;
       align-items: center;
-      gap: 24px;
-      margin-top: 32px;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
     .stat-number {
@@ -155,10 +168,10 @@
       color: #ff8200;
     }
 
-    .stat-divider {
-      color: #d1d5db;
-      font-size: 24px;
-      font-weight: 300;
+    .laurel {
+      width: 32px;
+      height: 64px;
+      flex-shrink: 0;
     }
 
     .widget-side {
@@ -281,13 +294,36 @@
         </div>
         <div class="stats-row">
           <div class="stat">
-            <div class="stat-number">2000 Visas</div>
-            <div class="stat-label">approved for our clients</div>
+            <svg class="laurel laurel-left" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 5 Q15 15 12 30 Q15 45 30 50 M30 15 Q20 22 18 32 M30 25 Q22 30 20 38 M30 35 Q24 40 22 46 M30 45 Q26 48 24 52" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 50 Q15 55 12 65 Q15 75 30 78" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 55 Q22 60 20 66 M30 62 Q24 66 22 70" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div class="stat-content">
+              <div class="stat-number">2000 Visas</div>
+              <div class="stat-label">approved for our clients</div>
+            </div>
+            <svg class="laurel laurel-right" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: scaleX(-1);">
+              <path d="M30 5 Q15 15 12 30 Q15 45 30 50 M30 15 Q20 22 18 32 M30 25 Q22 30 20 38 M30 35 Q24 40 22 46 M30 45 Q26 48 24 52" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 50 Q15 55 12 65 Q15 75 30 78" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 55 Q22 60 20 66 M30 62 Q24 66 22 70" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
           </div>
-          <div class="stat-divider">›</div>
           <div class="stat">
-            <div class="stat-number"><span class="star-icon">★</span> 4.9</div>
-            <div class="stat-label">based on 449+ reviews</div>
+            <svg class="laurel laurel-left" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 5 Q15 15 12 30 Q15 45 30 50 M30 15 Q20 22 18 32 M30 25 Q22 30 20 38 M30 35 Q24 40 22 46 M30 45 Q26 48 24 52" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 50 Q15 55 12 65 Q15 75 30 78" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 55 Q22 60 20 66 M30 62 Q24 66 22 70" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div class="stat-content">
+              <div class="stat-number"><span class="star-icon">★</span> 4.9</div>
+              <div class="stat-label">based on 449+ reviews</div>
+            </div>
+            <svg class="laurel laurel-right" viewBox="0 0 40 80" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform: scaleX(-1);">
+              <path d="M30 5 Q15 15 12 30 Q15 45 30 50 M30 15 Q20 22 18 32 M30 25 Q22 30 20 38 M30 35 Q24 40 22 46 M30 45 Q26 48 24 52" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 50 Q15 55 12 65 Q15 75 30 78" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M30 55 Q22 60 20 66 M30 62 Q24 66 22 70" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
           </div>
         </div>
       </div>
