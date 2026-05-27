@@ -183,7 +183,7 @@ class QIQWidget {
           <circle class="qiq-footer-badge" cx="12" cy="12" r="10"/>
           <path d="M8 12l3 3 5-6" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span>2000+ VISAS APPROVED WITH ROOTS GLOBAL</span>
+        <span>2000+ VISAS APPROVED WITH ${this.opts.companyName ? this.opts.companyName.toUpperCase() : "ROOTS GLOBAL"}</span>
       </div>`;
 
     this.root.prepend(div);

@@ -139,6 +139,14 @@
 
     el.innerHTML = WIDGET_HTML;
 
+    if (companyName) {
+      var footerLabel = "2000+ VISAS APPROVED WITH " + companyName.toUpperCase();
+      var footerSpans = el.querySelectorAll(".qiq-footer span");
+      for (var i = 0; i < footerSpans.length; i++) {
+        footerSpans[i].textContent = footerLabel;
+      }
+    }
+
     new window.QIQWidget(el, {
       apiBase:     apiBase,
       calendlyUrl: calendlyUrl,
