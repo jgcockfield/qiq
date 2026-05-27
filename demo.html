@@ -15,14 +15,32 @@
     body {
       min-height: 100vh;
       font-family: "Inter", Arial, sans-serif;
-      background: #ffffff;
-      color: #050505;
+      background: #121923;
+      color: #fff;
     }
 
     .hero {
-      background: #eaf6fd;
+      min-height: 100vh;
       position: relative;
       overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 16%, rgba(255,255,255,0.015) 16.5%, rgba(255,255,255,0) 33%, rgba(255,255,255,0.02) 33.5%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.015) 50.5%, rgba(255,255,255,0) 66%, rgba(255,255,255,0.015) 66.5%, rgba(255,255,255,0) 83%, rgba(255,255,255,0.015) 83.5%, rgba(255,255,255,0) 100%),
+        linear-gradient(180deg, #141c26 0%, #131b24 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255,255,255,0.035) 0, rgba(255,255,255,0.035) 120px, transparent 121px),
+        radial-gradient(circle at 18% 12%, transparent 0, transparent 185px, rgba(0,0,0,0.22) 186px, rgba(0,0,0,0.22) 310px, transparent 311px),
+        radial-gradient(circle at 78% 20%, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 170px, transparent 171px),
+        radial-gradient(circle at 78% 20%, transparent 0, transparent 280px, rgba(0,0,0,0.2) 281px, rgba(0,0,0,0.2) 440px, transparent 441px),
+        radial-gradient(circle at 40% 110%, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 220px, transparent 221px),
+        radial-gradient(circle at 40% 110%, transparent 0, transparent 370px, rgba(0,0,0,0.2) 371px, rgba(0,0,0,0.2) 520px, transparent 521px);
+      opacity: .9;
     }
 
     .wrap {
@@ -44,7 +62,7 @@
       font-size: 18px;
       font-weight: 700;
       letter-spacing: -0.02em;
-      color: #58a7e4;
+      color: #f5f7fb;
     }
 
     .nav-right {
@@ -58,7 +76,7 @@
       align-items: center;
       gap: 34px;
       font-size: 14px;
-      color: #050505;
+      color: rgba(255,255,255,0.92);
       font-weight: 500;
     }
 
@@ -69,8 +87,8 @@
     }
 
     .cta {
-      background: #269dd6;
-      color: #ffffff;
+      background: #d6ebff;
+      color: #16202a;
       border: none;
       border-radius: 999px;
       padding: 16px 24px;
@@ -79,7 +97,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.14);
       text-decoration: none;
     }
 
@@ -100,22 +118,23 @@
       align-items: center;
       gap: 10px;
       padding: 8px 13px;
-      border: 1px solid #d1d5db;
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 10px;
-      background: transparent;
-      color: #6b7280;
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.72);
       font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       margin-bottom: 28px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
 
     .eyebrow-dot {
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      border: 1px solid #d1d5db;
+      border: 1px solid rgba(255,255,255,0.28);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -129,11 +148,11 @@
       letter-spacing: -0.06em;
       font-weight: 800;
       max-width: 720px;
-      color: #050505;
+      color: #f7f9fc;
     }
 
     h1 .blue {
-      color: #269dd6;
+      color: #b8d8ff;
       display: block;
     }
 
@@ -142,7 +161,7 @@
       max-width: 520px;
       font-size: 16px;
       line-height: 1.45;
-      color: #050505;
+      color: rgba(255,255,255,0.95);
       font-weight: 600;
     }
 
@@ -155,14 +174,14 @@
     }
 
     .stat {
-      color: #050505;
+      color: rgba(255,255,255,0.95);
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
     .laurel {
-      color: #9ca3af;
+      color: rgba(255,255,255,0.45);
       font-size: 36px;
       line-height: 1;
     }
@@ -175,14 +194,14 @@
 
     .stat-sub {
       font-size: 10px;
-      color: #6b7280;
+      color: rgba(255,255,255,0.58);
       font-weight: 500;
       line-height: 1.2;
       margin-top: 2px;
     }
 
     .rating {
-      color: #ff8200;
+      color: #ffba4a;
       font-size: 22px;
       line-height: 1;
       margin-right: -4px;
@@ -203,8 +222,8 @@
       height: 582px;
       background: #f6f6f8;
       border-radius: 18px;
-      border: none;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      border: 2px solid #b4abff;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.20), 0 0 0 1px rgba(255,255,255,0.05);
       overflow: hidden;
       display: flex;
       flex-direction: column;
