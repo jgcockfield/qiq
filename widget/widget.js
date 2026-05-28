@@ -553,7 +553,7 @@ class QIQWidget {
     }
 
     // ── Footer wiring ───────────────────────────────────────────
-    if (pdfUrl) {
+    if (pdfUrl && status !== "eligible") {
       this.els.pdfBtn.href = pdfUrl;
       this.els.pdfBtn.style.display = "inline-block";
     } else {
