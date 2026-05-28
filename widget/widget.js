@@ -528,6 +528,7 @@ class QIQWidget {
       this.els.pdfBtn.style.display = "none";
     }
     this.els.callBtn.href = this.opts.calendlyUrl;
+    this.els.callBtn.style.display = status === "eligible" ? "inline-block" : "none";
 
     // Company name in "Book a consultation with ___"
     const companyNameEl = this.root.querySelector(".qiq-company-name");
