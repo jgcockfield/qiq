@@ -139,7 +139,7 @@
   background: var(--qiq-footer-bg, #d1d2ff);
   padding: 16px 0;
   text-align: center;
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--qiq-footer-text, #1f2937);
   letter-spacing: 0.05em;
