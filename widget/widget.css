@@ -532,6 +532,17 @@
   margin: 0;
 }
 
+/* Needs-review attorney follow-up banner */
+.qiq-review-banner {
+  background: #f3f4f6;
+  border-left: 3px solid #6b7280;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+}
+
 /* Clarifications section */
 .qiq-clars-heading {
   font-size: 14px;

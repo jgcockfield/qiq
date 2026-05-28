@@ -505,6 +505,11 @@ class QIQWidget {
     if (summary) html += `<p class="qiq-summary-sentence">${this._escapeHtml(summary)}</p>`;
     html += `</div>`;
 
+    // Needs-review attorney follow-up banner
+    if (status === "needs_review") {
+      html += `<div class="qiq-review-banner">An attorney will review your case. If a path to qualification exists, we’ll contact you to book a consultation.</div>`;
+    }
+
     // Clarifications
     if (clars.length) {
       html += `<h4 class="qiq-clars-heading">Clarifications</h4>`;
