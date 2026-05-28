@@ -510,8 +510,8 @@ class QIQWidget {
       html += `<div class="qiq-review-banner">An attorney will review your case. If a path to qualification exists, we’ll contact you to book a consultation.</div>`;
     }
 
-    // Clarifications
-    if (clars.length) {
+    // Clarifications (not shown for eligible — calendar is the next step)
+    if (status !== "eligible" && clars.length) {
       html += `<h4 class="qiq-clars-heading">Clarifications</h4>`;
       html += `<div class="qiq-clars-list">`;
       clars.forEach(c => { html += this._renderClarification(c); });
@@ -520,9 +520,13 @@ class QIQWidget {
 
     // Inline Calendly calendar for eligible prospects
     if (status === "eligible") {
-      const prefill = "?name=" + encodeURIComponent(this.session.name || "")
-                    + "&email=" + encodeURIComponent(this.session.email || "");
-      html += `<div class="qiq-calendly-inline" data-url="${this.opts.calendlyUrl}${prefill}"></div>`;
+      var calParams = "hide_gdpr_banner=1&hide_event_type_details=1&embed_type=Inline";
+      var sep = this.opts.calendlyUrl.indexOf("?") === -1 ? "?" : "&";
+      var fullCalUrl = this.opts.calendlyUrl + sep
+                     + "name="  + encodeURIComponent(this.session.name  || "")
+                     + "&email=" + encodeURIComponent(this.session.email || "")
+                     + "&" + calParams;
+      html += `<div class="qiq-calendly-inline" data-url="${fullCalUrl}"></div>`;
     }
 
     this.els.resultContent.innerHTML = html;
