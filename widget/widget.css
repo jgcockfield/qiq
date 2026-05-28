@@ -543,6 +543,13 @@
   color: #374151;
 }
 
+/* Inline Calendly embed for eligible results */
+.qiq-calendly-inline {
+  min-width: 100%;
+  height: 380px;
+  margin-top: 12px;
+}
+
 /* Clarifications section */
 .qiq-clars-heading {
   font-size: 14px;

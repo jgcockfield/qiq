@@ -518,7 +518,35 @@ class QIQWidget {
       html += `</div>`;
     }
 
+    // Inline Calendly calendar for eligible prospects
+    if (status === "eligible") {
+      const prefill = "?name=" + encodeURIComponent(this.session.name || "")
+                    + "&email=" + encodeURIComponent(this.session.email || "");
+      html += `<div class="qiq-calendly-inline" data-url="${this.opts.calendlyUrl}${prefill}"></div>`;
+    }
+
     this.els.resultContent.innerHTML = html;
+
+    // Load and init Calendly inline widget for eligible results
+    if (status === "eligible") {
+      if (!document.querySelector('script[src*="calendly.com/assets/external/widget.js"]')) {
+        var calScript = document.createElement("script");
+        calScript.src = "https://assets.calendly.com/assets/external/widget.js";
+        calScript.async = true;
+        document.body.appendChild(calScript);
+      }
+      var calEl  = this.els.resultContent.querySelector(".qiq-calendly-inline");
+      var calUrl = calEl && calEl.dataset.url;
+      if (calEl && calUrl) {
+        (function initCalendly(url, el) {
+          if (window.Calendly) {
+            window.Calendly.initInlineWidget({ url: url, parentElement: el });
+          } else {
+            setTimeout(function () { initCalendly(url, el); }, 200);
+          }
+        }(calUrl, calEl));
+      }
+    }
 
     // ── Footer wiring ───────────────────────────────────────────
     if (pdfUrl) {
@@ -527,8 +555,8 @@ class QIQWidget {
     } else {
       this.els.pdfBtn.style.display = "none";
     }
-    this.els.callBtn.href = this.opts.calendlyUrl;
-    this.els.callBtn.style.display = status === "eligible" ? "inline-block" : "none";
+    // Inline calendar replaces "Book a Call" button for all statuses
+    this.els.callBtn.style.display = "none";
 
     // Company name in "Book a consultation with ___"
     const companyNameEl = this.root.querySelector(".qiq-company-name");
