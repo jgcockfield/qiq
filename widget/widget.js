@@ -175,7 +175,7 @@ class QIQWidget {
         <p class="qiq-layer-0-subtext">Complete a 1-minute eligibility check. See your result instantly, then book your consultation.</p>
         <input type="text"  class="qiq-layer-0-input" placeholder="Your name" />
         <input type="email" class="qiq-layer-0-input" placeholder="Your email address" />
-        <button class="qiq-layer-0-button">Book a free consultation</button>
+        <button class="qiq-layer-0-button">Get Started</button>
         <p class="qiq-layer-0-note">This is a preliminary screening, results do not constitute legal advice.</p>
       </div>
       <div class="qiq-footer">
