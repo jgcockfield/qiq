@@ -2,12 +2,18 @@
 
 Requires env vars:
   SENDGRID_API_KEY
-  LEAD_NOTIFICATION_TO   (recipient: business admin email)
   LEAD_NOTIFICATION_FROM (sender: e.g. jude@nimbleai.email)
   ADMIN_CONSOLE_URL      (link to admin console)
 
 Optional:
   SEND_LEAD_NOTIFICATIONS (default "true"; set to "false" to disable)
+
+NOTE — DEMO BEHAVIOR:
+  The notification is sent TO the email address the prospect submitted in Layer 0,
+  so the person running the demo experiences receiving the lead alert themselves.
+  LEAD_NOTIFICATION_TO env var is read but not used in this demo flow.
+  For production, replace `to_email = email` with `to_email = os.getenv("LEAD_NOTIFICATION_TO", "").strip()`
+  and add it back to the missing-vars check.
 
 All failures are logged and swallowed — email never blocks record saving.
 """
@@ -60,13 +66,12 @@ def _send(
         return
 
     api_key     = os.getenv("SENDGRID_API_KEY", "").strip()
-    to_email    = os.getenv("LEAD_NOTIFICATION_TO", "").strip()
+    _unused_to  = os.getenv("LEAD_NOTIFICATION_TO", "").strip()  # kept for future production use
     from_email  = os.getenv("LEAD_NOTIFICATION_FROM", "").strip()
     console_url = os.getenv("ADMIN_CONSOLE_URL", "").strip()
 
     missing = [k for k, v in {
         "SENDGRID_API_KEY":        api_key,
-        "LEAD_NOTIFICATION_TO":    to_email,
         "LEAD_NOTIFICATION_FROM":  from_email,
     }.items() if not v]
 
@@ -74,6 +79,13 @@ def _send(
         logger.warning(
             "Lead notification skipped — missing env vars: %s", ", ".join(missing)
         )
+        return
+
+    # DEMO: send to the prospect's own email so the demo runner sees the alert.
+    # Production: replace this with `to_email = os.getenv("LEAD_NOTIFICATION_TO", "").strip()`
+    to_email = (email or "").strip()
+    if not to_email or "@" not in to_email:
+        logger.warning("Lead notification skipped — submitted email missing or invalid: %r", email)
         return
 
     try:
