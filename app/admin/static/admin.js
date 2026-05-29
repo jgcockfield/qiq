@@ -165,6 +165,7 @@ function closeModal() {
 
 function parsePathway(pathway) {
     if (!pathway) return { country: '—', visaType: '—' };
+    pathway = pathway.replace(/_/g, '-');
     const lastDash = pathway.lastIndexOf('-');
     if (lastDash === -1) return { country: pathway, visaType: '—' };
     const countrySlug = pathway.slice(0, lastDash);
