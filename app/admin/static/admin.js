@@ -46,12 +46,16 @@ function renderRunsTable(runs) {
     const listContainer = document.getElementById('edr-list');
     listContainer.innerHTML = '';
 
+    const GRID = '140px 220px 110px 110px 1fr 1fr 80px';
+
     const header = document.createElement('div');
     header.className = 'edr-item';
     header.innerHTML = `
-        <div class="edr-item-header" style="display:grid;grid-template-columns:140px 220px 1fr 1fr 80px;gap:12px;align-items:center;">
+        <div class="edr-item-header" style="display:grid;grid-template-columns:${GRID};gap:12px;align-items:center;">
             <strong>Status</strong>
             <strong>Created</strong>
+            <strong>Country</strong>
+            <strong>Visa Type</strong>
             <strong>Name</strong>
             <strong>Email</strong>
             <strong>Chat Log</strong>
@@ -68,11 +72,15 @@ function renderRunsTable(runs) {
         const created = run.created_at ? new Date(run.created_at).toLocaleString() : '—';
         const fullName = run.full_name || '—';
         const email = run.email || '—';
+        const pathway = run.chat_log?.input?.pathway || null;
+        const { country, visaType } = parsePathway(pathway);
 
         row.innerHTML = `
-            <div class="edr-item-header" style="display:grid;grid-template-columns:140px 220px 1fr 1fr 80px;gap:12px;align-items:center;">
+            <div class="edr-item-header" style="display:grid;grid-template-columns:${GRID};gap:12px;align-items:center;">
                 <span class="badge ${statusClass}">${status}</span>
                 <span>${created}</span>
+                <span>${escapeHtml(country)}</span>
+                <span>${escapeHtml(visaType)}</span>
                 <span>${escapeHtml(fullName)}</span>
                 <span>${escapeHtml(email)}</span>
                 <span><a href="#" class="view-chat-link">View</a></span>
@@ -153,6 +161,19 @@ async function openChatModal(run) {
 
 function closeModal() {
     document.getElementById('chat-modal').style.display = 'none';
+}
+
+function parsePathway(pathway) {
+    if (!pathway) return { country: '—', visaType: '—' };
+    const lastDash = pathway.lastIndexOf('-');
+    if (lastDash === -1) return { country: pathway, visaType: '—' };
+    const countrySlug = pathway.slice(0, lastDash);
+    const visaCode    = pathway.slice(lastDash + 1);
+    const country = countrySlug
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+    return { country, visaType: visaCode.toUpperCase() };
 }
 
 function formatKey(key) {
