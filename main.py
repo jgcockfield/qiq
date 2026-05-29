@@ -17,6 +17,7 @@ from app.api.admin_routes import router as admin_router
 from app.core.eligibility_decision_record import build_edr_from_evaluator
 from app.core.session_store import get_session
 from app.storage.run_store import save_run
+from app.notifications.lead_email import send_lead_notification
 from app.engine.evaluator import evaluate
 from app.engine.eligibility_rules import evaluate_eligibility
 from app.exports.edr_export import write_edr_json
@@ -220,10 +221,16 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
         if session_id:
             session = get_session(session_id)
 
+        # Identity: prefer session store, fall back to payload fields sent by widget
+        full_name = (session.get("full_name") if session else None) or data.get("full_name") or None
+        email     = (session.get("email")     if session else None) or data.get("email")     or None
+        phone     = data.get("phone") or None
+
         run = {
             "session_id": session_id,
-            "full_name": session.get("full_name") if session else None,
-            "email": session.get("email") if session else None,
+            "full_name": full_name,
+            "email": email,
+            "phone": phone,
             "eligibility_status": eligibility_raw.get("eligibility_status"),
             "summary": ui_result.get("summary"),
             "primary_reason": eligibility_raw.get("primary_reason_code"),
@@ -242,6 +249,18 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
             logger.info(f"✓ Run saved: {run_id}")
         except Exception as e:
             logger.error(f"Failed to save run: {e}", exc_info=True)
+
+        # Send internal lead notification (non-blocking)
+        try:
+            send_lead_notification(
+                full_name=full_name,
+                email=email,
+                phone=phone,
+                pathway=data.get("pathway"),
+                status=eligibility_raw.get("eligibility_status"),
+            )
+        except Exception as e:
+            logger.error(f"Lead notification failed (non-fatal): {e}", exc_info=True)
 
     if export_error:
         logger.error(f"Export completed with errors: {export_error}")
