@@ -502,7 +502,7 @@ class QIQWidget {
     if (meta.work_type) html += `<span>Work Type: ${this._escapeHtml(meta.work_type)}</span>`;
     if (meta.visa_type) html += `<span>Visa Type: ${this._escapeHtml(meta.visa_type)}</span>`;
     html += `</div>`;
-    if (summary) html += `<p class="qiq-summary-sentence">${this._escapeHtml(summary)}</p>`;
+    if (summary && status !== "eligible") html += `<p class="qiq-summary-sentence">${this._escapeHtml(summary)}</p>`;
     html += `</div>`;
 
     // Needs-review attorney follow-up banner
@@ -553,6 +553,9 @@ class QIQWidget {
     }
 
     // ── Footer wiring ───────────────────────────────────────────
+    const resultFooter = this.root.querySelector(".qiq-result-footer");
+    if (resultFooter) resultFooter.style.display = status === "eligible" ? "none" : "";
+
     if (pdfUrl && status !== "eligible") {
       this.els.pdfBtn.href = pdfUrl;
       this.els.pdfBtn.style.display = "inline-block";
