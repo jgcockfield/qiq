@@ -6,7 +6,7 @@
  *   <div data-qiq-widget
  *        data-api-base="https://your-api.com"
  *        data-calendly-url="https://calendly.com/your-link"
- *        data-pathway="portugal_d7"
+ *        data-pathway="costa-rica-dnv"
  *        data-company-name="Great Expatations">
  *   </div>
  *   <script src="https://your-host/widget/embed.js"></script>

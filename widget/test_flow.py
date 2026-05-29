@@ -76,7 +76,7 @@ for path, ct in [("/", "text/html"), ("/widget.css", "text/css"), ("/widget.js",
 SESSION_ID = str(uuid.uuid4())
 NAME       = "Jane Smith"
 EMAIL      = "jane@example.com"
-PATHWAY    = "portugal_d7"
+PATHWAY    = "costa-rica-dnv"
 
 base_payload = {
     "session_id": SESSION_ID,
@@ -175,10 +175,10 @@ check("eligible run:     exactly 1 session ID used across all calls",
       len(eligible_run["session_ids"]), 1)
 check("eligible run:     session ID matches the one we sent",
       SESSION_ID in eligible_run["session_ids"], True)
-check("eligible run:     pathway='portugal_d7' in every call",
-      eligible_run["pathways_seen"], {"portugal_d7"})
-check("not_eligible run: pathway='portugal_d7' in every call",
-      not_eligible_run["pathways_seen"], {"portugal_d7"})
+check("eligible run:     pathway='costa-rica-dnv' in every call",
+      eligible_run["pathways_seen"], {"costa-rica-dnv"})
+check("not_eligible run: pathway='costa-rica-dnv' in every call",
+      not_eligible_run["pathways_seen"], {"costa-rica-dnv"})
 
 # ── edr_ids are unique per call (not frozen at import time) ───────────────────
 separator("UUID freshness (not frozen at module load)")
