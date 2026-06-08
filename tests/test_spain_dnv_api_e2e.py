@@ -63,13 +63,13 @@ VALID_SPAIN_DNV_ANSWERS = {
     "routing.work_relationship": "employee",
     "role.profession_description": "Software Engineer",
     "routing.income_foreign_only": "yes",
-    "income.gross_monthly_income_band_eur": "eur_5000_10000",
-    "income.income_history_months": "12_or_more",
-    "income.income_evidence_types": [
+    "role.employee.gross_monthly_income_band_eur": "eur_5000_10000",
+    "role.employee.income_evidence_types": [
         "bank_statements",
         "employment_contract",
         "pay_stubs",
     ],
+    "role.employee.income_evidence_months": "12_or_more",
     "routing.passport_validity_months": "24",
     "documents.police_clearance_available": "yes",
     "routing.criminal_record_flag": "no",
@@ -101,9 +101,9 @@ def test_spain_dnv_valid_applicant_full_evaluate_flow(client):
         "routing.work_relationship",
         "role.profession_description",
         "routing.income_foreign_only",
-        "income.gross_monthly_income_band_eur",
-        "income.income_evidence_types",
-        "income.income_history_months",
+        "role.employee.gross_monthly_income_band_eur",
+        "role.employee.income_evidence_types",
+        "role.employee.income_evidence_months",
         "routing.has_dependents",
         "identity.nationality",
         "identity.country_of_residence",
@@ -137,7 +137,7 @@ def test_spain_dnv_valid_applicant_full_evaluate_flow(client):
 
 def test_spain_dnv_below_2800_full_evaluate_flow_returns_not_eligible(client):
     answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
-    answers["income.gross_monthly_income_band_eur"] = "below_2800"
+    answers["role.employee.gross_monthly_income_band_eur"] = "below_2800"
 
     body, asked_keys = _walk_spain_dnv_flow(client, answers)
 

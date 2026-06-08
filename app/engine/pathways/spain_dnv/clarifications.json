@@ -38,6 +38,21 @@
       "clarification": "The income evidence selected does not currently include the expected documents for the applicant's work type. The case should be reviewed to confirm whether alternative documents can support the application."
     },
     {
+      "requirement": "employee_income_evidence_incomplete",
+      "title": "Employee Income Evidence Incomplete",
+      "clarification": "Employee applicants should provide employee-specific salary evidence, such as bank statements, an employment contract, and pay stubs. If those documents are incomplete, the case should be reviewed to confirm whether alternative employee evidence can support eligibility."
+    },
+    {
+      "requirement": "contractor_income_evidence_incomplete",
+      "title": "Contractor Income Evidence Incomplete",
+      "clarification": "Contractor or self-employed applicants should provide contractor-specific income evidence, such as bank statements, invoices, and service agreements or contracts. If those documents are incomplete, the case should be reviewed to confirm whether alternative contractor evidence can support eligibility."
+    },
+    {
+      "requirement": "business_owner_income_evidence_incomplete",
+      "title": "Business Owner Income Evidence Incomplete",
+      "clarification": "Business-owner applicants should provide business-specific income evidence, such as bank statements, business registration, and tax returns or financial statements. If those documents are incomplete, the case should be reviewed to confirm whether alternative business evidence can support eligibility."
+    },
+    {
       "requirement": "passport_validity_needs_review",
       "title": "Passport Validity Needs Review",
       "clarification": "The passport validity answer is missing or below the screening threshold. The applicant may need to renew the passport or confirm validity before eligibility is confirmed."

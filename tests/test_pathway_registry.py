@@ -194,6 +194,20 @@ def _spain_payload(
         payload["role"]["contractor"] = {
             "service_agreements_available": service_agreements,
         }
+    elif work_relationship == "contractor":
+        payload["role"]["contractor"] = {
+            "service_agreements_available": "can_secure_service_agreements",
+        }
+
+    role_payload = payload["role"].setdefault(work_relationship, {})
+    role_payload.update(
+        {
+            "gross_monthly_income_band_eur": income_band,
+            "income_evidence_months": income_history,
+            "income_evidence_types": income_evidence_types,
+        }
+    )
+    payload["income"] = {}
     return payload
 
 
@@ -465,7 +479,131 @@ def test_spain_incomplete_income_evidence_returns_needs_review():
     )
 
     assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["income_evidence_incomplete"]
+    assert result["failed_requirements"] == ["employee_income_evidence_incomplete"]
+
+
+def test_spain_each_work_type_gets_only_its_role_income_fields():
+    cases = {
+        "employee": [
+            "role.employee.gross_monthly_income_band_eur",
+            "role.employee.income_evidence_types",
+            "role.employee.income_evidence_months",
+        ],
+        "contractor": [
+            "role.contractor.gross_monthly_income_band_eur",
+            "role.contractor.income_evidence_types",
+            "role.contractor.income_evidence_months",
+        ],
+        "business_owner": [
+            "role.business_owner.gross_monthly_income_band_eur",
+            "role.business_owner.income_evidence_types",
+            "role.business_owner.income_evidence_months",
+        ],
+    }
+    answers = {
+        "role.employee.gross_monthly_income_band_eur": "eur_2800_5000",
+        "role.employee.income_evidence_types": [
+            "bank_statements",
+            "employment_contract",
+            "pay_stubs",
+        ],
+        "role.employee.income_evidence_months": "12_or_more",
+        "role.contractor.gross_monthly_income_band_eur": "eur_2800_5000",
+        "role.contractor.income_evidence_types": [
+            "bank_statements",
+            "service_agreements_or_contracts",
+            "invoices",
+        ],
+        "role.contractor.income_evidence_months": "12_or_more",
+        "role.business_owner.gross_monthly_income_band_eur": "eur_2800_5000",
+        "role.business_owner.income_evidence_types": [
+            "bank_statements",
+            "business_registration",
+            "tax_returns_or_financial_statements",
+        ],
+        "role.business_owner.income_evidence_months": "12_or_more",
+    }
+
+    for work_relationship, expected_keys in cases.items():
+        payload = {
+            "routing": {
+                "service_interest": "digital_nomad_visa",
+                "work_relationship": work_relationship,
+                "income_foreign_only": "yes",
+            },
+            "role": {"profession_description": "Software Engineer"},
+        }
+        if work_relationship == "contractor":
+            payload["role"]["contractor"] = {
+                "service_agreements_available": "can_secure_service_agreements"
+            }
+
+        asked_keys = []
+        for expected_key in expected_keys:
+            result = evaluate(payload, pathway="spain-dnv")
+            asked_keys.append(result["next_field_key"])
+            assert result["next_field_key"] == expected_key
+
+            current = payload
+            parts = expected_key.split(".")
+            for part in parts[:-1]:
+                current = current.setdefault(part, {})
+            current[parts[-1]] = answers[expected_key]
+
+        result = evaluate(payload, pathway="spain-dnv")
+        assert result["next_field_key"] == "routing.has_dependents"
+        assert all("income." not in key for key in asked_keys)
+        assert all(
+            key.startswith(f"role.{work_relationship}.")
+            for key in asked_keys
+        )
+
+
+def test_spain_valid_employee_contractor_and_business_owner_can_return_eligible():
+    for work_relationship in ("employee", "contractor", "business_owner"):
+        result = evaluate_eligibility(
+            _spain_payload(work_relationship=work_relationship),
+            pathway="spain-dnv",
+        )
+
+        assert result["eligibility_status"] == "eligible"
+        assert result["failed_requirements"] == []
+
+
+def test_spain_role_specific_evidence_gaps_return_needs_review():
+    cases = {
+        "employee": "employee_income_evidence_incomplete",
+        "contractor": "contractor_income_evidence_incomplete",
+        "business_owner": "business_owner_income_evidence_incomplete",
+    }
+
+    for work_relationship, expected_failure in cases.items():
+        result = evaluate_eligibility(
+            _spain_payload(
+                work_relationship=work_relationship,
+                income_evidence_types=["bank_statements"],
+            ),
+            pathway="spain-dnv",
+        )
+
+        assert result["eligibility_status"] == "needs_review"
+        assert result["failed_requirements"] == [expected_failure]
+
+
+def test_spain_role_specific_evidence_failure_uses_role_clarification():
+    eligibility = evaluate_eligibility(
+        _spain_payload(
+            work_relationship="business_owner",
+            income_evidence_types=["bank_statements"],
+        ),
+        pathway="spain-dnv",
+    )
+    output = build_output(eligibility)
+
+    assert output["clarifications"][0]["requirement"] == (
+        "business_owner_income_evidence_incomplete"
+    )
+    assert "Business-owner applicants" in output["clarifications"][0]["clarification"]
 
 
 def test_spain_passport_background_and_insurance_gaps_return_needs_review():

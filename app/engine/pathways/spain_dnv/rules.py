@@ -37,6 +37,12 @@ REQUIRED_EVIDENCE_BY_WORK_TYPE: Dict[str, Set[str]] = {
     },
 }
 
+EVIDENCE_FAILURE_BY_WORK_TYPE = {
+    "employee": "employee_income_evidence_incomplete",
+    "contractor": "contractor_income_evidence_incomplete",
+    "business_owner": "business_owner_income_evidence_incomplete",
+}
+
 HARD_FAILURES = {
     "income_below_minimum",
     "foreign_income_source_unconfirmed",
@@ -80,13 +86,32 @@ def _has_required_income_evidence(work_type: Any, evidence_types: List[str]) -> 
     return required.issubset(set(evidence_types))
 
 
+def _role_key(work_type: Any, field_name: str) -> str | None:
+    if work_type not in {"business_owner", "contractor", "employee"}:
+        return None
+    return f"role.{work_type}.{field_name}"
+
+
+def _get_role_value(payload: Dict[str, Any], work_type: Any, field_name: str) -> Any:
+    dotted_key = _role_key(work_type, field_name)
+    if not dotted_key:
+        return None
+    return _get_dotted(payload, dotted_key)
+
+
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     routing = payload.get("routing", {}) if isinstance(payload, dict) else {}
     service_interest = _as_values(_get_dotted(payload, "routing.service_interest"))
     work_type = _get_dotted(payload, "routing.work_relationship")
-    income_band = _get_dotted(payload, "income.gross_monthly_income_band_eur")
-    income_history = _get_dotted(payload, "income.income_history_months")
-    income_evidence = _as_values(_get_dotted(payload, "income.income_evidence_types"))
+    income_band = _get_role_value(
+        payload,
+        work_type,
+        "gross_monthly_income_band_eur",
+    )
+    income_history = _get_role_value(payload, work_type, "income_evidence_months")
+    income_evidence = _as_values(
+        _get_role_value(payload, work_type, "income_evidence_types")
+    )
     service_agreements = _get_dotted(
         payload,
         "role.contractor.service_agreements_available",
@@ -124,7 +149,12 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         failed.append("income_duration_needs_review")
 
     if not _has_required_income_evidence(work_type, income_evidence):
-        failed.append("income_evidence_incomplete")
+        failed.append(
+            EVIDENCE_FAILURE_BY_WORK_TYPE.get(
+                str(work_type or ""),
+                "income_evidence_incomplete",
+            )
+        )
 
     passport_months = _as_int(_get_dotted(payload, "routing.passport_validity_months"))
     if (

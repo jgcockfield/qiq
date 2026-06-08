@@ -52,45 +52,112 @@
       "applies_when": { "contains": ["routing.service_interest", "digital_nomad_visa"] }
     },
     {
-      "key": "income.gross_monthly_income_band_eur",
+      "key": "role.employee.gross_monthly_income_band_eur",
       "depends_on": ["routing.income_foreign_only"],
-      "label": "What is your gross monthly income before tax?",
-      "description": "Consider your Gross Monthly Income from recent months or the amount you could reasonably earn in the coming months, if necessary, to meet the visa requirements.",
+      "label": "What is your gross monthly salary before tax?",
+      "description": "Consider your gross monthly salary from recent months or the amount you could reasonably earn in the coming months, if necessary, to meet the visa requirements.",
       "input_type": "choice",
       "required": true,
       "choices": ["below_2800", "eur_2800_5000", "eur_5000_10000", "above_10000"],
-      "applies_when": { "contains": ["routing.service_interest", "digital_nomad_visa"] }
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
     },
     {
-      "key": "income.income_evidence_types",
-      "depends_on": ["income.gross_monthly_income_band_eur"],
-      "label": "Which documents can you provide as proof of income or professional activity?",
+      "key": "role.employee.income_evidence_types",
+      "depends_on": ["role.employee.gross_monthly_income_band_eur"],
+      "label": "Which employee documents can you provide as proof of salary?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
         "bank_statements",
         "employment_contract",
         "pay_stubs",
-        "service_agreements_or_contracts",
-        "invoices",
-        "business_registration",
-        "tax_returns_or_financial_statements",
         "other"
       ],
-      "applies_when": { "contains": ["routing.service_interest", "digital_nomad_visa"] }
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
     },
     {
-      "key": "income.income_history_months",
-      "depends_on": ["income.income_evidence_types"],
-      "label": "For how many months can you prove this income with those documents?",
+      "key": "role.employee.income_evidence_months",
+      "depends_on": ["role.employee.income_evidence_types"],
+      "label": "For how many months can you prove this salary with those documents?",
       "input_type": "choice",
       "required": true,
       "choices": ["less_than_3", "3_to_5", "6_to_11", "12_or_more"],
-      "applies_when": { "contains": ["routing.service_interest", "digital_nomad_visa"] }
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
+    },
+    {
+      "key": "role.contractor.gross_monthly_income_band_eur",
+      "depends_on": ["routing.income_foreign_only"],
+      "label": "What is your gross monthly freelance or contractor income before tax?",
+      "description": "Consider your gross monthly contractor income from recent months or the amount you could reasonably earn in the coming months, if necessary, to meet the visa requirements.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["below_2800", "eur_2800_5000", "eur_5000_10000", "above_10000"],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.income_evidence_types",
+      "depends_on": ["role.contractor.gross_monthly_income_band_eur"],
+      "label": "Which contractor documents can you provide as proof of income?",
+      "input_type": "multi_choice",
+      "required": true,
+      "choices": [
+        "bank_statements",
+        "service_agreements_or_contracts",
+        "invoices",
+        "other"
+      ],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.income_evidence_months",
+      "depends_on": ["role.contractor.income_evidence_types"],
+      "label": "For how many months can you prove this contractor income with those documents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["less_than_3", "3_to_5", "6_to_11", "12_or_more"],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.business_owner.gross_monthly_income_band_eur",
+      "depends_on": ["routing.income_foreign_only"],
+      "label": "What is your average gross monthly business-owner income before tax?",
+      "description": "Consider your average gross monthly business income from recent months or the amount you could reasonably earn in the coming months, if necessary, to meet the visa requirements.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["below_2800", "eur_2800_5000", "eur_5000_10000", "above_10000"],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
+    },
+    {
+      "key": "role.business_owner.income_evidence_types",
+      "depends_on": ["role.business_owner.gross_monthly_income_band_eur"],
+      "label": "Which business-owner documents can you provide as proof of business income?",
+      "input_type": "multi_choice",
+      "required": true,
+      "choices": [
+        "bank_statements",
+        "business_registration",
+        "tax_returns_or_financial_statements",
+        "profit_loss_statements",
+        "other"
+      ],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
+    },
+    {
+      "key": "role.business_owner.income_evidence_months",
+      "depends_on": ["role.business_owner.income_evidence_types"],
+      "label": "For how many months can you prove this business income with those documents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["less_than_3", "3_to_5", "6_to_11", "12_or_more"],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
       "key": "routing.has_dependents",
-      "depends_on": ["income.income_history_months"],
+      "depends_on": [
+        "role.employee.income_evidence_months",
+        "role.contractor.income_evidence_months",
+        "role.business_owner.income_evidence_months"
+      ],
       "label": "Are you applying as an individual or with family dependents?",
       "input_type": "choice",
       "required": true,
