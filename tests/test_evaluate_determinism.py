@@ -159,24 +159,24 @@ def normalize_required_fields(body: Dict[str, Any]) -> Dict[str, Any]:
 # -----------------
 
 
-def test_route_001_missing_payload_returns_422_and_system_authority_failure(client):
-    """T-ROUTE-001: Empty payload => 422 + SYSTEM_AUTHORITY_FAILURE."""
+def test_route_001_missing_payload_asks_country_selector(client):
+    """T-ROUTE-001: Empty payload => first Stage 1 country selector."""
     r = post_evaluate(client, {})
-    assert r.status_code == 422
+    assert r.status_code == 200
 
-    # Body may or may not include full EvaluateResponse on validation errors.
-    # Contract addition expects a body with SYSTEM_AUTHORITY_FAILURE.
-    rule = find_rule(r.json, "SYSTEM_AUTHORITY_FAILURE")
-    assert rule is not None, "Expected SYSTEM_AUTHORITY_FAILURE rule_result in body"
+    assert r.json["next_field_key"] == "routing.country"
+    assert r.json["missing_fields"] == ["routing.country"]
+    assert r.json["field"]["choices"] == ["spain", "costa_rica"]
 
 
-def test_route_002_invalid_work_relationship_returns_422_and_system_authority_failure(client):
-    """T-ROUTE-002: Invalid work_relationship => 422 + SYSTEM_AUTHORITY_FAILURE."""
-    r = post_evaluate(client, {"routing": {"work_relationship": "freelancer"}})
-    assert r.status_code == 422
+def test_route_002_selected_country_asks_filtered_pathway(client):
+    """T-ROUTE-002: Selected country => filtered Stage 1 pathway selector."""
+    r = post_evaluate(client, {"routing": {"country": "spain"}})
+    assert r.status_code == 200
 
-    rule = find_rule(r.json, "SYSTEM_AUTHORITY_FAILURE")
-    assert rule is not None, "Expected SYSTEM_AUTHORITY_FAILURE rule_result in body"
+    assert r.json["next_field_key"] == "routing.pathway"
+    assert r.json["missing_fields"] == ["routing.pathway"]
+    assert r.json["field"]["choices"] == ["spain_dnv"]
 
 
 def test_core_002_repeat_stability_missing_fields_order_is_identical(client):

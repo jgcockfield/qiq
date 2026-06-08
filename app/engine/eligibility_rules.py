@@ -7,9 +7,11 @@ This layer does NOT ask questions and does NOT render output.
 Rules here should remain deterministic and conservative.
 """
 
-from typing import Dict, List
+from typing import Dict, List, Optional
+from importlib import import_module
 
 from app.engine.evidence_validation import validate_income_evidence
+from app.engine.pathway_registry import resolve_pathway
 
 
 INCOME_MIN_MONTHLY_USD = 3000
@@ -25,7 +27,7 @@ EMPLOYEE_REQUIRED_EVIDENCE = [
 ]
 
 
-def evaluate_eligibility(payload: Dict) -> Dict:
+def evaluate_eligibility(payload: Dict, pathway: Optional[str] = None) -> Dict:
     """
     Evaluate eligibility based on completed intake payload.
 
@@ -33,6 +35,13 @@ def evaluate_eligibility(payload: Dict) -> Dict:
     - eligibility_status: eligible | needs_review | not_eligible
     - failed_requirements: list of requirement keys
     """
+
+    routing = payload.get("routing", {}) if isinstance(payload.get("routing"), dict) else {}
+    pathway_definition = resolve_pathway(pathway or payload.get("pathway") or routing.get("pathway"))
+
+    if pathway_definition.rules_module:
+        rules_module = import_module(pathway_definition.rules_module)
+        return rules_module.evaluate_eligibility(payload)
 
     failed: List[str] = []
 

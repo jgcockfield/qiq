@@ -1,0 +1,242 @@
+{
+  "pathway": "costa_rica_pensionado",
+  "source": {
+    "type": "requirements_reference",
+    "file": "app/engine/pathways/costa_rica_pensionado/requirements_reference.md",
+    "title": "Costa Rica Pensionado Requirements Reference"
+  },
+  "taxonomy_fields": [
+    {
+      "key": "routing.applicant_type",
+      "depends_on": [],
+      "label": "Are you applying as an individual or with family dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["individual", "family"]
+    },
+    {
+      "key": "role.pensionado.retired_from_habitual_occupation",
+      "depends_on": ["routing.applicant_type"],
+      "label": "Are you retired from your habitual occupation?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "role.pensionado.pension_source_type",
+      "depends_on": ["role.pensionado.retired_from_habitual_occupation"],
+      "label": "What type of pension or retirement benefit do you receive?",
+      "input_type": "choice",
+      "required": true,
+      "choices": [
+        "social_security",
+        "government_pension",
+        "private_pension",
+        "retirement_benefit",
+        "other"
+      ]
+    },
+    {
+      "key": "role.pensionado.pension_retirement_based",
+      "depends_on": ["role.pensionado.pension_source_type"],
+      "label": "Does this income arise from retirement or a similar pension benefit?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "routing.no_work_authorization_acknowledged",
+      "depends_on": ["role.pensionado.pension_retirement_based"],
+      "label": "Is your Costa Rica Pensionado case based on pension income rather than Costa Rican employment?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "role.pensionado.pension_foreign_source_confirmed",
+      "depends_on": ["routing.no_work_authorization_acknowledged"],
+      "label": "Is the pension income issued from outside Costa Rica?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "role.pensionado.monthly_pension_usd",
+      "depends_on": ["role.pensionado.pension_foreign_source_confirmed"],
+      "label": "What is your monthly pension income in USD?",
+      "description": "Costa Rica Pensionado residency requires pension income of at least US$1,000 per month.",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "role.pensionado.pension_certificate_available",
+      "depends_on": ["role.pensionado.monthly_pension_usd"],
+      "label": "Which documents can you provide as proof of your pension source and amount?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "role.pensionado.pension_duration_type",
+      "depends_on": ["role.pensionado.pension_certificate_available"],
+      "label": "For how long can you prove this pension will continue?",
+      "input_type": "choice",
+      "required": true,
+      "choices": [
+        "lifetime_or_indefinite",
+        "fixed_term_12_months_or_more",
+        "fixed_term_less_than_12_months",
+        "not_sure"
+      ]
+    },
+    {
+      "key": "routing.dependents_count",
+      "depends_on": ["routing.applicant_type"],
+      "label": "How many dependents are included in your application?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "documents.dependent_documents_available",
+      "depends_on": ["routing.dependents_count"],
+      "label": "Which marriage, birth, or dependency evidence supports the included dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "identity.nationality",
+      "depends_on": ["role.pensionado.pension_duration_type"],
+      "label": "What is your nationality?",
+      "input_type": "text",
+      "required": true
+    },
+    {
+      "key": "identity.country_of_residence",
+      "depends_on": ["identity.nationality"],
+      "label": "What is your current legal country of residence?",
+      "input_type": "text",
+      "required": true
+    },
+    {
+      "key": "routing.passport_validity_months",
+      "depends_on": ["identity.country_of_residence"],
+      "label": "How many months will your passport be valid from your intended filing or entry date?",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "documents.passport_copy_available",
+      "depends_on": ["routing.passport_validity_months"],
+      "label": "Which passport identity pages or travel-document evidence can you provide?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.ccss_renewal_ready",
+      "depends_on": ["documents.passport_copy_available"],
+      "label": "Do you have CCSS or Costa Rican social insurance coverage, or will you register after approval?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["already_registered", "will_register_after_approval", "not_ready"]
+    },
+    {
+      "key": "documents.police_clearance_available",
+      "depends_on": ["documents.ccss_renewal_ready"],
+      "label": "Can you obtain a criminal background certificate from your country of origin or legal residence?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "routing.criminal_record_flag",
+      "depends_on": ["documents.police_clearance_available"],
+      "label": "Do you have any criminal convictions that may appear on a background check?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.birth_certificate_available",
+      "depends_on": ["routing.criminal_record_flag"],
+      "label": "Do you have an apostilled or legalized birth certificate?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.passport_photos_available",
+      "depends_on": ["documents.birth_certificate_available"],
+      "label": "Do you have recent passport-size photographs?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.filiacion_form_ready",
+      "depends_on": ["documents.passport_photos_available"],
+      "label": "Will your application include the completed and signed affiliation/filiacion form?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.request_letter_ready",
+      "depends_on": ["documents.filiacion_form_ready"],
+      "label": "Will your application include a Spanish request letter with identity, purpose, address, and notification details?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.government_fees_ready",
+      "depends_on": ["documents.request_letter_ready"],
+      "label": "Will you pay the required DGME government fees and fiscal stamps?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.apostille_translation_ready",
+      "depends_on": ["documents.government_fees_ready"],
+      "label": "Do your foreign documents have apostille, legalization, or official Spanish translation where required?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "documents.pension_receipt_costa_rica_evidence_available",
+      "depends_on": ["documents.apostille_translation_ready"],
+      "label": "What is your status for receiving pension income in Costa Rica and converting it into national currency when required?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["can_document", "will_document_after_approval", "cannot_document"]
+    },
+    {
+      "key": "routing.temporary_residence_acknowledged",
+      "depends_on": ["documents.pension_receipt_costa_rica_evidence_available"],
+      "label": "Are you seeking Costa Rica Pensionado as a temporary residence category?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "routing.renewal_every_two_years_acknowledged",
+      "depends_on": ["routing.temporary_residence_acknowledged"],
+      "label": "Will you renew Pensionado temporary residence every 2 years if approved?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "routing.additional_information",
+      "depends_on": ["routing.renewal_every_two_years_acknowledged"],
+      "label": "What else about your pension, dependents, or Costa Rica residency plans should QIQ consider?",
+      "input_type": "text",
+      "required": false
+    }
+  ]
+}

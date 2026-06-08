@@ -41,7 +41,10 @@ app.include_router(identity_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=False,
@@ -87,9 +90,11 @@ def _nav_response(res: Dict[str, Any]) -> Dict[str, Any]:
 @app.post("/evaluate")
 async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B008
     data = payload.root or {}
+    routing = data.get("routing") if isinstance(data.get("routing"), dict) else {}
+    pathway = data.get("pathway") or routing.get("pathway")
 
     # 1) Deterministic evaluator (next question OR completion)
-    res = evaluate(data)
+    res = evaluate(data, pathway=pathway)
 
     # 2) Navigation phase
     if res.get("next_field_key") is not None:
@@ -101,7 +106,7 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
     print("DEBUG: ENTERING FINAL ELIGIBILITY PHASE")
     print("=" * 80)
     logger.info("Entering final eligibility phase")
-    eligibility_raw = evaluate_eligibility(data) or {}
+    eligibility_raw = evaluate_eligibility(data, pathway=pathway) or {}
 
     # 4) Build UI output (this is what we want in the PDF)
     ui_result = build_output(
@@ -256,7 +261,7 @@ async def run_evaluate(payload: EvaluatePayload = Body(default={})):  # noqa: B0
                 full_name=full_name,
                 email=email,
                 phone=phone,
-                pathway=data.get("pathway"),
+                pathway=pathway,
                 status=eligibility_raw.get("eligibility_status"),
             )
         except Exception as e:

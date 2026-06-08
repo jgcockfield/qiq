@@ -25,6 +25,30 @@ function _qiqUUID() {
   });
 }
 
+const QIQ_STAGE1_COUNTRIES = [
+  { value: "spain", label: "Spain" },
+  { value: "costa_rica", label: "Costa Rica" },
+];
+
+const QIQ_STAGE1_PATHWAYS_BY_COUNTRY = {
+  spain: [
+    { value: "spain-dnv", label: "Digital Nomad Visa" },
+  ],
+  costa_rica: [
+    { value: "costa-rica-dnv", label: "Digital Nomad Visa" },
+    { value: "costa-rica-pensionado", label: "Pensionado Residency" },
+  ],
+};
+
+const QIQ_COUNTRY_BY_PATHWAY = {
+  "spain-dnv": "spain",
+  "spain_dnv": "spain",
+  "costa-rica-dnv": "costa_rica",
+  "costa_rica_dnv": "costa_rica",
+  "costa-rica-pensionado": "costa_rica",
+  "costa_rica_pensionado": "costa_rica",
+};
+
 class QIQWidget {
   constructor(rootEl, options = {}) {
     this.root = rootEl;
@@ -52,6 +76,7 @@ class QIQWidget {
     this._log("init", { instanceId: this.instanceId, opts: this.opts });
 
     this._bindElements();
+    this._initStage1PathwayFields();
     if (this.root.dataset.entryMode === "consultation") {
       this._initLayer0();
       this._showLayer(0);
@@ -110,8 +135,12 @@ class QIQWidget {
       layer1:        r.querySelector(".qiq-layer-1"),
       nameInput:     ref("name"),
       emailInput:    ref("email"),
+      countryInput:  ref("country"),
+      pathwayInput:  ref("pathway"),
       nameField:     ref("name-field"),
       emailField:    ref("email-field"),
+      countryField:  ref("country-field"),
+      pathwayField:  ref("pathway-field"),
       submitBtn:     ref("submit"),
 
       // Layer 2
@@ -130,13 +159,126 @@ class QIQWidget {
 
     this.els.submitBtn.addEventListener("click", () => this._handleEmailSubmit());
     this.els.nameInput.addEventListener("keydown",  e => { if (e.key === "Enter") this.els.emailInput.focus(); });
-    this.els.emailInput.addEventListener("keydown", e => { if (e.key === "Enter") this._handleEmailSubmit(); });
+    this.els.emailInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        if (this._shouldShowStage1PathwayFields() && this.els.countryInput) {
+          this.els.countryInput.focus();
+        } else {
+          this._handleEmailSubmit();
+        }
+      }
+    });
 
     this.els.sendBtn.addEventListener("click", () => this._handleChatSend());
     this.els.chatInput.addEventListener("keydown", e => {
       if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); this._handleChatSend(); }
     });
     this.els.chatInput.addEventListener("input", () => this._updateSendButton());
+  }
+
+  _shouldShowStage1PathwayFields() {
+    return !this.opts.pathway;
+  }
+
+  _countryForPathway(pathway) {
+    return QIQ_COUNTRY_BY_PATHWAY[String(pathway || "").trim().toLowerCase()] || "";
+  }
+
+  _initStage1PathwayFields() {
+    if (this._shouldShowStage1PathwayFields()) {
+      this._ensureStage1PathwayFields();
+      this._wireStage1PathwayFields();
+      this._populateCountryOptions();
+      return;
+    }
+
+    this._hideStage1PathwayFields();
+    const fixedPathway = this.opts.pathway;
+    const fixedCountry = this._countryForPathway(fixedPathway);
+    if (fixedCountry) this._setDotted(this.answers, "routing.country", fixedCountry);
+    if (fixedPathway) this._setDotted(this.answers, "routing.pathway", fixedPathway);
+  }
+
+  _ensureStage1PathwayFields() {
+    if (this.els.countryInput && this.els.pathwayInput) return;
+
+    const form = this.root.querySelector(".qiq-layer-1 .qiq-form");
+    if (!form || !this.els.submitBtn) return;
+
+    const countryField = document.createElement("div");
+    countryField.className = "qiq-field";
+    countryField.setAttribute("data-qiq-ref", "country-field");
+    countryField.innerHTML = `
+      <label>Country</label>
+      <select data-qiq-ref="country" autocomplete="country-name">
+        <option value="">Select country</option>
+      </select>
+      <span class="field-error"></span>`;
+
+    const pathwayField = document.createElement("div");
+    pathwayField.className = "qiq-field";
+    pathwayField.setAttribute("data-qiq-ref", "pathway-field");
+    pathwayField.innerHTML = `
+      <label>Pathway / visa type</label>
+      <select data-qiq-ref="pathway" disabled>
+        <option value="">Select pathway / visa type</option>
+      </select>
+      <span class="field-error"></span>`;
+
+    form.insertBefore(countryField, this.els.submitBtn);
+    form.insertBefore(pathwayField, this.els.submitBtn);
+
+    this.els.countryField = countryField;
+    this.els.pathwayField = pathwayField;
+    this.els.countryInput = countryField.querySelector('[data-qiq-ref="country"]');
+    this.els.pathwayInput = pathwayField.querySelector('[data-qiq-ref="pathway"]');
+  }
+
+  _hideStage1PathwayFields() {
+    [this.els.countryField, this.els.pathwayField].forEach(field => {
+      if (field) field.style.display = "none";
+    });
+  }
+
+  _wireStage1PathwayFields() {
+    if (!this.els.countryInput || !this.els.pathwayInput) return;
+
+    this.els.countryInput.addEventListener("change", () => {
+      this._clearFieldError(this.els.countryField);
+      this._populatePathwayOptions(this.els.countryInput.value);
+    });
+    this.els.pathwayInput.addEventListener("change", () => {
+      this._clearFieldError(this.els.pathwayField);
+    });
+    this.els.countryInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") this.els.pathwayInput.focus();
+    });
+    this.els.pathwayInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") this._handleEmailSubmit();
+    });
+  }
+
+  _populateCountryOptions() {
+    if (!this.els.countryInput) return;
+    this.els.countryInput.innerHTML = [
+      '<option value="">Select country</option>',
+      ...QIQ_STAGE1_COUNTRIES.map(country =>
+        `<option value="${this._escapeHtml(country.value)}">${this._escapeHtml(country.label)}</option>`
+      ),
+    ].join("");
+    this._populatePathwayOptions("");
+  }
+
+  _populatePathwayOptions(country) {
+    if (!this.els.pathwayInput) return;
+    const pathways = QIQ_STAGE1_PATHWAYS_BY_COUNTRY[country] || [];
+    this.els.pathwayInput.disabled = pathways.length === 0;
+    this.els.pathwayInput.innerHTML = [
+      '<option value="">Select pathway / visa type</option>',
+      ...pathways.map(pathway =>
+        `<option value="${this._escapeHtml(pathway.value)}">${this._escapeHtml(pathway.label)}</option>`
+      ),
+    ].join("");
   }
 
   // ── Dotted key helper ─────────────────────────────────────────
@@ -218,6 +360,8 @@ class QIQWidget {
 
     this._clearFieldError(this.els.nameField);
     this._clearFieldError(this.els.emailField);
+    if (this.els.countryField) this._clearFieldError(this.els.countryField);
+    if (this.els.pathwayField) this._clearFieldError(this.els.pathwayField);
 
     if (!name) {
       this._setFieldError(this.els.nameField, "Please enter your name.");
@@ -227,22 +371,44 @@ class QIQWidget {
       this._setFieldError(this.els.emailField, "Please enter a valid email address.");
       valid = false;
     }
+    if (this._shouldShowStage1PathwayFields()) {
+      if (!this.els.countryInput || !this.els.countryInput.value) {
+        this._setFieldError(this.els.countryField, "Please select a country.");
+        valid = false;
+      }
+      if (!this.els.pathwayInput || !this.els.pathwayInput.value) {
+        this._setFieldError(this.els.pathwayField, "Please select a pathway.");
+        valid = false;
+      }
+    }
     if (!valid) return;
 
     this.session.name  = name;
     this.session.email = email;
+    if (this._shouldShowStage1PathwayFields()) {
+      this._setDotted(this.answers, "routing.country", this.els.countryInput.value);
+      this._setDotted(this.answers, "routing.pathway", this.els.pathwayInput.value);
+    }
 
-    this._log("email captured", { name, email });
+    this._log("intake captured", {
+      name,
+      email,
+      country: this.answers.routing?.country,
+      pathway: this.opts.pathway || this.answers.routing?.pathway,
+    });
     this._showLayer(2);
     this._startChat();
   }
 
   _setFieldError(fieldEl, msg) {
+    if (!fieldEl) return;
     fieldEl.classList.add("has-error");
-    fieldEl.querySelector(".field-error").textContent = msg;
+    const errorEl = fieldEl.querySelector(".field-error");
+    if (errorEl) errorEl.textContent = msg;
   }
 
   _clearFieldError(fieldEl) {
+    if (!fieldEl) return;
     fieldEl.classList.remove("has-error");
   }
 
@@ -288,12 +454,13 @@ class QIQWidget {
 
     // Spread nested answers as top-level keys alongside identity fields.
     // The backend's _get_dotted() traverses e.g. payload.routing.work_relationship.
+    const selectedPathway = this.opts.pathway || this.answers.routing?.pathway;
     const payload = {
       ...JSON.parse(JSON.stringify(this.answers)),
       session_id: this.instanceId,
       full_name:  this.session.name,
       email:      this.session.email,
-      ...(this.opts.pathway && { pathway: this.opts.pathway }),
+      ...(selectedPathway && { pathway: selectedPathway }),
     };
 
     this._logRequest(payload);

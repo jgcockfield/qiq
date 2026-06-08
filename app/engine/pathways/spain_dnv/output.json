@@ -1,0 +1,72 @@
+{
+  "pathway": "spain_dnv",
+  "visa_type": "Spain Digital Nomad Visa",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core requirements for Spain's Digital Nomad Visa."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your information requires manual review, and our team should follow up by email."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet the core income requirement for Spain's Digital Nomad Visa."
+      }
+    },
+    "requirement_variants": {
+      "non_dnv_service_interest": {
+        "text": "Your request appears to relate to tax or non-Digital Nomad Visa services. Our team should follow up by email with the appropriate next step."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Spain's Digital Nomad Visa.",
+          "The next step is to schedule a Spain DNV consultation so the team can verify your details and discuss the application process."
+        ],
+        "action": {
+          "label": "Book a Spain DNV consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before eligibility can be confirmed.",
+          "The team should follow up by email with next steps or any follow-up questions."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet the minimum income band used for this Spain DNV screening.",
+          "If your situation changes, you can complete the eligibility check again or ask the team about alternative options."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "non_dnv_service_interest": {
+        "enabled": true,
+        "text": [
+          "Your request appears to relate to tax consultation or setup services rather than the Spain Digital Nomad Visa.",
+          "The team should follow up by email with the appropriate tax-service next step."
+        ],
+        "action": {
+          "label": "Wait for tax-service follow-up",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

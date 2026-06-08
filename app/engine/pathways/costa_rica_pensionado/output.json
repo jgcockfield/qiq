@@ -1,0 +1,78 @@
+{
+  "pathway": "costa_rica_pensionado",
+  "visa_type": "Costa Rica Pensionado Residency",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core requirements for Costa Rica Pensionado temporary residence."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet the core pensionado eligibility requirements."
+      }
+    },
+    "requirement_variants": {
+      "pension_income_below_minimum": {
+        "text": "Based on the pension amount provided, you do not currently appear to meet the minimum US$1,000 per month pension income requirement."
+      },
+      "pension_not_retirement_based": {
+        "text": "Based on the information provided, the income does not appear to arise from retirement or a similar pension benefit."
+      },
+      "not_retired_from_habitual_occupation": {
+        "text": "Based on the information provided, you do not currently appear to meet the pensionado requirement of being retired from habitual occupation."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Costa Rica Pensionado temporary residence.",
+          "The next step is to verify the pension, civil documents, and category requirements before preparing an application."
+        ],
+        "action": {
+          "label": "Book a Costa Rica Pensionado consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before eligibility can be confirmed.",
+          "The team should follow up by email with next steps or any follow-up questions."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory pensionado eligibility requirements.",
+          "If your pension status or income changes, you can complete the eligibility check again or ask the team about alternative Costa Rica residence options."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "pension_source_needs_review": {
+        "enabled": true,
+        "text": [
+          "The pension source selected needs manual review before eligibility can be confirmed.",
+          "The team should verify whether the income qualifies as a retirement or similar pension benefit."
+        ],
+        "action": {
+          "label": "Wait for pension-source review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

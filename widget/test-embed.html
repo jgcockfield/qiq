@@ -141,12 +141,25 @@ window.addEventListener("load", function () {
     check("widget.css loaded exactly once", cssLinks.length === 1);
 
     // data-qiq-ref elements exist in each widget (not shared IDs)
+    var fixedPathwayWidget = document.querySelector("#widget-slot .qiq-widget");
+
     widgets.forEach(function (w, i) {
       var nameEl  = w.querySelector("[data-qiq-ref='name']");
       var emailEl = w.querySelector("[data-qiq-ref='email']");
+      var countryEl = w.querySelector("[data-qiq-ref='country']");
+      var pathwayEl = w.querySelector("[data-qiq-ref='pathway']");
       check("widget " + (i+1) + ": name input found via data-qiq-ref",  !!nameEl);
       check("widget " + (i+1) + ": email input found via data-qiq-ref", !!emailEl);
+      if (w !== fixedPathwayWidget) {
+        check("widget " + (i+1) + ": country selector found via data-qiq-ref", !!countryEl);
+        check("widget " + (i+1) + ": pathway selector found via data-qiq-ref", !!pathwayEl);
+      }
     });
+
+    var fixedCountryField = fixedPathwayWidget && fixedPathwayWidget.querySelector("[data-qiq-ref='country-field']");
+    var fixedPathwayField = fixedPathwayWidget && fixedPathwayWidget.querySelector("[data-qiq-ref='pathway-field']");
+    check("fixed data-pathway widget hides country selector", !fixedCountryField || fixedCountryField.style.display === "none");
+    check("fixed data-pathway widget hides pathway selector", !fixedPathwayField || fixedPathwayField.style.display === "none");
 
     // No duplicate element IDs that would cause binding conflicts
     var allIds = Array.from(document.querySelectorAll("[id]")).map(function (el) { return el.id; });
