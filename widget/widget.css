@@ -227,6 +227,16 @@
   color: #9ca3af;
 }
 
+select.qiq-layer-0-input {
+  appearance: none;
+  cursor: pointer;
+}
+
+select.qiq-layer-0-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .qiq-layer-0-button {
   width: 100%;
   padding: 16px 24px;

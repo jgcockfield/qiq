@@ -280,7 +280,7 @@ class QIQWidget {
 
     this.els.countryInput.addEventListener("change", () => {
       this._clearFieldError(this.els.countryField);
-      this._populatePathwayOptions(this.els.countryInput.value);
+      this._populatePathwayOptions(this.els.pathwayInput, this.els.countryInput.value);
     });
     this.els.pathwayInput.addEventListener("change", () => {
       this._clearFieldError(this.els.pathwayField);
@@ -293,22 +293,24 @@ class QIQWidget {
     });
   }
 
-  _populateCountryOptions() {
-    if (!this.els.countryInput) return;
-    this.els.countryInput.innerHTML = [
+  // countryEl/pathwayEl default to Layer 1's fields so existing call sites
+  // (Layer 1) are unaffected; Layer 0 passes its own select elements.
+  _populateCountryOptions(countryEl = this.els.countryInput, pathwayEl = this.els.pathwayInput) {
+    if (!countryEl) return;
+    countryEl.innerHTML = [
       '<option value="">Select country</option>',
       ...QIQ_STAGE1_COUNTRIES.map(country =>
         `<option value="${this._escapeHtml(country.value)}">${this._escapeHtml(country.label)}</option>`
       ),
     ].join("");
-    this._populatePathwayOptions("");
+    this._populatePathwayOptions(pathwayEl, "");
   }
 
-  _populatePathwayOptions(country) {
-    if (!this.els.pathwayInput) return;
+  _populatePathwayOptions(pathwayEl = this.els.pathwayInput, country = "") {
+    if (!pathwayEl) return;
     const pathways = QIQ_STAGE1_PATHWAYS_BY_COUNTRY[country] || [];
-    this.els.pathwayInput.disabled = pathways.length === 0;
-    this.els.pathwayInput.innerHTML = [
+    pathwayEl.disabled = pathways.length === 0;
+    pathwayEl.innerHTML = [
       '<option value="">Select pathway / visa type</option>',
       ...pathways.map(pathway =>
         `<option value="${this._escapeHtml(pathway.value)}">${this._escapeHtml(pathway.label)}</option>`
@@ -366,24 +368,64 @@ class QIQWidget {
     this.root.prepend(div);
     this.els.layer0 = div;
 
-    const inputs    = div.querySelectorAll(".qiq-layer-0-input");
+    const content    = div.querySelector(".qiq-layer-0-content");
+    const inputs     = div.querySelectorAll(".qiq-layer-0-input");
     const nameInput  = inputs[0];
     const emailInput = inputs[1];
     const btn        = div.querySelector(".qiq-layer-0-button");
+
+    // Same condition as Layer 1: only show country/pathway when no fixed
+    // pathway was configured via data-pathway.
+    const showPathwayFields = this._shouldShowStage1PathwayFields();
+    let countryInput = null;
+    let pathwayInput = null;
+
+    if (showPathwayFields) {
+      countryInput = document.createElement("select");
+      countryInput.className = "qiq-layer-0-input";
+      countryInput.setAttribute("autocomplete", "country-name");
+
+      pathwayInput = document.createElement("select");
+      pathwayInput.className = "qiq-layer-0-input";
+      pathwayInput.disabled = true;
+
+      content.insertBefore(countryInput, btn);
+      content.insertBefore(pathwayInput, btn);
+
+      // Reuse Layer 1's population logic so Layer 0 filters identically.
+      this._populateCountryOptions(countryInput, pathwayInput);
+    }
 
     const submit = () => {
       const name  = nameInput.value.trim();
       const email = emailInput.value.trim();
       if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+      if (showPathwayFields && (!countryInput.value || !pathwayInput.value)) return;
+
       this.session.name  = name;
       this.session.email = email;
+      if (showPathwayFields) {
+        this._setDotted(this.answers, "routing.country", countryInput.value);
+        this._setDotted(this.answers, "routing.pathway", pathwayInput.value);
+      }
       this._showLayer(2);
       this._startChat();
     };
 
     btn.addEventListener("click", submit);
     nameInput.addEventListener("keydown",  e => { if (e.key === "Enter") emailInput.focus(); });
-    emailInput.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+    emailInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        if (showPathwayFields) countryInput.focus();
+        else submit();
+      }
+    });
+
+    if (showPathwayFields) {
+      countryInput.addEventListener("change", () => this._populatePathwayOptions(pathwayInput, countryInput.value));
+      countryInput.addEventListener("keydown", e => { if (e.key === "Enter") pathwayInput.focus(); });
+      pathwayInput.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+    }
   }
 
   // ── Layer 1: Email Capture ────────────────────────────────────
