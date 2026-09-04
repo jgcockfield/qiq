@@ -1,0 +1,535 @@
+{
+  "pathway": "portugal_golden_visa",
+  "visa_type": "Portugal Golden Visa / ARI",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core qualification requirements for Portugal Golden Visa / ARI."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your Portugal Golden Visa / ARI investment-residence information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet one or more core Portugal Golden Visa / ARI requirements."
+      }
+    },
+    "route_variants": {
+      "job_creation": {
+        "text": "The job creation route requires creating at least 10 jobs and providing employment creation proof, company records, and Social Security evidence."
+      },
+      "scientific_research": {
+        "text": "The scientific research route requires at least EUR 500,000 transferred into qualifying research activities with confirmation from a qualifying research institution."
+      },
+      "arts_cultural_heritage": {
+        "text": "The arts / cultural heritage route requires at least EUR 250,000 transferred into qualifying artistic production or cultural heritage recovery or maintenance with qualifying entity confirmation."
+      },
+      "non_real_estate_investment_fund": {
+        "text": "The fund route requires at least EUR 500,000 into a qualifying non-real-estate fund with 5-year maturity, at least 60% invested in Portuguese companies, and fund subscription documents."
+      },
+      "company_capitalization_jobs": {
+        "text": "The company capitalization route requires at least EUR 500,000 to create or reinforce a Portuguese company plus a qualifying job creation or maintenance plan and company/employment documents."
+      }
+    },
+    "requirement_variants": {
+      "portuguese_eu_eea_andorra_swiss_national": {
+        "text": "Portugal Golden Visa / ARI is for third-country nationals. Based on the information provided, this pathway does not appear to match the applicant's nationality status."
+      },
+      "third_country_national_status_needs_review": {
+        "text": "The applicant's third-country national status is unclear and must be reviewed before Portugal Golden Visa / ARI eligibility can be confirmed."
+      },
+      "real_estate_only_basis": {
+        "text": "AIMA's current ARI requirements do not list real-estate purchase or rehabilitation as qualifying routes. A real-estate-only basis does not currently appear eligible."
+      },
+      "real_estate_only_basis_needs_review": {
+        "text": "It is unclear whether the case relies only on real estate. The investment basis requires manual review against current Portugal ARI routes."
+      },
+      "investment_route_missing_or_unrecognized": {
+        "text": "The qualifying Portugal ARI investment route is missing or unclear, so eligibility cannot be confirmed automatically."
+      },
+      "job_creation_count_missing_or_unrecognized": {
+        "text": "The job creation count is missing or unclear. The Portugal ARI job creation route requires at least 10 jobs."
+      },
+      "job_creation_below_minimum": {
+        "text": "Based on the number of jobs provided, the job creation route does not appear to meet the 10-job minimum."
+      },
+      "job_creation_evidence_unavailable": {
+        "text": "The job creation route requires employment creation proof, company records, and Social Security evidence. Based on the information provided, this evidence is not available."
+      },
+      "job_creation_evidence_needs_review": {
+        "text": "Job creation evidence is unclear and needs manual review before the route can be confirmed."
+      },
+      "scientific_research_amount_missing_or_unrecognized": {
+        "text": "The scientific research investment amount is missing or unclear. The route requires at least EUR 500,000."
+      },
+      "scientific_research_amount_below_minimum": {
+        "text": "Based on the amount provided, the scientific research route does not appear to meet the EUR 500,000 minimum."
+      },
+      "scientific_research_institution_confirmation_unavailable": {
+        "text": "The scientific research route requires confirmation from a qualifying research institution. Based on the information provided, this confirmation is not available."
+      },
+      "scientific_research_institution_confirmation_needs_review": {
+        "text": "The qualifying research institution confirmation is unclear and needs manual review."
+      },
+      "arts_cultural_heritage_amount_missing_or_unrecognized": {
+        "text": "The arts / cultural heritage investment amount is missing or unclear. The route requires at least EUR 250,000."
+      },
+      "arts_cultural_heritage_amount_below_minimum": {
+        "text": "Based on the amount provided, the arts / cultural heritage route does not appear to meet the EUR 250,000 minimum."
+      },
+      "arts_cultural_heritage_qualifying_entity_unavailable": {
+        "text": "The arts / cultural heritage route requires confirmation from a qualifying entity. Based on the information provided, this confirmation is not available."
+      },
+      "arts_cultural_heritage_qualifying_entity_needs_review": {
+        "text": "The qualifying arts or cultural heritage entity confirmation is unclear and needs manual review."
+      },
+      "fund_amount_missing_or_unrecognized": {
+        "text": "The fund investment amount is missing or unclear. The non-real-estate investment fund route requires at least EUR 500,000."
+      },
+      "fund_amount_below_minimum": {
+        "text": "Based on the amount provided, the non-real-estate investment fund route does not appear to meet the EUR 500,000 minimum."
+      },
+      "fund_not_non_real_estate": {
+        "text": "The fund route requires a qualifying non-real-estate fund. Based on the information provided, this requirement is not currently met."
+      },
+      "fund_non_real_estate_status_needs_review": {
+        "text": "The fund's non-real-estate status is unclear and needs manual review."
+      },
+      "fund_maturity_or_portuguese_company_investment_not_confirmed": {
+        "text": "The fund route requires 5-year maturity and at least 60% investment in Portuguese companies. Based on the information provided, this requirement is not confirmed."
+      },
+      "fund_maturity_or_portuguese_company_investment_needs_review": {
+        "text": "The fund's 5-year maturity or 60% Portuguese-company investment requirement is unclear and needs manual review."
+      },
+      "fund_subscription_documents_unavailable": {
+        "text": "The fund route requires fund subscription proof and fund documentation. Based on the information provided, those documents are not available."
+      },
+      "fund_subscription_documents_needs_review": {
+        "text": "Fund subscription proof or fund documentation is unclear and needs manual review."
+      },
+      "company_capitalization_amount_missing_or_unrecognized": {
+        "text": "The company capitalization investment amount is missing or unclear. The route requires at least EUR 500,000."
+      },
+      "company_capitalization_amount_below_minimum": {
+        "text": "Based on the amount provided, the company capitalization route does not appear to meet the EUR 500,000 minimum."
+      },
+      "company_capitalization_job_requirement_not_met": {
+        "text": "The company capitalization route requires creating 5 permanent jobs or maintaining 10 jobs, including at least 5 permanent jobs, for at least 3 years. Based on the information provided, this job requirement is not met."
+      },
+      "company_capitalization_job_requirement_needs_review": {
+        "text": "The company capitalization job plan is missing or unclear and needs manual review."
+      },
+      "company_capitalization_documents_unavailable": {
+        "text": "The company capitalization route requires capital transfer proof, commercial registry records, and employment records. Based on the information provided, those documents are not available."
+      },
+      "company_capitalization_documents_needs_review": {
+        "text": "Company capitalization and employment documents are unclear and need manual review."
+      },
+      "investment_proof_or_transfer_unavailable": {
+        "text": "Portugal ARI requires route-specific investment proof or transfer evidence. Based on the information provided, this evidence is not available."
+      },
+      "investment_proof_or_transfer_needs_review": {
+        "text": "Investment proof or transfer evidence is unclear and needs manual review."
+      },
+      "applicant_type_missing": {
+        "text": "The applicant route is missing or unclear. Portugal ARI screening should confirm whether this is an individual or family reunification case."
+      },
+      "dependents_count_missing": {
+        "text": "The number of family members included for family reunification is missing or unclear."
+      },
+      "dependent_relationships_missing": {
+        "text": "Family relationship details are missing or unclear and need manual review."
+      },
+      "family_documents_needs_review": {
+        "text": "Family relationship documents are missing, unclear, or not confirmed and need manual review."
+      },
+      "portal_ari_family_process_needs_review": {
+        "text": "The Portal ARI family process acknowledgment is missing or unclear for the family reunification route."
+      },
+      "passport_unavailable": {
+        "text": "Portugal ARI guidance requires a valid passport. Based on the information provided, this requirement is not currently met."
+      },
+      "passport_needs_review": {
+        "text": "The valid passport requirement is unclear and needs manual review."
+      },
+      "criminal_record_certificate_unavailable": {
+        "text": "Portugal ARI requires a recent criminal record certificate with required translation and certification. Based on the information provided, this document is not available."
+      },
+      "criminal_record_certificate_needs_translation_or_apostille": {
+        "text": "The criminal record certificate may need Portuguese translation, apostille, or consular certification before the requirement can be confirmed."
+      },
+      "criminal_record_certificate_needs_review": {
+        "text": "The criminal record certificate status is unclear and needs manual review."
+      },
+      "serious_criminal_conviction": {
+        "text": "Portugal ARI requires no conviction for a crime punishable in Portugal by imprisonment over 1 year. Based on the information provided, this issue may prevent eligibility."
+      },
+      "serious_criminal_conviction_needs_review": {
+        "text": "The serious criminal conviction question is unclear and needs manual review."
+      },
+      "entry_stay_ban": {
+        "text": "An entry or stay ban after removal may prevent Portugal ARI eligibility. Based on the information provided, this issue is present."
+      },
+      "entry_stay_ban_needs_review": {
+        "text": "The entry or stay ban question is unclear and needs manual review."
+      },
+      "sii_ucfe_refusal_alert": {
+        "text": "A SII/UCFE refusal alert may prevent Portugal ARI eligibility. Based on the information provided, this issue is present."
+      },
+      "sii_ucfe_refusal_alert_needs_review": {
+        "text": "The SII/UCFE refusal alert question is unclear and needs manual review."
+      },
+      "portuguese_tax_debts": {
+        "text": "Portugal ARI requires Portuguese Tax Authority clearance or proof of non-registration. Based on the information provided, a tax debt issue is present."
+      },
+      "portuguese_tax_clearance_needs_review": {
+        "text": "Portuguese Tax Authority clearance or non-registration proof is missing or unclear and needs manual review."
+      },
+      "social_security_debts": {
+        "text": "Portugal ARI requires Social Security clearance or proof of non-registration. Based on the information provided, a Social Security debt issue is present."
+      },
+      "social_security_clearance_needs_review": {
+        "text": "Social Security clearance or non-registration proof is missing or unclear and needs manual review."
+      },
+      "foreign_tax_id_disclosure_unavailable": {
+        "text": "Portugal ARI requires foreign tax ID disclosure or proof that no tax ID exists. Based on the information provided, this requirement is not currently met."
+      },
+      "foreign_tax_id_disclosure_needs_review": {
+        "text": "Foreign tax ID disclosure or proof that no tax ID exists is unclear and needs manual review."
+      },
+      "investment_maintenance_declaration_unavailable": {
+        "text": "Portugal ARI requires a sworn investment-maintenance declaration. Based on the information provided, this declaration is not available."
+      },
+      "investment_maintenance_declaration_needs_review": {
+        "text": "The sworn investment-maintenance declaration is missing or unclear and needs manual review."
+      },
+      "minimum_stay_acknowledgement_needs_review": {
+        "text": "The Portugal ARI minimum physical stay requirement acknowledgment is missing or unclear and needs manual review."
+      },
+      "portal_ari_process_needs_review": {
+        "text": "The Portal ARI process acknowledgment is missing or unclear and needs manual review."
+      },
+      "renewal_investment_maintenance_needs_review": {
+        "text": "The renewal investment-maintenance acknowledgment is missing or unclear and needs manual review."
+      },
+      "permanent_residence_later_stage_needs_review": {
+        "text": "The permanent residence later-stage acknowledgment is missing or unclear and needs manual review."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Portugal Golden Visa / ARI.",
+          "The next step is to verify your third-country national status, selected investment route, route-specific investment proof, passport, criminal record certificate, tax and Social Security clearance, foreign tax ID disclosure, investment-maintenance declaration, minimum-stay commitment, Portal ARI process, family route if applicable, and renewal obligations before preparing the application."
+        ],
+        "action": {
+          "label": "Book a Portugal ARI consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before Portugal Golden Visa / ARI eligibility can be confirmed.",
+          "The team should follow up by email to confirm the investment route, route-specific evidence, compliance documents, family reunification details if applicable, and later-stage acknowledgments."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory Portugal Golden Visa / ARI qualification requirements.",
+          "If your nationality status, investment route, investment amount, route evidence, real-estate basis, passport, background, tax or Social Security compliance, foreign tax ID disclosure, or investment-maintenance documents change, you can complete the eligibility check again."
+        ],
+        "action": {
+          "label": "Review Portugal ARI requirements",
+          "type": "informational"
+        }
+      }
+    },
+    "route_variants": {
+      "job_creation": {
+        "enabled": true,
+        "text": [
+          "Your selected route appears to be job creation.",
+          "Confirm at least 10 jobs and supporting employment creation proof, company records, and Social Security evidence before proceeding."
+        ],
+        "action": {
+          "label": "Review job creation route",
+          "type": "informational"
+        }
+      },
+      "scientific_research": {
+        "enabled": true,
+        "text": [
+          "Your selected route appears to be scientific research.",
+          "Confirm at least EUR 500,000, transfer proof, and qualifying research institution confirmation before proceeding."
+        ],
+        "action": {
+          "label": "Review research route",
+          "type": "informational"
+        }
+      },
+      "arts_cultural_heritage": {
+        "enabled": true,
+        "text": [
+          "Your selected route appears to be arts / cultural heritage.",
+          "Confirm at least EUR 250,000, transfer proof, and qualifying entity confirmation before proceeding."
+        ],
+        "action": {
+          "label": "Review cultural route",
+          "type": "informational"
+        }
+      },
+      "non_real_estate_investment_fund": {
+        "enabled": true,
+        "text": [
+          "Your selected route appears to be non-real-estate investment fund.",
+          "Confirm at least EUR 500,000, non-real-estate fund status, 5-year maturity, 60% Portuguese-company investment, and subscription documents before proceeding."
+        ],
+        "action": {
+          "label": "Review fund route",
+          "type": "informational"
+        }
+      },
+      "company_capitalization_jobs": {
+        "enabled": true,
+        "text": [
+          "Your selected route appears to be company capitalization / jobs.",
+          "Confirm at least EUR 500,000, the qualifying job plan, capital transfer proof, commercial registry records, and employment records before proceeding."
+        ],
+        "action": {
+          "label": "Review company route",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "portuguese_eu_eea_andorra_swiss_national": {
+        "enabled": true,
+        "text": [
+          "Your nationality status does not currently fit Portugal Golden Visa / ARI.",
+          "This ARI pathway is for qualifying third-country nationals and excludes Portuguese, EU, EEA, Andorra, and Swiss nationals."
+        ],
+        "action": {
+          "label": "Review nationality requirement",
+          "type": "informational"
+        }
+      },
+      "third_country_national_status_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your third-country national status needs manual review.",
+          "The team should confirm whether you are eligible to use the Portugal ARI investment-residence pathway."
+        ],
+        "action": {
+          "label": "Wait for nationality review",
+          "type": "email_followup"
+        }
+      },
+      "real_estate_only_basis": {
+        "enabled": true,
+        "text": [
+          "Your stated investment basis does not currently fit Portugal Golden Visa / ARI.",
+          "AIMA's current ARI requirements do not list real-estate purchase or rehabilitation as qualifying investment routes."
+        ],
+        "action": {
+          "label": "Review current ARI routes",
+          "type": "informational"
+        }
+      },
+      "investment_route_missing_or_unrecognized": {
+        "enabled": true,
+        "text": [
+          "Your investment route needs manual review.",
+          "The team should identify whether your case fits a current Portugal ARI route such as job creation, scientific research, arts / cultural heritage, non-real-estate fund, or company capitalization with jobs."
+        ],
+        "action": {
+          "label": "Wait for investment-route review",
+          "type": "email_followup"
+        }
+      },
+      "investment_proof_or_transfer_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your investment proof or transfer evidence is not currently available.",
+          "Portugal ARI requires route-specific proof such as transfer proof, fund documents, company records, or employment records."
+        ],
+        "action": {
+          "label": "Review investment evidence",
+          "type": "informational"
+        }
+      },
+      "passport_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your valid passport is not currently available.",
+          "Portugal ARI guidance requires a valid passport before the application can be confirmed."
+        ],
+        "action": {
+          "label": "Review passport requirement",
+          "type": "informational"
+        }
+      },
+      "criminal_record_certificate_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your criminal record certificate is not currently available.",
+          "Portugal ARI requires a recent criminal record certificate with required translation and certification."
+        ],
+        "action": {
+          "label": "Review background document",
+          "type": "informational"
+        }
+      },
+      "serious_criminal_conviction": {
+        "enabled": true,
+        "text": [
+          "Your background answer may prevent Portugal ARI eligibility.",
+          "A conviction for a crime punishable in Portugal by imprisonment over 1 year requires legal review before proceeding."
+        ],
+        "action": {
+          "label": "Review background issue",
+          "type": "informational"
+        }
+      },
+      "entry_stay_ban": {
+        "enabled": true,
+        "text": [
+          "Your entry or stay ban answer may prevent Portugal ARI eligibility.",
+          "The case should be reviewed before proceeding because an entry or stay ban after removal is a disqualifying concern."
+        ],
+        "action": {
+          "label": "Review entry-ban issue",
+          "type": "informational"
+        }
+      },
+      "sii_ucfe_refusal_alert": {
+        "enabled": true,
+        "text": [
+          "Your SII/UCFE refusal alert answer may prevent Portugal ARI eligibility.",
+          "The case should be reviewed before proceeding because refusal alerts can block eligibility."
+        ],
+        "action": {
+          "label": "Review refusal-alert issue",
+          "type": "informational"
+        }
+      },
+      "portuguese_tax_debts": {
+        "enabled": true,
+        "text": [
+          "Your Portuguese Tax Authority status does not currently satisfy the ARI requirement.",
+          "Portugal ARI requires a no-debt certificate or proof of non-registration."
+        ],
+        "action": {
+          "label": "Review tax compliance",
+          "type": "informational"
+        }
+      },
+      "social_security_debts": {
+        "enabled": true,
+        "text": [
+          "Your Social Security status does not currently satisfy the ARI requirement.",
+          "Portugal ARI requires a no-debt certificate or proof of non-registration."
+        ],
+        "action": {
+          "label": "Review Social Security compliance",
+          "type": "informational"
+        }
+      },
+      "foreign_tax_id_disclosure_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your foreign tax ID disclosure is not currently available.",
+          "Portugal ARI requires tax identification numbers from country of origin, residence, or tax residence, or proof none exists."
+        ],
+        "action": {
+          "label": "Review tax ID requirement",
+          "type": "informational"
+        }
+      },
+      "investment_maintenance_declaration_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your investment-maintenance declaration is not currently available.",
+          "Portugal ARI requires a sworn statement confirming compliance with minimum quantitative and time requirements."
+        ],
+        "action": {
+          "label": "Review investment declaration",
+          "type": "informational"
+        }
+      },
+      "minimum_stay_acknowledgement_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your minimum physical stay acknowledgment needs manual review.",
+          "The team should confirm that you understand the Portugal ARI stay requirement of 7 days in the first year and 14 days in subsequent years."
+        ],
+        "action": {
+          "label": "Wait for minimum-stay review",
+          "type": "email_followup"
+        }
+      },
+      "family_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your family reunification documents need manual review.",
+          "The team should verify relationship documents for each included family member."
+        ],
+        "action": {
+          "label": "Wait for family-document review",
+          "type": "email_followup"
+        }
+      },
+      "portal_ari_process_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your Portal ARI process acknowledgment needs manual review.",
+          "The team should confirm you understand Portal ARI registration, document upload, fee payment, and AIMA appointment scheduling."
+        ],
+        "action": {
+          "label": "Wait for Portal ARI review",
+          "type": "email_followup"
+        }
+      },
+      "portal_ari_family_process_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your Portal ARI family process acknowledgment needs manual review.",
+          "The team should confirm how family reunification applications will be handled through Portal ARI."
+        ],
+        "action": {
+          "label": "Wait for family-process review",
+          "type": "email_followup"
+        }
+      },
+      "renewal_investment_maintenance_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your renewal investment-maintenance acknowledgment needs manual review.",
+          "The team should confirm you understand renewal requires maintaining qualifying investment requirements and may require updated investment proof, compliance certificates, and criminal checks."
+        ],
+        "action": {
+          "label": "Wait for renewal review",
+          "type": "email_followup"
+        }
+      },
+      "permanent_residence_later_stage_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your permanent residence later-stage acknowledgment needs manual review.",
+          "The team should confirm you understand permanent residence is a later-stage option only if Article 80 requirements are met."
+        ],
+        "action": {
+          "label": "Wait for later-stage review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

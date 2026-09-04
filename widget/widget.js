@@ -28,25 +28,60 @@ function _qiqUUID() {
 const QIQ_STAGE1_COUNTRIES = [
   { value: "spain", label: "Spain" },
   { value: "costa_rica", label: "Costa Rica" },
+  { value: "italy", label: "Italy" },
+  { value: "portugal", label: "Portugal" },
 ];
 
 const QIQ_STAGE1_PATHWAYS_BY_COUNTRY = {
   spain: [
     { value: "spain-dnv", label: "Digital Nomad Visa" },
+    { value: "spain-nlv", label: "Non-Lucrative Visa" },
+    { value: "spain-student-visa", label: "Student Visa" },
   ],
   costa_rica: [
     { value: "costa-rica-dnv", label: "Digital Nomad Visa" },
     { value: "costa-rica-pensionado", label: "Pensionado Residency" },
+  ],
+  italy: [
+    { value: "italy-dnv", label: "Digital Nomad Visa" },
+    { value: "italy-elective-residence", label: "Elective Residence Visa" },
+  ],
+  portugal: [
+    { value: "portugal-d7", label: "D7 Passive Income Visa" },
+    { value: "portugal-dnv", label: "Digital Nomad Visa" },
+    { value: "portugal-golden-visa", label: "Golden Visa / ARI" },
   ],
 };
 
 const QIQ_COUNTRY_BY_PATHWAY = {
   "spain-dnv": "spain",
   "spain_dnv": "spain",
+  "spain-nlv": "spain",
+  "spain_nlv": "spain",
+  "spain-student-visa": "spain",
+  "spain_student_visa": "spain",
   "costa-rica-dnv": "costa_rica",
   "costa_rica_dnv": "costa_rica",
   "costa-rica-pensionado": "costa_rica",
   "costa_rica_pensionado": "costa_rica",
+  "italy-dnv": "italy",
+  "italy_dnv": "italy",
+  "italy-elective-residence": "italy",
+  "italy_elective_residence": "italy",
+  "portugal-d7": "portugal",
+  "portugal_d7": "portugal",
+  "portugal-dnv": "portugal",
+  "portugal_dnv": "portugal",
+  "portugal-digital-nomad": "portugal",
+  "portugal-digital-nomad-visa": "portugal",
+  "portugal-remote-work": "portugal",
+  "portugal-remote-work-visa": "portugal",
+  "portugal-golden-visa": "portugal",
+  "portugal_golden_visa": "portugal",
+  "portugal-ari": "portugal",
+  "portugal_ari": "portugal",
+  "portugal-investment-residence": "portugal",
+  "portugal-investment-residence-permit": "portugal",
 };
 
 class QIQWidget {

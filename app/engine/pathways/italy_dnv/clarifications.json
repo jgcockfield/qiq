@@ -1,0 +1,191 @@
+{
+  "pathway": "italy_dnv",
+  "visa_type": "Italy Digital Nomad / Remote Worker Visa",
+  "clarifications": [
+    {
+      "requirement": "worker_category_missing_or_unrecognized",
+      "title": "Worker Route Needs Review",
+      "clarification": "The Italy pathway requires selecting either the self-employed digital nomad route or the employee/collaborator remote worker route. The selected route is missing or unclear, so the case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "digital_nomad_self_employment_proof_unavailable",
+      "title": "Self-Employment Proof Unavailable",
+      "clarification": "Self-employed digital nomads must be able to document freelance or self-employment activity. Without proof of self-employment, the case does not appear to meet the Italy Digital Nomad route requirements."
+    },
+    {
+      "requirement": "digital_nomad_self_employment_proof_needs_review",
+      "title": "Self-Employment Proof Needs Review",
+      "clarification": "The applicant's self-employment or freelance proof is unclear. The case should be reviewed to confirm whether the applicant can document qualifying self-employed remote work."
+    },
+    {
+      "requirement": "partita_iva_acknowledgement_needs_review",
+      "title": "Partita IVA Requirement Needs Review",
+      "clarification": "Self-employed digital nomads may need to request an Italian VAT number after entry. The applicant's understanding of this after-entry requirement is unclear and should be reviewed."
+    },
+    {
+      "requirement": "remote_worker_contract_unavailable",
+      "title": "Remote Worker Contract Unavailable",
+      "clarification": "Remote workers must provide an employment or collaboration contract, or a binding offer. Without this document, the case does not appear to meet the remote worker route requirements."
+    },
+    {
+      "requirement": "remote_worker_contract_needs_review",
+      "title": "Remote Worker Contract Needs Review",
+      "clarification": "The applicant's employment or collaboration contract status is unclear. The case should be reviewed to confirm whether a qualifying contract or binding offer is available."
+    },
+    {
+      "requirement": "remote_worker_employer_clean_record_unavailable",
+      "title": "Employer Clean-Record Declaration Unavailable",
+      "clarification": "For the remote worker route, the employer must provide a declaration that it has no relevant convictions in the previous 5 years. Without that declaration, the case does not appear to satisfy this route-specific requirement."
+    },
+    {
+      "requirement": "remote_worker_employer_clean_record_needs_review",
+      "title": "Employer Declaration Needs Review",
+      "clarification": "The employer clean-record declaration is missing or uncertain. The case should be reviewed to confirm whether the employer can provide the required declaration and signer identification."
+    },
+    {
+      "requirement": "eu_citizen_status",
+      "title": "EU Citizen Status",
+      "clarification": "The Italy Digital Nomad / Remote Worker Visa pathway is for non-EU citizens. If the applicant is an EU citizen, this visa route does not appear to be the correct pathway."
+    },
+    {
+      "requirement": "eu_citizen_status_needs_review",
+      "title": "Nationality Status Needs Review",
+      "clarification": "The applicant's EU citizenship status is unclear. The case should be reviewed to confirm whether the applicant is a non-EU citizen eligible to use this visa route."
+    },
+    {
+      "requirement": "remote_technological_work_not_confirmed",
+      "title": "Remote Technology Work Not Confirmed",
+      "clarification": "This visa is for applicants performing highly qualified work remotely using technological tools. If the work will not be performed remotely with technological tools, the case does not appear to meet the core visa requirement."
+    },
+    {
+      "requirement": "remote_technological_work_needs_review",
+      "title": "Remote Technology Work Needs Review",
+      "clarification": "It is unclear whether the applicant will perform highly qualified work remotely using technological tools while in Italy. The work arrangement should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "highly_qualified_basis_not_met",
+      "title": "Highly Qualified Basis Not Met",
+      "clarification": "The applicant must meet a highly qualified worker basis, such as a qualifying degree, regulated-profession attestation, 5 years of professional experience, or 3 years of ICT executive or specialist experience. If none applies, the case does not appear to qualify."
+    },
+    {
+      "requirement": "highly_qualified_basis_needs_review",
+      "title": "Highly Qualified Basis Needs Review",
+      "clarification": "The applicant's highly qualified worker basis is missing or unclear. The case should be reviewed to confirm whether the applicant can document one of the accepted qualification routes."
+    },
+    {
+      "requirement": "prior_experience_needs_review",
+      "title": "Prior Experience Needs Review",
+      "clarification": "The applicant must prove at least 6 months of prior experience in the activity to be performed remotely from Italy. The amount of prior experience is missing or unclear and should be reviewed."
+    },
+    {
+      "requirement": "prior_experience_below_minimum",
+      "title": "Prior Experience Below Minimum",
+      "clarification": "Italy Digital Nomad / Remote Worker screening requires at least 6 months of prior experience in the activity to be performed. The provided experience is below that minimum."
+    },
+    {
+      "requirement": "income_needs_review",
+      "title": "Income Needs Review",
+      "clarification": "The annual work-income amount is missing or unclear. The case should be reviewed to confirm whether the applicant can document income meeting the Italy Digital Nomad / Remote Worker threshold."
+    },
+    {
+      "requirement": "income_below_minimum",
+      "title": "Income Below Minimum",
+      "clarification": "The source reference uses a conservative annual income threshold of EUR 25,500. The documented annual work income is below that threshold, so the case does not appear to meet the income requirement."
+    },
+    {
+      "requirement": "passive_income_not_accepted",
+      "title": "Passive Income Not Accepted",
+      "clarification": "Consular guidance notes that income should derive from the work to be performed in Italy, and passive income is not accepted by that interpretation. A case relying on passive income does not appear to meet the income-source requirement."
+    },
+    {
+      "requirement": "income_source_needs_review",
+      "title": "Income Source Needs Review",
+      "clarification": "The source of income is unclear or not clearly tied to the work to be performed in Italy. The case should be reviewed against consular income-source guidance."
+    },
+    {
+      "requirement": "income_evidence_needs_review",
+      "title": "Income Evidence Needs Review",
+      "clarification": "The selected documents do not clearly show qualifying work-derived income. Income proof may include payslips, tax returns, W-2 forms, bank statements, invoices, or other work-income proof."
+    },
+    {
+      "requirement": "health_insurance_unavailable",
+      "title": "Health Insurance Unavailable",
+      "clarification": "Applicants must have health insurance for medical care and hospitalization valid in Italy for the stay period. If qualifying coverage cannot be obtained, the case does not appear to meet this requirement."
+    },
+    {
+      "requirement": "health_insurance_needs_review",
+      "title": "Health Insurance Needs Review",
+      "clarification": "The applicant does not currently have qualifying health insurance, or the coverage status is unclear. The case should be reviewed to confirm that valid medical and hospitalization coverage can be provided."
+    },
+    {
+      "requirement": "accommodation_unavailable",
+      "title": "Accommodation Unavailable",
+      "clarification": "Applicants must show suitable accommodation in Italy for the visa period, such as a registered lease, rental contract, or property deed. Without accommodation documentation, the case does not appear to meet this requirement."
+    },
+    {
+      "requirement": "accommodation_needs_review",
+      "title": "Accommodation Needs Review",
+      "clarification": "The applicant's accommodation documentation is not yet confirmed or is unclear. The case should be reviewed to confirm whether suitable housing evidence can be provided."
+    },
+    {
+      "requirement": "passport_validity_needs_review",
+      "title": "Passport Validity Needs Review",
+      "clarification": "Passport validity is missing or unclear. The case should be reviewed because consular requirements include passport validity beyond the intended stay or travel period."
+    },
+    {
+      "requirement": "passport_validity_below_minimum",
+      "title": "Passport Validity Below Minimum",
+      "clarification": "The source reference includes a minimum passport-validity requirement of at least 3 months beyond the stay. A passport below that minimum should be renewed before the case can qualify."
+    },
+    {
+      "requirement": "passport_validity_consular_threshold_needs_review",
+      "title": "Passport Validity Consular Threshold Needs Review",
+      "clarification": "Some consular guidance lists a higher passport-validity threshold of 15 months beyond intended travel. The passport appears above the baseline minimum but below that consular threshold, so the case should be reviewed."
+    },
+    {
+      "requirement": "passport_blank_pages_needs_review",
+      "title": "Blank Passport Pages Need Review",
+      "clarification": "The number of blank passport pages is missing or unclear. The case should be reviewed because consular guidance may require two blank passport pages."
+    },
+    {
+      "requirement": "passport_blank_pages_below_minimum",
+      "title": "Blank Passport Pages Below Minimum",
+      "clarification": "Consular guidance may require at least two blank passport pages. If the passport has fewer than two blank pages, the case does not appear to meet this document requirement."
+    },
+    {
+      "requirement": "permesso_acknowledgement_missing",
+      "title": "Residence Permit Acknowledgment Missing",
+      "clarification": "Applicants must apply for a permesso di soggiorno within 8 working days of entering Italy. If the applicant will not comply with this requirement, the case does not appear to satisfy the after-entry compliance obligation."
+    },
+    {
+      "requirement": "permesso_acknowledgement_needs_review",
+      "title": "Residence Permit Requirement Needs Review",
+      "clarification": "The applicant's understanding of the 8-working-day permesso di soggiorno requirement is unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "tax_social_security_acknowledgement_missing",
+      "title": "Tax and Social-Security Acknowledgment Missing",
+      "clarification": "Italy verifies tax and contribution compliance, and Italian social-security rules may apply if no bilateral agreement exists. If the applicant will not comply, the case does not appear to satisfy this requirement."
+    },
+    {
+      "requirement": "tax_social_security_acknowledgement_needs_review",
+      "title": "Tax and Social-Security Requirement Needs Review",
+      "clarification": "The applicant's understanding of Italian tax and contribution compliance is unclear. The case should be reviewed to confirm the applicant can address these after-entry obligations."
+    },
+    {
+      "requirement": "family_reunification_needs_review",
+      "title": "Family Reunification Needs Review",
+      "clarification": "The applicant's family reunification intent is unclear. The case should be reviewed because family routing may affect document requirements and consular handling."
+    },
+    {
+      "requirement": "adult_children_or_parents_family_route_not_supported",
+      "title": "Family Route Not Supported",
+      "clarification": "The reference notes spouse and minor children for the family route and does not support adult children or parents in this screening. A case seeking to include adult children or parents does not appear to fit this pathway's family route."
+    },
+    {
+      "requirement": "family_documents_needs_review",
+      "title": "Family Documents Need Review",
+      "clarification": "For spouse or minor-child family reunification, relationship documents such as marriage or birth records may be required. The availability of those documents is missing or uncertain and should be reviewed."
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "pathway": "portugal_d7",
+  "source": {
+    "type": "requirements_reference",
+    "file": "app/engine/pathways/portugal_d7/requirements_reference.md",
+    "title": "Portugal D7 Passive Income Visa Requirements Reference"
+  },
+  "taxonomy_fields": [
+    {
+      "key": "routing.applicant_type",
+      "depends_on": [],
+      "label": "Are you applying as an individual or with family dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["individual", "family"]
+    },
+    {
+      "key": "identity.nationality",
+      "depends_on": ["routing.applicant_type"],
+      "label": "What is your nationality?",
+      "input_type": "text",
+      "required": true
+    },
+    {
+      "key": "routing.application_country_matches_nationality",
+      "depends_on": ["identity.nationality"],
+      "label": "Are you applying from your country of nationality?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "routing.lawful_residence_where_applying",
+      "depends_on": ["routing.application_country_matches_nationality"],
+      "label": "If applying outside your country of nationality, can you prove lawful residence there beyond the requested visa period?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.application_country_matches_nationality", "no"] }
+    },
+    {
+      "key": "routing.passive_own_income_intent",
+      "depends_on": ["routing.application_country_matches_nationality"],
+      "label": "Is your Portugal D7 case based on living in Portugal from passive or own income rather than active employment?",
+      "description": "This pathway is a passive-income / own-income residence visa, not a digital nomad or active-employment visa.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "financial.annual_passive_income_eur",
+      "depends_on": ["routing.passive_own_income_intent"],
+      "label": "What annual passive or own income in EUR can you document?",
+      "description": "Portugal D7 screening uses the 2026 minimum monthly salary of EUR 920 and a 12-month main-applicant threshold of EUR 11,040.",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "financial.income_source_types",
+      "depends_on": ["financial.annual_passive_income_eur"],
+      "label": "Which passive or own-income sources support your Portugal D7 case?",
+      "input_type": "multi_choice",
+      "required": true,
+      "choices": [
+        "pension",
+        "rental_property_income",
+        "dividends",
+        "royalties",
+        "financial_investments",
+        "intellectual_property",
+        "savings_or_bank_balance",
+        "employment_or_active_work_income",
+        "other",
+        "not_sure"
+      ]
+    },
+    {
+      "key": "financial.income_evidence_types",
+      "depends_on": ["financial.income_source_types"],
+      "label": "Which documents can you provide as proof of passive income, own income, or funds?",
+      "input_type": "multi_choice",
+      "required": true,
+      "choices": [
+        "bank_statements",
+        "income_proof",
+        "pension_proof",
+        "investment_income_proof",
+        "property_income_proof",
+        "royalty_or_ip_income_proof",
+        "other"
+      ]
+    },
+    {
+      "key": "financial.portuguese_bank_availability",
+      "depends_on": ["financial.income_evidence_types"],
+      "label": "Can you show that your income or funds are available in Portugal, such as through a Portuguese bank account?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "will_open_or_transfer", "no", "not_sure"]
+    },
+    {
+      "key": "housing.portugal_accommodation_12_months",
+      "depends_on": ["financial.portuguese_bank_availability"],
+      "label": "Can you demonstrate permanent accommodation in Portugal for at least 12 months?",
+      "input_type": "choice",
+      "required": true,
+      "choices": [
+        "lease_12_months_or_more",
+        "property_deed",
+        "other_qualifying_accommodation",
+        "less_than_12_months",
+        "not_available",
+        "not_sure"
+      ]
+    },
+    {
+      "key": "routing.dependents_count",
+      "depends_on": ["routing.applicant_type"],
+      "label": "How many dependents are included in your application?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.additional_adult_dependents_count",
+      "depends_on": ["routing.dependents_count"],
+      "label": "How many included dependents are additional adults?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.child_or_dependent_non_minor_count",
+      "depends_on": ["routing.dependents_count"],
+      "label": "How many included dependents are children under 18 or dependent non-minor children?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.dependent_relationships",
+      "depends_on": ["routing.dependents_count"],
+      "label": "What is each dependent's relationship to you?",
+      "input_type": "text",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.family_documents_available",
+      "depends_on": ["routing.dependent_relationships"],
+      "label": "Can you provide relationship documents for each included family member?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.passport_validity_months",
+      "depends_on": ["housing.portugal_accommodation_12_months"],
+      "label": "How many months will your passport be valid beyond your estimated return or intended stay period?",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "routing.health_travel_insurance_status",
+      "depends_on": ["routing.passport_validity_months"],
+      "label": "Do you have health or travel insurance covering medical expenses, urgent medical assistance, and possible repatriation, or will you obtain it?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["have_it", "will_obtain", "bilateral_exception_applies", "cannot_obtain"]
+    },
+    {
+      "key": "routing.police_clearance_available",
+      "depends_on": ["routing.health_travel_insurance_status"],
+      "label": "Can you obtain the required criminal record certificate from your country of nationality or any country where you lived over 1 year?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "under_16_exempt", "no", "not_sure"]
+    },
+    {
+      "key": "routing.criminal_record_flag",
+      "depends_on": ["routing.police_clearance_available"],
+      "label": "Do you have any criminal convictions that may appear on the required certificate?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "compliance.aima_residence_step_acknowledged",
+      "depends_on": ["routing.criminal_record_flag"],
+      "label": "Do you understand that after D7 visa approval, you must request a residence title from AIMA during the residence stage?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "consulate.discretion_extra_documents_acknowledged",
+      "depends_on": ["compliance.aima_residence_step_acknowledged"],
+      "label": "Do you understand the consulate may request supplementary documents and that missing mandatory documents can lead to refusal?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "compliance.truthful_documents_acknowledged",
+      "depends_on": ["consulate.discretion_extra_documents_acknowledged"],
+      "label": "Do you understand that false statements can cause refusal or annulment of a granted visa?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "routing.additional_information",
+      "depends_on": ["compliance.truthful_documents_acknowledged"],
+      "label": "What else about your Portugal D7 Passive Income Visa situation should QIQ consider?",
+      "input_type": "text",
+      "required": false
+    }
+  ]
+}

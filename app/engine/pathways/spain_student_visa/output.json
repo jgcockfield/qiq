@@ -1,0 +1,123 @@
+{
+  "pathway": "spain_student_visa",
+  "visa_type": "Spain Student Visa",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core qualification requirements for Spain's Student Visa / Study Stay pathway."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your Spain Student Visa / Study Stay information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet one or more core Spain Student Visa / Study Stay requirements."
+      }
+    },
+    "requirement_variants": {
+      "study_admission_unavailable": {
+        "text": "Based on the information provided, you do not currently appear to have qualifying admission to an authorized or recognized institution, center, or program in Spain."
+      },
+      "study_stay_not_over_90_days": {
+        "text": "Spain's Student Visa / Study Stay pathway is for stays over 90 days. Based on the duration provided, this pathway may not match your stay length."
+      },
+      "insufficient_financial_means": {
+        "text": "Based on the financial amount provided, you do not currently appear to meet the Spain Student Visa / Study Stay financial-means threshold for your applicant route."
+      },
+      "dependents_not_allowed_for_study_category": {
+        "text": "Based on the study category provided, your family dependents may not be eligible to accompany you under the student-family stay route."
+      },
+      "student_work_not_compatible": {
+        "text": "Based on the work plans provided, the intended student work does not appear compatible with Spain's student-work limits."
+      },
+      "passport_validity_below_minimum": {
+        "text": "Based on the passport validity provided, you do not currently appear to meet the Spain Student Visa / Study Stay 1-year passport-validity requirement."
+      },
+      "health_insurance_unavailable": {
+        "text": "Spain's Student Visa / Study Stay pathway requires qualifying health insurance with an insurer authorized to operate in Spain. Without qualifying coverage, eligibility cannot be confirmed."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Spain's Student Visa / Study Stay pathway.",
+          "The next step is to verify your admission, study category, funds, insurance, filing route, and any family-dependent details before preparing an application."
+        ],
+        "action": {
+          "label": "Book a Spain Student Visa consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before Spain Student Visa / Study Stay eligibility can be confirmed.",
+          "The team should follow up by email with next steps or any follow-up questions."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory Spain Student Visa / Study Stay qualification requirements.",
+          "If your admission, study category, funds, insurance, passport validity, or family route changes, you can complete the eligibility check again or ask the team about alternative Spain pathways."
+        ],
+        "action": {
+          "label": "Review alternative Spain options",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "application_route_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your application filing route needs manual review before eligibility can be confirmed.",
+          "The team should verify whether your case should be filed through a Spanish consulate or whether an in-Spain filing route may apply."
+        ],
+        "action": {
+          "label": "Wait for filing-route review",
+          "type": "email_followup"
+        }
+      },
+      "financial_evidence_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your financial evidence needs manual review before eligibility can be confirmed.",
+          "The team should verify whether your bank statements, scholarship, family support, grants, or other funds can satisfy the Spain Student Visa / Study Stay requirement."
+        ],
+        "action": {
+          "label": "Wait for financial review",
+          "type": "email_followup"
+        }
+      },
+      "student_work_authorization_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your student-work plans need manual review.",
+          "The team should verify whether your study category authorizes work automatically or requires additional authorization, and whether the work remains compatible with your studies."
+        ],
+        "action": {
+          "label": "Wait for student-work review",
+          "type": "email_followup"
+        }
+      },
+      "dependents_allowed_for_study_category_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your family-dependent route needs manual review.",
+          "The team should verify whether your study category allows dependents and whether the dependent funds and documentation can support the case."
+        ],
+        "action": {
+          "label": "Wait for dependent-route review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

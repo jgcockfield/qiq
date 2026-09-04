@@ -1,0 +1,206 @@
+{
+  "pathway": "portugal_dnv",
+  "visa_type": "Portugal Digital Nomad Visa",
+  "clarifications": [
+    {
+      "requirement": "visa_route_needs_review",
+      "title": "Remote-Work Visa Route Needs Review",
+      "clarification": "Portugal has both a remote-work residence visa route and a temporary-stay remote-work route for stays under 1 year. The selected route is missing or unclear, so the case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "work_relationship_missing_or_unrecognized",
+      "title": "Remote-Work Route Needs Review",
+      "clarification": "The Portugal Digital Nomad Visa screening must identify whether the applicant is a remote employee, an independent professional, or a business owner providing services remotely. The selected work route is missing or unclear."
+    },
+    {
+      "requirement": "remote_work_not_for_entities_outside_portugal",
+      "title": "Remote Work Outside Portugal Not Confirmed",
+      "clarification": "This pathway is for professional activity performed remotely for entities outside Portugal. If the work is not for entities outside Portugal, the case does not appear to meet the Portugal remote-work requirement."
+    },
+    {
+      "requirement": "remote_work_entities_outside_portugal_needs_review",
+      "title": "Remote Work Entity Location Needs Review",
+      "clarification": "It is unclear whether the applicant's professional activity will be performed remotely for entities outside Portugal. The work arrangement should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "employee_contract_or_declaration_unavailable",
+      "title": "Employee Contract or Declaration Missing",
+      "clarification": "Remote employees must provide an employment contract, promise of contract, or employer declaration confirming the labor relationship. Without one of these documents, the employee route does not appear to meet the requirement."
+    },
+    {
+      "requirement": "employee_contract_or_declaration_needs_review",
+      "title": "Employee Contract or Declaration Needs Review",
+      "clarification": "The employee contract, promise of contract, or employer declaration is missing or uncertain. The case should be reviewed to confirm whether the employee route is supported by qualifying evidence."
+    },
+    {
+      "requirement": "independent_service_or_client_proof_unavailable",
+      "title": "Independent Service Proof Missing",
+      "clarification": "Independent professionals must provide service contracts, a written service proposal, or proof of services to one or more entities. Without qualifying service or client proof, the independent route does not appear to meet the requirement."
+    },
+    {
+      "requirement": "independent_service_or_client_proof_needs_review",
+      "title": "Independent Service Proof Needs Review",
+      "clarification": "The independent professional's service contracts, client proof, or written service proposal are missing or unclear. The case should be reviewed to confirm whether the route-specific evidence is sufficient."
+    },
+    {
+      "requirement": "business_owner_company_service_documents_unavailable",
+      "title": "Business-Owner Service Documents Missing",
+      "clarification": "Business-owner cases must show company documents plus contracts, proposals, or client proof demonstrating remote services to entities outside Portugal. Without those documents, this route does not appear to meet the requirement."
+    },
+    {
+      "requirement": "business_owner_company_service_documents_needs_review",
+      "title": "Business-Owner Service Documents Need Review",
+      "clarification": "The business-owner company documents, service contracts, proposals, or client proof are missing or unclear. The case should be reviewed to confirm whether the business-owner route is supported."
+    },
+    {
+      "requirement": "average_monthly_income_missing_or_unrecognized",
+      "title": "Average Monthly Income Needs Review",
+      "clarification": "The average monthly remote-work income over the last 3 months is missing or could not be interpreted as a numeric EUR amount. Portugal Digital Nomad Visa income eligibility cannot be confirmed automatically."
+    },
+    {
+      "requirement": "income_below_minimum",
+      "title": "Income Below EUR 3,680 per Month",
+      "clarification": "Portugal Digital Nomad Visa screening uses the 2026 threshold of EUR 3,680 per month, equal to 4 times the EUR 920 Portuguese minimum wage. The documented average monthly income is below that threshold."
+    },
+    {
+      "requirement": "income_evidence_needs_review",
+      "title": "Remote-Work Income Evidence Needs Review",
+      "clarification": "The selected documents do not clearly prove the last 3 months of remote-work income. Evidence may include payslips, invoices, contracts, bank statements, or other income proof."
+    },
+    {
+      "requirement": "tax_residence_certificate_unavailable",
+      "title": "Tax Residence Certificate Missing",
+      "clarification": "The Portugal remote-work visa reference requires a document attesting fiscal residence. Without a tax residence certificate or equivalent fiscal-residence document, this requirement does not appear to be met."
+    },
+    {
+      "requirement": "tax_residence_certificate_needs_review",
+      "title": "Tax Residence Certificate Needs Review",
+      "clarification": "The applicant's tax residence certificate or fiscal-residence document is missing or uncertain. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "applicant_type_missing",
+      "title": "Applicant Type Needs Review",
+      "clarification": "The case should confirm whether the applicant is applying individually or with family dependents. Family cases require additional review of relationship documents and stable means for the family group."
+    },
+    {
+      "requirement": "dependents_count_missing",
+      "title": "Dependent Count Missing",
+      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case so the family route and stable-means requirement can be reviewed."
+    },
+    {
+      "requirement": "dependent_relationships_missing",
+      "title": "Dependent Relationships Missing",
+      "clarification": "Family cases should identify each dependent's relationship to the main applicant. This is needed to review whether the accompanying-family route is supported."
+    },
+    {
+      "requirement": "family_documents_needs_review",
+      "title": "Family Documents Need Review",
+      "clarification": "Family applications require relationship proof for included dependents. The availability of family documents is missing, unclear, or not confirmed."
+    },
+    {
+      "requirement": "family_stable_means_unavailable",
+      "title": "Family Stable Means Unavailable",
+      "clarification": "Accompanying family applications require stable and regular means sufficient for the applicant and relatives for the stay or 12 months, whichever is less. If family funds cannot be shown, this requirement does not appear to be met."
+    },
+    {
+      "requirement": "family_stable_means_needs_review",
+      "title": "Family Stable Means Need Review",
+      "clarification": "The applicant's ability to show stable and regular means for included family members is unclear. The family funds coverage should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "lawful_residence_where_applying_unavailable",
+      "title": "Lawful Residence Where Applying Unavailable",
+      "clarification": "If applying outside the country of nationality, the applicant must prove lawful residence in the application country beyond the requested visa period. Without that status, this requirement does not appear to be met."
+    },
+    {
+      "requirement": "lawful_residence_where_applying_needs_review",
+      "title": "Lawful Residence Where Applying Needs Review",
+      "clarification": "The applicant is applying outside the country of nationality, but lawful residence status in the application country is unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "application_country_needs_review",
+      "title": "Application Country Needs Review",
+      "clarification": "It is unclear whether the applicant is applying from the country of nationality. This matters because lawful residence evidence may be required when applying elsewhere."
+    },
+    {
+      "requirement": "passport_validity_missing_or_unrecognized",
+      "title": "Passport Validity Needs Review",
+      "clarification": "Passport validity is missing or could not be interpreted as a number of months. Portugal remote-work visa screening should confirm passport validity before eligibility is finalized."
+    },
+    {
+      "requirement": "passport_validity_below_minimum",
+      "title": "Passport Validity Below Minimum",
+      "clarification": "The source reference requires a passport or travel document valid at least 3 months beyond the intended stay or return date. A passport below that threshold should be renewed."
+    },
+    {
+      "requirement": "health_travel_insurance_unavailable",
+      "title": "Health / Travel Insurance Unavailable",
+      "clarification": "Portugal remote-work visa applicants must have insurance covering necessary medical expenses, urgent medical assistance, and repatriation unless a bilateral exception applies. Without qualifying coverage, this requirement is not met."
+    },
+    {
+      "requirement": "health_travel_insurance_needs_review",
+      "title": "Health / Travel Insurance Needs Review",
+      "clarification": "The applicant does not currently have qualifying health/travel insurance, or the coverage status is unclear. The case should be reviewed to confirm qualifying coverage or a bilateral exception."
+    },
+    {
+      "requirement": "police_clearance_unavailable",
+      "title": "Police Clearance Unavailable",
+      "clarification": "Portugal remote-work visa applicants generally need a criminal record certificate from the country of nationality or any country where they lived over 1 year, unless under 16. If the certificate cannot be obtained, this requirement is not met."
+    },
+    {
+      "requirement": "police_clearance_needs_review",
+      "title": "Police Clearance Needs Review",
+      "clarification": "The police clearance status is unclear. The case should be reviewed to confirm whether the required criminal record certificate can be obtained or whether an under-16 exemption applies."
+    },
+    {
+      "requirement": "criminal_record_needs_review",
+      "title": "Criminal Record Needs Review",
+      "clarification": "A disclosed or uncertain criminal record should be reviewed before eligibility is confirmed. The review should determine whether any record may affect issuance of the Portugal remote-work visa or later residence authorization."
+    },
+    {
+      "requirement": "removal_or_refusal_alert",
+      "title": "Removal or Refusal Alert Issue",
+      "clarification": "An active entry or stay ban, removal order, or SII/UCFE refusal alert may block residence authorization in Portugal. If such an alert exists, the case does not appear to qualify without legal review."
+    },
+    {
+      "requirement": "removal_or_refusal_alert_needs_review",
+      "title": "Removal or Refusal Alert Needs Review",
+      "clarification": "It is unclear whether the applicant has an active entry or stay ban, removal order, or SII/UCFE refusal alert. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "settlement_statement_unavailable",
+      "title": "Accommodation / Settlement Statement Missing",
+      "clarification": "The embassy checklist requires a personal statement explaining the reason for settling in Portugal, intended area of residence, and accommodation type. Without this settlement statement, the checklist requirement does not appear to be met."
+    },
+    {
+      "requirement": "settlement_statement_needs_review",
+      "title": "Accommodation / Settlement Statement Needs Review",
+      "clarification": "The applicant's settlement statement or accommodation explanation is missing or unclear. The case should be reviewed to confirm the intended area of residence and accommodation type."
+    },
+    {
+      "requirement": "aima_residence_permit_acknowledgement_needs_review",
+      "title": "AIMA Residence Permit Step Needs Review",
+      "clarification": "For the residence visa route, the applicant must apply to AIMA for a residence permit after entry. The applicant's understanding of this post-entry step is missing or unclear."
+    },
+    {
+      "requirement": "renewal_acknowledgement_needs_review",
+      "title": "Residence Renewal Requirement Needs Review",
+      "clarification": "For the residence visa route, the remote-work residence authorization is initially valid for 2 years and may be renewed for successive 3-year periods if requirements remain satisfied. The applicant's understanding of this renewal requirement is unclear."
+    },
+    {
+      "requirement": "discretionary_extra_documents_needs_review",
+      "title": "Discretionary Extra-Document Review",
+      "clarification": "Missing mandatory documents may lead to refusal, and the consulate may request supplementary documents. The applicant's understanding of this discretionary review is unclear."
+    },
+    {
+      "requirement": "truthful_documents_not_acknowledged",
+      "title": "Truthful-Document Requirement Not Acknowledged",
+      "clarification": "False statements may cause refusal or annulment of a visa and legal action under Portuguese law. If the applicant does not acknowledge this compliance requirement, the case does not appear ready to proceed."
+    },
+    {
+      "requirement": "truthful_documents_needs_review",
+      "title": "Truthful Documents Need Review",
+      "clarification": "The applicant's understanding of the truthful-document requirement is unclear. The case should be reviewed because inconsistent or false documentation can lead to refusal or annulment."
+    }
+  ]
+}

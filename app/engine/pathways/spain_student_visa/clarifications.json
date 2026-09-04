@@ -1,0 +1,276 @@
+{
+  "pathway": "spain_student_visa",
+  "visa_type": "Spain Student Visa",
+  "clarifications": [
+    {
+      "requirement": "applicant_type_missing",
+      "title": "Applicant Type Needs Review",
+      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Dependent count affects the student-visa financial threshold and family-route eligibility."
+    },
+    {
+      "requirement": "eu_eea_swiss_or_free_movement_status",
+      "title": "EU Free-Movement Status",
+      "clarification": "Spain Student Visa screening is for non-EU, non-EEA, non-Swiss applicants who are not covered by EU free-movement rules. If the applicant is covered by those rules, this pathway does not appear to be the right category."
+    },
+    {
+      "requirement": "eu_eea_swiss_or_free_movement_status_needs_review",
+      "title": "Nationality Status Needs Review",
+      "clarification": "The applicant's EU, EEA, Swiss, or free-movement status is unclear. The case should be reviewed before Spain Student Visa eligibility is confirmed."
+    },
+    {
+      "requirement": "irregular_presence_in_spain",
+      "title": "Irregular Presence in Spain",
+      "clarification": "The reference requirement states that the applicant must not be irregularly present in Spain. Current irregular presence is a disqualifying factor for this screening."
+    },
+    {
+      "requirement": "irregular_presence_needs_review",
+      "title": "Immigration Status Needs Review",
+      "clarification": "The applicant's current Spain immigration status is unclear. The case should be reviewed to confirm they are not irregularly present in Spain."
+    },
+    {
+      "requirement": "application_route_needs_review",
+      "title": "Application Route Needs Review",
+      "clarification": "Student-visa applications are generally filed through the Spanish consulate in the applicant's country of origin or residence. Some higher-study cases may be filed from Spain if the applicant is legally present. The filing route should be reviewed."
+    },
+    {
+      "requirement": "in_spain_filing_without_lawful_status",
+      "title": "In-Spain Filing Without Lawful Status",
+      "clarification": "Some higher-study cases may file from Spain only if the applicant is legally present. Filing from Spain without lawful status does not appear to satisfy the student-stay route requirement."
+    },
+    {
+      "requirement": "in_spain_filing_lawful_status_needs_review",
+      "title": "In-Spain Filing Status Needs Review",
+      "clarification": "The applicant plans to file from Spain, but lawful status is unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "in_spain_filing_route_needs_review",
+      "title": "In-Spain Filing Route Needs Review",
+      "clarification": "The reference notes that some higher-study cases may apply from Spain if legally present. If the study category is not clearly a higher-study route, in-Spain filing should be reviewed."
+    },
+    {
+      "requirement": "study_category_needs_review",
+      "title": "Study Category Needs Review",
+      "clarification": "The selected study activity is missing, unclear, or outside the expected student-stay categories. The case should be reviewed to confirm whether it fits an approved study, mobility, volunteering, or training route."
+    },
+    {
+      "requirement": "study_admission_unavailable",
+      "title": "Study Admission Unavailable",
+      "clarification": "Spain Student Visa screening requires admission to an authorized or recognized institution, center, or program. Without qualifying admission, the case does not appear to meet this core requirement."
+    },
+    {
+      "requirement": "study_admission_needs_review",
+      "title": "Study Admission Needs Review",
+      "clarification": "The applicant's admission status is unclear. The case should be reviewed to confirm whether the institution or program is authorized or recognized."
+    },
+    {
+      "requirement": "study_program_not_full_time_or_recognized",
+      "title": "Program Not Full-Time or Recognized",
+      "clarification": "The reference requirement states that qualifying studies must be full-time and recognized for the relevant category. A program that is not full-time or recognized does not appear to satisfy the student-stay requirement."
+    },
+    {
+      "requirement": "study_program_recognition_needs_review",
+      "title": "Program Recognition Needs Review",
+      "clarification": "The program's full-time or recognized status is unclear. The case should be reviewed before Spain Student Visa eligibility is confirmed."
+    },
+    {
+      "requirement": "study_modality_not_eligible",
+      "title": "Study Modality Not Eligible",
+      "clarification": "The reference requires an in-person or qualifying hybrid study format. A fully online program does not appear to satisfy the Spain Student Visa modality requirement."
+    },
+    {
+      "requirement": "study_modality_needs_review",
+      "title": "Study Modality Needs Review",
+      "clarification": "The program modality is unclear. The case should be reviewed to confirm whether the program is in-person or hybrid as required for the study category."
+    },
+    {
+      "requirement": "in_person_requirement_not_met",
+      "title": "In-Person Requirement Not Met",
+      "clarification": "Spain Student Visa screening requires the program to meet the in-person or hybrid attendance requirement for the selected study category. If this requirement is not met, the case does not appear to qualify."
+    },
+    {
+      "requirement": "in_person_requirement_needs_review",
+      "title": "In-Person Requirement Needs Review",
+      "clarification": "The in-person or hybrid attendance requirement is unclear. The case should be reviewed against the program type and modality."
+    },
+    {
+      "requirement": "study_duration_missing_or_unrecognized",
+      "title": "Study Duration Needs Review",
+      "clarification": "The official program duration was missing or could not be interpreted as a number of months. The case should be reviewed to confirm the stay length."
+    },
+    {
+      "requirement": "study_stay_not_over_90_days",
+      "title": "Study Stay Not Over 90 Days",
+      "clarification": "This pathway is for study stays over 90 days. A stay of 90 days or less does not appear to match the long-duration Spain Student Visa route."
+    },
+    {
+      "requirement": "stay_over_6_months_needs_review",
+      "title": "Stay Length Needs Review",
+      "clarification": "It is unclear whether the stay exceeds 6 months. This matters because longer stays may trigger criminal-record and TIE requirements."
+    },
+    {
+      "requirement": "application_timing_too_late",
+      "title": "Application Timing Too Late",
+      "clarification": "The reference states that the application must be submitted at least 2 months before studies begin, unless a justified exception applies. Filing late without justification does not appear to meet this timing requirement."
+    },
+    {
+      "requirement": "application_timing_needs_review",
+      "title": "Application Timing Needs Review",
+      "clarification": "The filing timing is unclear or depends on a justified exception. The case should be reviewed against the study start date."
+    },
+    {
+      "requirement": "enrollment_payment_unavailable",
+      "title": "Enrollment Payment Unavailable",
+      "clarification": "The applicant must prove admission and payment of registration or enrollment fees, unless a temporary responsible declaration applies. If neither is available, the case does not appear to satisfy this requirement."
+    },
+    {
+      "requirement": "enrollment_payment_needs_review",
+      "title": "Enrollment Payment Needs Review",
+      "clarification": "Enrollment payment proof is incomplete, uncertain, or depends on a responsible declaration. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "financial_means_missing_or_unrecognized",
+      "title": "Financial Means Need Review",
+      "clarification": "The monthly funds amount was missing or could not be interpreted as a numeric EUR amount. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "insufficient_financial_means",
+      "title": "Insufficient Financial Means",
+      "clarification": "Spain Student Visa screening requires sufficient funds for the stay and return. The baseline is 100% monthly IPREM for the main applicant, plus 75% IPREM for the first family member and 50% IPREM for each additional family member."
+    },
+    {
+      "requirement": "financial_means_below_threshold_accommodation_prepaid_review",
+      "title": "Financial Means and Prepaid Accommodation Need Review",
+      "clarification": "The funds amount is below the standard threshold, but accommodation may be prepaid for the full stay. The case should be reviewed because prepaid accommodation can affect the financial analysis."
+    },
+    {
+      "requirement": "accommodation_prepaid_needs_review",
+      "title": "Accommodation Status Needs Review",
+      "clarification": "It is unclear whether accommodation is prepaid for the full stay. This should be reviewed because accommodation status may affect how the financial-means requirement is assessed."
+    },
+    {
+      "requirement": "financial_evidence_needs_review",
+      "title": "Financial Evidence Needs Review",
+      "clarification": "The selected evidence does not clearly show funds for the stay. Spain Student Visa financial proof may include bank statements, scholarships, family support, or grants."
+    },
+    {
+      "requirement": "dependents_count_missing",
+      "title": "Dependent Count Missing",
+      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case because each dependent increases the required financial means."
+    },
+    {
+      "requirement": "dependent_relationships_missing",
+      "title": "Dependent Relationships Missing",
+      "clarification": "When dependents are included, the application should identify each dependent's relationship to the main applicant so family eligibility can be reviewed."
+    },
+    {
+      "requirement": "dependent_ages_missing",
+      "title": "Dependent Ages Missing",
+      "clarification": "When dependents are included, the application should identify each dependent's age. Dependent age may affect document review and family-route analysis."
+    },
+    {
+      "requirement": "minor_children_needs_review",
+      "title": "Minor Children Need Review",
+      "clarification": "It is unclear whether any included dependents are minor children. The case should be reviewed because minor-child status can affect family documentation and stay requirements."
+    },
+    {
+      "requirement": "dependents_not_allowed_for_study_category",
+      "title": "Dependents Not Allowed for Study Category",
+      "clarification": "The reference notes that family dependents may accompany only for higher studies or specialized health training. If the selected study category does not allow dependents, the family route does not appear to qualify."
+    },
+    {
+      "requirement": "dependents_allowed_for_study_category_needs_review",
+      "title": "Dependent Route Needs Review",
+      "clarification": "It is unclear whether the selected study category allows family dependents. The case should be reviewed before family eligibility is confirmed."
+    },
+    {
+      "requirement": "dependents_study_category_needs_review",
+      "title": "Dependent Study Category Needs Review",
+      "clarification": "Family dependents are generally tied to higher studies or specialized health training. The selected study category should be reviewed to confirm whether dependents can be included."
+    },
+    {
+      "requirement": "dependents_work_not_allowed",
+      "title": "Dependents Cannot Work",
+      "clarification": "Family members under a student-family stay are not authorized to work. If an included family member intends to work in Spain under that stay, the family route does not appear to qualify."
+    },
+    {
+      "requirement": "dependents_work_intent_needs_review",
+      "title": "Dependent Work Intent Needs Review",
+      "clarification": "It is unclear whether included family members intend to work in Spain. The case should be reviewed because student-family authorization does not permit dependent work."
+    },
+    {
+      "requirement": "passport_validity_missing_or_unrecognized",
+      "title": "Passport Validity Needs Review",
+      "clarification": "The passport validity answer was missing or could not be interpreted as a number of months. Spain Student Visa screening should confirm passport validity before eligibility is finalized."
+    },
+    {
+      "requirement": "passport_validity_below_minimum",
+      "title": "Passport Validity Below Minimum",
+      "clarification": "Spain Student Visa requirements call for a valid passport recognized by Spain with at least 1 year of validity. A passport below that threshold should be renewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "health_insurance_unavailable",
+      "title": "Health Insurance Unavailable",
+      "clarification": "Spain Student Visa requirements include health insurance with an insurer authorized in Spain and benefits similar to Spain's basic public health system. If the applicant cannot obtain qualifying insurance, the case does not appear to meet this requirement."
+    },
+    {
+      "requirement": "health_insurance_needs_review",
+      "title": "Health Insurance Needs Review",
+      "clarification": "The applicant does not currently have qualifying Spain-authorized health insurance or the status is unclear. The case should be reviewed to confirm whether qualifying coverage can be obtained."
+    },
+    {
+      "requirement": "criminal_age_status_needs_review",
+      "title": "Criminal Age Status Needs Review",
+      "clarification": "For stays over 6 months, criminal-record requirements depend on whether the applicant is of criminal age. The case should be reviewed to confirm whether this requirement applies."
+    },
+    {
+      "requirement": "background_check_needs_review",
+      "title": "Criminal Record Certificates Need Review",
+      "clarification": "For stays over 6 months, applicants of criminal age may need criminal record certificates from the country of origin or residence covering the prior 5 years. If those certificates are unavailable or uncertain, the case needs review."
+    },
+    {
+      "requirement": "criminal_record_needs_review",
+      "title": "Criminal Background Needs Review",
+      "clarification": "A disclosed or uncertain criminal record should be reviewed before eligibility is confirmed. The review should determine whether any record is disqualifying under Spain Student Visa requirements."
+    },
+    {
+      "requirement": "public_order_security_risk",
+      "title": "Public Order or Security Risk",
+      "clarification": "Spain Student Visa requirements state that the applicant must not be listed as rejectable and must not pose a public-order, security, or public-health risk. A known issue in this area is a disqualifying factor for this screening."
+    },
+    {
+      "requirement": "public_order_security_needs_review",
+      "title": "Public Order or Security Needs Review",
+      "clarification": "The applicant's public-order, security, or entry-ban status is unclear. The case should be reviewed before Spain Student Visa eligibility is confirmed."
+    },
+    {
+      "requirement": "serious_public_health_disease",
+      "title": "Public Health Requirement",
+      "clarification": "Spain Student Visa requirements include that the applicant not have a disease with serious public-health implications under the International Health Regulations. A known serious public-health issue is a disqualifying factor for this screening."
+    },
+    {
+      "requirement": "public_health_needs_review",
+      "title": "Public Health Status Needs Review",
+      "clarification": "The public-health answer is unclear. The case should be reviewed to confirm whether the applicant can satisfy the Spain Student Visa medical requirement."
+    },
+    {
+      "requirement": "student_work_not_compatible",
+      "title": "Student Work Not Compatible",
+      "clarification": "Student work must remain compatible with studies and cannot exceed 30 hours per week. Work over that limit or incompatible with studies does not appear to satisfy the student-work rule."
+    },
+    {
+      "requirement": "student_work_authorization_needs_review",
+      "title": "Student Work Authorization Needs Review",
+      "clarification": "Higher-study authorization may automatically allow work, while other categories may require additional authorization. The case should be reviewed before confirming work eligibility."
+    },
+    {
+      "requirement": "student_work_intent_needs_review",
+      "title": "Student Work Intent Needs Review",
+      "clarification": "The applicant's work plans while studying are unclear. The case should be reviewed for study compatibility, category authorization, and the 30-hour weekly limit."
+    },
+    {
+      "requirement": "needs_manual_review",
+      "title": "Manual Review Required",
+      "clarification": "The information provided is not enough to confirm Spain Student Visa eligibility automatically. The case should be reviewed manually so the team can identify the appropriate next step."
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "pathway": "portugal_dnv",
+  "source": {
+    "type": "requirements_reference",
+    "file": "app/engine/pathways/portugal_dnv/requirements_reference.md",
+    "title": "Portugal Digital Nomad Visa Requirements Reference"
+  },
+  "taxonomy_fields": [
+    {
+      "key": "routing.visa_route",
+      "depends_on": [],
+      "label": "Which Portugal remote-work visa route are you considering?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["residence_visa", "temporary_stay_under_1_year", "not_sure"]
+    },
+    {
+      "key": "routing.work_relationship",
+      "depends_on": ["routing.visa_route"],
+      "label": "Which remote-work category best describes you?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["remote_employee", "freelancer_independent", "business_owner_company_service", "not_sure"]
+    },
+    {
+      "key": "work.entities_outside_portugal",
+      "depends_on": ["routing.work_relationship"],
+      "label": "Will your professional activity be performed remotely for entities outside Portugal?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "role.employee.contract_or_declaration_available",
+      "depends_on": ["routing.work_relationship"],
+      "label": "As a remote employee, can you provide an employment contract, promise of contract, or employer declaration confirming the work relationship?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.work_relationship", "remote_employee"] }
+    },
+    {
+      "key": "role.independent.service_or_client_proof_available",
+      "depends_on": ["routing.work_relationship"],
+      "label": "As an independent professional, can you provide service contracts, a written service proposal, or proof of services to one or more entities?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.work_relationship", "freelancer_independent"] }
+    },
+    {
+      "key": "role.business_owner.company_service_documents_available",
+      "depends_on": ["routing.work_relationship"],
+      "label": "As a business owner, can you provide company documents plus contracts, proposals, or client proof showing services to entities outside Portugal?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner_company_service"] }
+    },
+    {
+      "key": "financial.average_monthly_income_last_3_months_eur",
+      "depends_on": ["work.entities_outside_portugal"],
+      "label": "What average monthly income in EUR can you document for the last 3 months?",
+      "description": "Portugal Digital Nomad Visa screening uses the 2026 threshold of EUR 3,680 per month, equal to 4x the EUR 920 monthly minimum wage.",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "financial.income_evidence_types",
+      "depends_on": ["financial.average_monthly_income_last_3_months_eur"],
+      "label": "Which documents can you provide for the last 3 months of remote-work income?",
+      "input_type": "multi_choice",
+      "required": true,
+      "choices": [
+        "payslips",
+        "invoices",
+        "contracts",
+        "bank_statements",
+        "income_proof",
+        "other"
+      ]
+    },
+    {
+      "key": "documents.tax_residence_certificate_available",
+      "depends_on": ["financial.income_evidence_types"],
+      "label": "Can you provide a tax residence certificate or document attesting fiscal residence?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "routing.applicant_type",
+      "depends_on": ["documents.tax_residence_certificate_available"],
+      "label": "Are you applying as an individual or with family dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["individual", "family"]
+    },
+    {
+      "key": "routing.dependents_count",
+      "depends_on": ["routing.applicant_type"],
+      "label": "How many dependents are included in your application?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.dependent_relationships",
+      "depends_on": ["routing.dependents_count"],
+      "label": "What is each dependent's relationship to you?",
+      "input_type": "text",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.family_documents_available",
+      "depends_on": ["routing.dependent_relationships"],
+      "label": "Can you provide family relationship proof for each included dependent?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "financial.family_stable_means_available",
+      "depends_on": ["routing.dependent_relationships"],
+      "label": "Can you show stable and regular means sufficient for you and your included family members for the stay or 12 months, whichever is less?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "identity.nationality",
+      "depends_on": ["routing.applicant_type"],
+      "label": "What is your nationality?",
+      "input_type": "text",
+      "required": true
+    },
+    {
+      "key": "routing.application_country_matches_nationality",
+      "depends_on": ["identity.nationality"],
+      "label": "Are you applying from your country of nationality?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "routing.lawful_residence_where_applying",
+      "depends_on": ["routing.application_country_matches_nationality"],
+      "label": "If applying outside your country of nationality, can you prove lawful residence there beyond the requested visa period?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.application_country_matches_nationality", "no"] }
+    },
+    {
+      "key": "routing.passport_validity_months",
+      "depends_on": ["routing.application_country_matches_nationality"],
+      "label": "How many months will your passport be valid beyond your intended stay or return date?",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "routing.health_travel_insurance_status",
+      "depends_on": ["routing.passport_validity_months"],
+      "label": "Do you have travel medical insurance covering medical expenses, urgent medical assistance, and repatriation, or will you obtain it?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["have_it", "will_obtain", "bilateral_exception_applies", "cannot_obtain"]
+    },
+    {
+      "key": "routing.police_clearance_available",
+      "depends_on": ["routing.health_travel_insurance_status"],
+      "label": "Can you obtain the required criminal record certificate from your nationality country or any country where you lived over 1 year?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "under_16_exempt", "no", "not_sure"]
+    },
+    {
+      "key": "routing.criminal_record_flag",
+      "depends_on": ["routing.police_clearance_available"],
+      "label": "Do you have any criminal convictions that may appear on the required certificate?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "routing.removal_or_refusal_alert_flag",
+      "depends_on": ["routing.criminal_record_flag"],
+      "label": "Are you aware of any active entry or stay ban, removal order, or SII/UCFE refusal alert that may affect residence in Portugal?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "housing.settlement_statement_ready",
+      "depends_on": ["routing.removal_or_refusal_alert_flag"],
+      "label": "Can you provide a personal statement explaining your reason for settling in Portugal, intended area of residence, and accommodation type?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "compliance.aima_residence_permit_acknowledged",
+      "depends_on": ["housing.settlement_statement_ready"],
+      "label": "Do you understand that after entry with a residence visa, you must apply to AIMA for the residence permit?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.visa_route", "residence_visa"] }
+    },
+    {
+      "key": "compliance.renewal_acknowledged",
+      "depends_on": ["compliance.aima_residence_permit_acknowledged"],
+      "label": "Do you understand the remote-work residence authorization is initially valid for 2 years and may be renewed for successive 3-year periods if requirements remain satisfied?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"],
+      "applies_when": { "equals": ["routing.visa_route", "residence_visa"] }
+    },
+    {
+      "key": "consulate.discretion_extra_documents_acknowledged",
+      "depends_on": ["compliance.renewal_acknowledged"],
+      "label": "Do you understand missing mandatory documents may lead to rejection and the consulate may request supplementary documents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "compliance.truthful_documents_acknowledged",
+      "depends_on": ["consulate.discretion_extra_documents_acknowledged"],
+      "label": "Do you understand false statements can cause refusal or annulment of a visa and legal action under Portuguese law?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no", "not_sure"]
+    },
+    {
+      "key": "routing.additional_information",
+      "depends_on": ["compliance.truthful_documents_acknowledged"],
+      "label": "What else about your Portugal Digital Nomad Visa situation should QIQ consider?",
+      "input_type": "text",
+      "required": false
+    }
+  ]
+}

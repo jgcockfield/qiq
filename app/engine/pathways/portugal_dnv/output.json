@@ -1,0 +1,692 @@
+{
+  "pathway": "portugal_dnv",
+  "visa_type": "Portugal Digital Nomad Visa",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core qualification requirements for Portugal's Digital Nomad / Remote Work Visa."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your Portugal Digital Nomad / Remote Work Visa information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet one or more core Portugal Digital Nomad / Remote Work Visa requirements."
+      }
+    },
+    "route_variants": {
+      "residence_visa": {
+        "text": "The residence visa route is for remote professional activity performed for entities outside Portugal and includes a post-entry AIMA residence permit step."
+      },
+      "temporary_stay_under_1_year": {
+        "text": "The temporary-stay route may fit remote-work stays under 1 year and should be reviewed separately from the residence visa route."
+      },
+      "remote_employee": {
+        "text": "The remote employee route requires an employment contract, promise of contract, or employer declaration confirming the labor relationship."
+      },
+      "freelancer_independent": {
+        "text": "The freelancer / independent professional route requires service contracts, client proof, written proposals, or similar evidence of remote services."
+      },
+      "business_owner_company_service": {
+        "text": "The business-owner / company-service route requires company documents plus contracts, proposals, or client proof showing services to entities outside Portugal."
+      }
+    },
+    "requirement_variants": {
+      "visa_route_needs_review": {
+        "text": "Portugal remote-work screening should confirm whether the case is for the residence visa route or the temporary-stay route for stays under 1 year."
+      },
+      "work_relationship_missing_or_unrecognized": {
+        "text": "Portugal remote-work screening requires a clear route: remote employee, freelancer / independent professional, or business owner / company-service provider."
+      },
+      "remote_work_not_for_entities_outside_portugal": {
+        "text": "Portugal's Digital Nomad / Remote Work Visa is for professional activity performed remotely for entities outside Portugal. Based on the information provided, this core requirement is not currently met."
+      },
+      "remote_work_entities_outside_portugal_needs_review": {
+        "text": "It is unclear whether the remote work will be performed for entities outside Portugal, so eligibility requires manual review."
+      },
+      "employee_contract_or_declaration_unavailable": {
+        "text": "Remote employees must provide an employment contract, promise of contract, or employer declaration. Based on the information provided, this route-specific requirement is not currently met."
+      },
+      "employee_contract_or_declaration_needs_review": {
+        "text": "The employee contract or employer declaration status is unclear and needs review before the employee route can be confirmed."
+      },
+      "independent_service_or_client_proof_unavailable": {
+        "text": "Freelancers and independent professionals must provide service contracts, client proof, or similar independent-activity evidence. Based on the information provided, this route-specific requirement is not currently met."
+      },
+      "independent_service_or_client_proof_needs_review": {
+        "text": "The independent service contract or client-proof evidence is unclear and needs review before the independent route can be confirmed."
+      },
+      "business_owner_company_service_documents_unavailable": {
+        "text": "Business-owner cases must provide company documents plus service contracts, proposals, or client proof. Based on the information provided, this route-specific requirement is not currently met."
+      },
+      "business_owner_company_service_documents_needs_review": {
+        "text": "The business-owner company or service documents are unclear and need review before the business-owner route can be confirmed."
+      },
+      "average_monthly_income_missing_or_unrecognized": {
+        "text": "The last-3-month average monthly income amount is missing or unclear, so the EUR 3,680/month threshold cannot be confirmed automatically."
+      },
+      "income_below_minimum": {
+        "text": "Based on the income provided, you do not currently appear to meet the Portugal remote-work income threshold of EUR 3,680/month as a last-3-month average."
+      },
+      "income_evidence_needs_review": {
+        "text": "Your income evidence needs manual review to confirm it proves the last 3 months of qualifying remote-work income."
+      },
+      "tax_residence_certificate_unavailable": {
+        "text": "Portugal remote-work screening requires a tax residence certificate or fiscal-residence document. Based on the information provided, this requirement is not currently met."
+      },
+      "tax_residence_certificate_needs_review": {
+        "text": "The tax residence certificate or fiscal-residence document is missing or unclear and needs manual review."
+      },
+      "applicant_type_missing": {
+        "text": "The applicant route is missing or unclear. Portugal remote-work screening should confirm whether this is an individual or family/dependent case."
+      },
+      "dependents_count_missing": {
+        "text": "The number of included dependents is missing or unclear, so the family route cannot be confirmed automatically."
+      },
+      "dependent_relationships_missing": {
+        "text": "Dependent relationships are missing or unclear, so the accompanying-family route requires manual review."
+      },
+      "family_documents_needs_review": {
+        "text": "Family relationship documents need manual review before the dependent route can be confirmed."
+      },
+      "family_stable_means_unavailable": {
+        "text": "Accompanying family cases require stable and regular means for the applicant and family members. Based on the information provided, this family-funds requirement is not currently met."
+      },
+      "family_stable_means_needs_review": {
+        "text": "Family stable-means coverage is unclear and needs manual review before the dependent route can be confirmed."
+      },
+      "lawful_residence_where_applying_unavailable": {
+        "text": "If applying outside the country of nationality, Portugal requires proof of lawful residence where applying. Based on the information provided, this requirement is not currently met."
+      },
+      "lawful_residence_where_applying_needs_review": {
+        "text": "Lawful residence where applying is unclear and needs manual review."
+      },
+      "application_country_needs_review": {
+        "text": "The application-country relationship to nationality is unclear, so lawful-residence requirements need manual review."
+      },
+      "passport_validity_missing_or_unrecognized": {
+        "text": "Passport validity is missing or unclear and needs manual review."
+      },
+      "passport_validity_below_minimum": {
+        "text": "Based on the passport validity provided, you do not currently appear to meet Portugal's passport-validity requirement for this remote-work pathway."
+      },
+      "health_travel_insurance_unavailable": {
+        "text": "Portugal remote-work applicants need qualifying health/travel insurance unless an exception applies. Based on the information provided, this requirement is not currently met."
+      },
+      "health_travel_insurance_needs_review": {
+        "text": "Health/travel insurance status is unclear and needs manual review."
+      },
+      "police_clearance_unavailable": {
+        "text": "Portugal remote-work applicants generally need a criminal record certificate unless an under-16 exemption applies. Based on the information provided, this requirement is not currently met."
+      },
+      "police_clearance_needs_review": {
+        "text": "Police clearance status is unclear and needs manual review."
+      },
+      "criminal_record_needs_review": {
+        "text": "A disclosed or uncertain criminal record needs manual review before Portugal remote-work eligibility can be confirmed."
+      },
+      "removal_or_refusal_alert": {
+        "text": "A removal order, entry/stay ban, or refusal alert may block Portuguese residence authorization. Based on the information provided, the case requires legal review and does not currently appear clear for this pathway."
+      },
+      "removal_or_refusal_alert_needs_review": {
+        "text": "Removal, entry/stay ban, or refusal-alert status is unclear and needs manual review."
+      },
+      "settlement_statement_unavailable": {
+        "text": "Portugal's remote-work checklist requires a settlement statement describing the reason for settling in Portugal, intended area of residence, and accommodation type. Based on the information provided, this requirement is not currently met."
+      },
+      "settlement_statement_needs_review": {
+        "text": "The settlement statement or accommodation explanation is unclear and needs manual review."
+      },
+      "aima_residence_permit_acknowledgement_needs_review": {
+        "text": "For the residence visa route, the post-entry AIMA residence permit step needs manual review because the acknowledgment is missing or unclear."
+      },
+      "renewal_acknowledgement_needs_review": {
+        "text": "For the residence visa route, renewal obligations need manual review because the acknowledgment is missing or unclear."
+      },
+      "discretionary_extra_documents_needs_review": {
+        "text": "Consular discretion and possible extra-document requests need manual review because the acknowledgment is missing or unclear."
+      },
+      "truthful_documents_not_acknowledged": {
+        "text": "Portugal remote-work screening requires truthful and consistent documentation. If the false-statement risk is not acknowledged, the case does not appear ready to proceed."
+      },
+      "truthful_documents_needs_review": {
+        "text": "Truthful-document and false-statement compliance needs manual review."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Portugal's Digital Nomad / Remote Work Visa.",
+          "The next step is to verify your visa route, remote-work relationship, work for entities outside Portugal, last-3-month average income of at least EUR 3,680/month, tax residence certificate, passport, insurance, police clearance, settlement statement, and any family or residence-route obligations before preparing an application."
+        ],
+        "action": {
+          "label": "Book a Portugal DNV consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before Portugal Digital Nomad / Remote Work Visa eligibility can be confirmed.",
+          "The team should follow up by email to confirm the route, remote-work evidence, income threshold, document requirements, family coverage if applicable, and any residence-route compliance items."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory Portugal Digital Nomad / Remote Work Visa qualification requirements.",
+          "If your remote-work arrangement, income, route-specific documents, tax residence certificate, lawful residence where applying, passport, insurance, police clearance, settlement statement, family funds, or compliance answers change, you can complete the eligibility check again."
+        ],
+        "action": {
+          "label": "Review Portugal remote-work requirements",
+          "type": "informational"
+        }
+      }
+    },
+    "route_variants": {
+      "residence_visa": {
+        "enabled": true,
+        "text": [
+          "Your case appears to be using the Portugal remote-work residence visa route.",
+          "Before filing, verify the remote-work evidence, income threshold, tax residence certificate, settlement statement, and post-entry AIMA residence permit step."
+        ],
+        "action": {
+          "label": "Review residence visa route",
+          "type": "informational"
+        }
+      },
+      "temporary_stay_under_1_year": {
+        "enabled": true,
+        "text": [
+          "Your case appears to be using the temporary-stay remote-work route for a stay under 1 year.",
+          "Before filing, verify the temporary-stay requirements separately from the residence visa route and confirm whether AIMA residence-permit and renewal steps apply."
+        ],
+        "action": {
+          "label": "Review temporary-stay route",
+          "type": "informational"
+        }
+      },
+      "remote_employee": {
+        "enabled": true,
+        "text": [
+          "Your route appears to be remote employee.",
+          "Confirm you can provide an employment contract, promise of contract, or employer declaration, plus income evidence and work for entities outside Portugal."
+        ],
+        "action": {
+          "label": "Review employee evidence",
+          "type": "informational"
+        }
+      },
+      "freelancer_independent": {
+        "enabled": true,
+        "text": [
+          "Your route appears to be freelancer / independent professional.",
+          "Confirm you can provide service contracts, written proposals, client proof, or similar evidence showing remote services to entities outside Portugal."
+        ],
+        "action": {
+          "label": "Review independent evidence",
+          "type": "informational"
+        }
+      },
+      "business_owner_company_service": {
+        "enabled": true,
+        "text": [
+          "Your route appears to be business owner / company-service provider.",
+          "Confirm you can provide company documents plus contracts, proposals, or client proof showing remote services to entities outside Portugal."
+        ],
+        "action": {
+          "label": "Review business-owner evidence",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "visa_route_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your Portugal remote-work visa route needs manual review.",
+          "The team should confirm whether you are pursuing the residence visa route or the temporary-stay route for stays under 1 year."
+        ],
+        "action": {
+          "label": "Wait for visa-route review",
+          "type": "email_followup"
+        }
+      },
+      "work_relationship_missing_or_unrecognized": {
+        "enabled": true,
+        "text": [
+          "Your remote-work category needs manual review.",
+          "The team should confirm whether you are a remote employee, freelancer / independent professional, or business owner / company-service provider."
+        ],
+        "action": {
+          "label": "Wait for work-route review",
+          "type": "email_followup"
+        }
+      },
+      "remote_work_not_for_entities_outside_portugal": {
+        "enabled": true,
+        "text": [
+          "Your remote-work entity location does not currently meet the Portugal remote-work requirement.",
+          "This pathway requires professional activity performed remotely for entities outside Portugal."
+        ],
+        "action": {
+          "label": "Review remote-work fit",
+          "type": "informational"
+        }
+      },
+      "remote_work_entities_outside_portugal_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your remote-work entity location needs manual review.",
+          "The team should confirm whether your work will be performed remotely for entities outside Portugal."
+        ],
+        "action": {
+          "label": "Wait for entity-location review",
+          "type": "email_followup"
+        }
+      },
+      "employee_contract_or_declaration_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your remote employee evidence is missing.",
+          "If you can later provide an employment contract, promise of contract, or employer declaration, you can re-check this route."
+        ],
+        "action": {
+          "label": "Review employee document options",
+          "type": "informational"
+        }
+      },
+      "employee_contract_or_declaration_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your employee contract or employer declaration needs manual review.",
+          "The team should verify whether the document confirms the required remote labor relationship."
+        ],
+        "action": {
+          "label": "Wait for employee-document review",
+          "type": "email_followup"
+        }
+      },
+      "independent_service_or_client_proof_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your independent professional evidence is missing.",
+          "If you can later provide service contracts, client proof, or written proposals, you can re-check this route."
+        ],
+        "action": {
+          "label": "Review independent document options",
+          "type": "informational"
+        }
+      },
+      "independent_service_or_client_proof_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your independent service or client proof needs manual review.",
+          "The team should verify whether your service contracts, client proof, or written proposals support the Portugal remote-work route."
+        ],
+        "action": {
+          "label": "Wait for independent-document review",
+          "type": "email_followup"
+        }
+      },
+      "business_owner_company_service_documents_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your business-owner company/service evidence is missing.",
+          "If you can later provide company documents plus contracts, proposals, or client proof, you can re-check this route."
+        ],
+        "action": {
+          "label": "Review business-owner document options",
+          "type": "informational"
+        }
+      },
+      "business_owner_company_service_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your business-owner company/service documents need manual review.",
+          "The team should verify whether your company documents and service evidence support remote services to entities outside Portugal."
+        ],
+        "action": {
+          "label": "Wait for business-document review",
+          "type": "email_followup"
+        }
+      },
+      "average_monthly_income_missing_or_unrecognized": {
+        "enabled": true,
+        "text": [
+          "Your last-3-month average monthly income needs manual review.",
+          "The team should verify the numeric EUR amount before confirming whether it meets the EUR 3,680/month threshold."
+        ],
+        "action": {
+          "label": "Wait for income review",
+          "type": "email_followup"
+        }
+      },
+      "income_below_minimum": {
+        "enabled": true,
+        "text": [
+          "Your average monthly income is below the Portugal remote-work threshold.",
+          "The 2026 threshold is EUR 3,680/month as an average over the last 3 months."
+        ],
+        "action": {
+          "label": "Review income threshold",
+          "type": "informational"
+        }
+      },
+      "income_evidence_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your remote-work income evidence needs manual review.",
+          "The team should verify whether your payslips, invoices, contracts, bank statements, or income proof document the last 3 months."
+        ],
+        "action": {
+          "label": "Wait for income-evidence review",
+          "type": "email_followup"
+        }
+      },
+      "tax_residence_certificate_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your tax residence certificate is missing.",
+          "Portugal remote-work screening requires a fiscal-residence document before eligibility can be confirmed."
+        ],
+        "action": {
+          "label": "Review tax certificate requirement",
+          "type": "informational"
+        }
+      },
+      "tax_residence_certificate_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your tax residence certificate needs manual review.",
+          "The team should verify whether your fiscal-residence document satisfies the Portugal remote-work requirement."
+        ],
+        "action": {
+          "label": "Wait for tax-certificate review",
+          "type": "email_followup"
+        }
+      },
+      "applicant_type_missing": {
+        "enabled": true,
+        "text": [
+          "Your applicant route needs manual review.",
+          "The team should confirm whether you are applying individually or with family dependents."
+        ],
+        "action": {
+          "label": "Wait for applicant-route review",
+          "type": "email_followup"
+        }
+      },
+      "dependents_count_missing": {
+        "enabled": true,
+        "text": [
+          "Your dependent count needs manual review.",
+          "The team should confirm how many family members are included in the Portugal remote-work case."
+        ],
+        "action": {
+          "label": "Wait for dependent-count review",
+          "type": "email_followup"
+        }
+      },
+      "dependent_relationships_missing": {
+        "enabled": true,
+        "text": [
+          "Your dependent relationships need manual review.",
+          "The team should confirm each included family member's relationship to the main applicant."
+        ],
+        "action": {
+          "label": "Wait for family-route review",
+          "type": "email_followup"
+        }
+      },
+      "family_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your family relationship documents need manual review.",
+          "The team should verify relationship proof for each included dependent."
+        ],
+        "action": {
+          "label": "Wait for family-document review",
+          "type": "email_followup"
+        }
+      },
+      "family_stable_means_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your family stable-means coverage is not currently confirmed.",
+          "The accompanying-family route requires stable and regular means sufficient for the applicant and family members."
+        ],
+        "action": {
+          "label": "Review family funds requirement",
+          "type": "informational"
+        }
+      },
+      "family_stable_means_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your family stable-means coverage needs manual review.",
+          "The team should verify whether your funds cover the applicant and included family members for the stay or 12 months, whichever is less."
+        ],
+        "action": {
+          "label": "Wait for family-funds review",
+          "type": "email_followup"
+        }
+      },
+      "lawful_residence_where_applying_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your lawful residence where applying is not currently confirmed.",
+          "If applying outside your country of nationality, Portugal requires lawful residence in the application country."
+        ],
+        "action": {
+          "label": "Review lawful-residence requirement",
+          "type": "informational"
+        }
+      },
+      "lawful_residence_where_applying_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your lawful residence where applying needs manual review.",
+          "The team should verify your residence status if you are applying outside your country of nationality."
+        ],
+        "action": {
+          "label": "Wait for lawful-residence review",
+          "type": "email_followup"
+        }
+      },
+      "application_country_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your application country needs manual review.",
+          "The team should confirm whether lawful-residence evidence is required because you are applying outside your country of nationality."
+        ],
+        "action": {
+          "label": "Wait for application-country review",
+          "type": "email_followup"
+        }
+      },
+      "passport_validity_missing_or_unrecognized": {
+        "enabled": true,
+        "text": [
+          "Your passport validity needs manual review.",
+          "The team should confirm the passport validity period before Portugal remote-work eligibility is finalized."
+        ],
+        "action": {
+          "label": "Wait for passport review",
+          "type": "email_followup"
+        }
+      },
+      "passport_validity_below_minimum": {
+        "enabled": true,
+        "text": [
+          "Your passport validity is below the Portugal remote-work requirement.",
+          "Renewing the passport may be needed before this pathway can proceed."
+        ],
+        "action": {
+          "label": "Review passport requirement",
+          "type": "informational"
+        }
+      },
+      "health_travel_insurance_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your health/travel insurance is not currently available.",
+          "Portugal remote-work applicants need coverage for necessary medical expenses, urgent medical assistance, and repatriation unless an exception applies."
+        ],
+        "action": {
+          "label": "Review insurance requirement",
+          "type": "informational"
+        }
+      },
+      "health_travel_insurance_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your health/travel insurance status needs manual review.",
+          "The team should verify whether your coverage or exception satisfies Portugal remote-work requirements."
+        ],
+        "action": {
+          "label": "Wait for insurance review",
+          "type": "email_followup"
+        }
+      },
+      "police_clearance_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your police clearance is not currently available.",
+          "Portugal remote-work applicants generally need a criminal record certificate unless an under-16 exemption applies."
+        ],
+        "action": {
+          "label": "Review police-clearance requirement",
+          "type": "informational"
+        }
+      },
+      "police_clearance_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your police clearance status needs manual review.",
+          "The team should confirm whether the required criminal record certificate can be obtained or whether an under-16 exemption applies."
+        ],
+        "action": {
+          "label": "Wait for police-clearance review",
+          "type": "email_followup"
+        }
+      },
+      "criminal_record_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your criminal record answer needs manual review.",
+          "The team should determine whether any disclosed or uncertain record affects Portugal remote-work eligibility or later residence authorization."
+        ],
+        "action": {
+          "label": "Wait for background review",
+          "type": "email_followup"
+        }
+      },
+      "removal_or_refusal_alert": {
+        "enabled": true,
+        "text": [
+          "Your removal or refusal alert answer may block eligibility.",
+          "The case should be reviewed before proceeding because active entry/stay bans, removal orders, or refusal alerts can affect Portuguese residence authorization."
+        ],
+        "action": {
+          "label": "Review refusal-alert issue",
+          "type": "informational"
+        }
+      },
+      "removal_or_refusal_alert_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your removal or refusal alert status needs manual review.",
+          "The team should confirm whether any active entry/stay ban, removal order, or refusal alert exists."
+        ],
+        "action": {
+          "label": "Wait for refusal-alert review",
+          "type": "email_followup"
+        }
+      },
+      "settlement_statement_unavailable": {
+        "enabled": true,
+        "text": [
+          "Your settlement statement is not currently available.",
+          "Portugal remote-work checklist guidance asks for a statement explaining the reason for settling in Portugal, intended area of residence, and accommodation type."
+        ],
+        "action": {
+          "label": "Review settlement statement requirement",
+          "type": "informational"
+        }
+      },
+      "settlement_statement_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your settlement statement or accommodation explanation needs manual review.",
+          "The team should verify the intended area of residence and accommodation type before eligibility is finalized."
+        ],
+        "action": {
+          "label": "Wait for settlement review",
+          "type": "email_followup"
+        }
+      },
+      "aima_residence_permit_acknowledgement_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your AIMA residence permit acknowledgment needs manual review.",
+          "For the residence visa route, the team should confirm that you understand the post-entry AIMA residence permit step."
+        ],
+        "action": {
+          "label": "Wait for AIMA-step review",
+          "type": "email_followup"
+        }
+      },
+      "renewal_acknowledgement_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your renewal acknowledgment needs manual review.",
+          "For the residence visa route, the team should confirm that you understand the 2-year initial authorization and potential 3-year renewals if requirements remain satisfied."
+        ],
+        "action": {
+          "label": "Wait for renewal review",
+          "type": "email_followup"
+        }
+      },
+      "discretionary_extra_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your discretionary extra-document acknowledgment needs manual review.",
+          "The team should confirm that you understand the consulate may request supplementary documents and missing mandatory documents can lead to refusal."
+        ],
+        "action": {
+          "label": "Wait for consular-discretion review",
+          "type": "email_followup"
+        }
+      },
+      "truthful_documents_not_acknowledged": {
+        "enabled": true,
+        "text": [
+          "Your truthful-document acknowledgment is not confirmed.",
+          "False statements may cause visa refusal or annulment and legal action under Portuguese law."
+        ],
+        "action": {
+          "label": "Review truthful-document requirement",
+          "type": "informational"
+        }
+      },
+      "truthful_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your truthful-document acknowledgment needs manual review.",
+          "The team should confirm that you understand false or inconsistent documentation can lead to refusal or annulment."
+        ],
+        "action": {
+          "label": "Wait for truthful-document review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

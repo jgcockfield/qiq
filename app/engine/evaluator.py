@@ -71,7 +71,7 @@ def _applies_when_true(payload: Dict[str, Any], spec: Dict[str, Any]) -> bool:
 
 FIELD_SPECS: List[Dict[str, Any]] = []
 PATHWAYS_BY_COUNTRY = {
-    "spain": ["spain_dnv"],
+    "spain": ["spain_dnv", "spain_nlv", "spain_student_visa"],
     "costa_rica": ["costa_rica_dnv", "costa_rica_pensionado"],
 }
 

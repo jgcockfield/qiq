@@ -1,0 +1,156 @@
+{
+  "pathway": "spain_nlv",
+  "visa_type": "Spain Non-Lucrative Visa",
+  "clarifications": [
+    {
+      "requirement": "applicant_type_missing",
+      "title": "Applicant Type Needs Review",
+      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Dependent count affects the financial threshold for Spain NLV screening."
+    },
+    {
+      "requirement": "eu_eea_swiss_or_free_movement_status",
+      "title": "EU Free-Movement Status",
+      "clarification": "Spain NLV screening is for non-EU, non-EEA, non-Swiss applicants who are not covered by EU free-movement rules. If the applicant is covered by those rules, this pathway does not appear to be the right category."
+    },
+    {
+      "requirement": "eu_eea_swiss_or_free_movement_status_needs_review",
+      "title": "Nationality Status Needs Review",
+      "clarification": "The applicant's EU, EEA, Swiss, or free-movement status is unclear. The case should be reviewed before Spain NLV eligibility is confirmed."
+    },
+    {
+      "requirement": "no_work_activity_needs_review",
+      "title": "No-Work Requirement Needs Review",
+      "clarification": "Spain NLV is for residence without labor or professional activity in Spain. If the applicant is unsure whether their plans count as work, the case should be reviewed."
+    },
+    {
+      "requirement": "work_activity_in_spain",
+      "title": "Work Activity in Spain",
+      "clarification": "Spain NLV requires the applicant to reside in Spain without carrying out labor or professional activity. If the applicant intends to work in Spain, this pathway does not appear to satisfy the core category requirement."
+    },
+    {
+      "requirement": "irregular_presence_in_spain",
+      "title": "Irregular Presence in Spain",
+      "clarification": "The reference requirement states that the applicant must not be irregularly present in Spain. Current irregular presence is a disqualifying factor for this screening."
+    },
+    {
+      "requirement": "irregular_presence_needs_review",
+      "title": "Immigration Status Needs Review",
+      "clarification": "The applicant's current Spain immigration status is unclear. The case should be reviewed to confirm they are not irregularly present in Spain."
+    },
+    {
+      "requirement": "dependents_count_missing",
+      "title": "Dependent Count Missing",
+      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case because each dependent increases the required financial means."
+    },
+    {
+      "requirement": "dependent_relationships_missing",
+      "title": "Dependent Relationships Missing",
+      "clarification": "When dependents are included, the application should identify each dependent's relationship to the main applicant so family eligibility can be reviewed."
+    },
+    {
+      "requirement": "dependent_ages_missing",
+      "title": "Dependent Ages Missing",
+      "clarification": "When dependents are included, the application should identify each dependent's age. Minor children may trigger a schooling requirement."
+    },
+    {
+      "requirement": "minor_children_schooling_issue",
+      "title": "Minor Children Schooling Issue",
+      "clarification": "Minor children of compulsory school age may need to be enrolled during the stay in Spain. If required schooling cannot be arranged, the family case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "minor_children_schooling_needs_review",
+      "title": "Minor Children Schooling Needs Review",
+      "clarification": "The schooling status for dependent minor children is unclear. The case should be reviewed to confirm whether the schooling requirement applies and can be satisfied."
+    },
+    {
+      "requirement": "financial_means_missing_or_unrecognized",
+      "title": "Financial Means Need Review",
+      "clarification": "The passive income or available assets amount was missing or could not be interpreted as a numeric EUR amount. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "insufficient_financial_means",
+      "title": "Insufficient Financial Means",
+      "clarification": "Spain NLV requires sufficient financial means without working in Spain. The screening threshold is based on 400% of monthly IPREM for the main applicant plus 100% of monthly IPREM for each dependent."
+    },
+    {
+      "requirement": "financial_evidence_needs_review",
+      "title": "Financial Evidence Needs Review",
+      "clarification": "The selected evidence does not clearly show passive income or available assets. Spain NLV financial proof may include bank certificates, property titles, certified checks, bank-certified credit cards, or passive income proof."
+    },
+    {
+      "requirement": "spanish_company_labor_activity",
+      "title": "Spanish Company Labor Activity",
+      "clarification": "If funds come from ownership in a Spanish company, the applicant must not perform labor or professional activity for that company. Performing labor activity there is incompatible with the non-lucrative pathway."
+    },
+    {
+      "requirement": "spanish_company_no_labor_activity_needs_review",
+      "title": "Spanish Company Ownership Needs Review",
+      "clarification": "The applicant owns or receives funds from a Spanish company, but it is unclear whether they perform labor or professional activity for that company. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "spanish_company_ownership_needs_review",
+      "title": "Spanish Company Funding Needs Review",
+      "clarification": "It is unclear whether the applicant's funds come from shares or ownership in a company based in Spain. This should be reviewed because Spanish company ownership can trigger a no-labor-activity requirement."
+    },
+    {
+      "requirement": "passport_validity_missing_or_unrecognized",
+      "title": "Passport Validity Needs Review",
+      "clarification": "The passport validity answer was missing or could not be interpreted as a number of months. Spain NLV screening should confirm passport validity before eligibility is finalized."
+    },
+    {
+      "requirement": "passport_validity_below_minimum",
+      "title": "Passport Validity Below Minimum",
+      "clarification": "Spain NLV requires a valid passport recognized by Spain with at least 1 year of validity. A passport below that threshold should be renewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "health_insurance_unavailable",
+      "title": "Health Insurance Unavailable",
+      "clarification": "Spain NLV requires qualifying public or private health insurance with an insurer authorized to operate in Spain. If the applicant cannot obtain qualifying insurance, the case does not appear to meet this requirement."
+    },
+    {
+      "requirement": "health_insurance_needs_review",
+      "title": "Health Insurance Needs Review",
+      "clarification": "The applicant does not currently have qualifying Spain-authorized health insurance or the status is unclear. The case should be reviewed to confirm whether qualifying coverage can be obtained."
+    },
+    {
+      "requirement": "background_check_needs_review",
+      "title": "Criminal Record Certificates Need Review",
+      "clarification": "Spain NLV requires criminal record certificates for the country of origin and countries of residence during the previous 5 years. If those certificates are unavailable or uncertain, the case needs review."
+    },
+    {
+      "requirement": "criminal_record_needs_review",
+      "title": "Criminal Background Needs Review",
+      "clarification": "A disclosed or uncertain criminal record should be reviewed before eligibility is confirmed. The review should determine whether any record is disqualifying under Spain NLV requirements."
+    },
+    {
+      "requirement": "public_order_security_risk",
+      "title": "Public Order or Security Risk",
+      "clarification": "Spain NLV requires that the applicant not be listed as rejectable and not present a public-order or security risk. A known issue in this area is a disqualifying factor for this screening."
+    },
+    {
+      "requirement": "public_order_security_needs_review",
+      "title": "Public Order or Security Needs Review",
+      "clarification": "The applicant's public-order, security, or entry-ban status is unclear. The case should be reviewed before Spain NLV eligibility is confirmed."
+    },
+    {
+      "requirement": "serious_public_health_disease",
+      "title": "Public Health Requirement",
+      "clarification": "Spain NLV requires that the applicant not have a disease with serious public-health implications under the International Health Regulations. A known serious public-health issue is a disqualifying factor for this screening."
+    },
+    {
+      "requirement": "public_health_needs_review",
+      "title": "Public Health Status Needs Review",
+      "clarification": "The public-health answer is unclear. The case should be reviewed to confirm whether the applicant can satisfy the Spain NLV medical requirement."
+    },
+    {
+      "requirement": "renewal_residence_days_needs_review",
+      "title": "Renewal Residence Days Need Review",
+      "clarification": "For renewal, the reference notes that the applicant must actually reside in Spain more than 183 days per calendar year. If renewal plans are uncertain or below that threshold, the case should be reviewed."
+    },
+    {
+      "requirement": "needs_manual_review",
+      "title": "Manual Review Required",
+      "clarification": "The information provided is not enough to confirm Spain Non-Lucrative Visa eligibility automatically. The case should be reviewed manually so the team can identify the appropriate next step."
+    }
+  ]
+}

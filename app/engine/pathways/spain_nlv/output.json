@@ -1,0 +1,109 @@
+{
+  "pathway": "spain_nlv",
+  "visa_type": "Spain Non-Lucrative Visa",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core qualification requirements for Spain's Non-Lucrative Visa."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your Spain Non-Lucrative Visa information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet one or more core Spain Non-Lucrative Visa requirements."
+      }
+    },
+    "requirement_variants": {
+      "insufficient_financial_means": {
+        "text": "Based on the financial amount provided, you do not currently appear to meet the Spain Non-Lucrative Visa financial-means threshold for your applicant route."
+      },
+      "work_activity_in_spain": {
+        "text": "Spain's Non-Lucrative Visa is for residence without labor or professional activity in Spain. Based on the information provided, this pathway does not appear to match your work plans."
+      },
+      "eu_eea_swiss_or_free_movement_status": {
+        "text": "Spain's Non-Lucrative Visa screening is intended for applicants who are not EU, EEA, or Swiss citizens and are not covered by EU free-movement rules."
+      },
+      "irregular_presence_in_spain": {
+        "text": "Based on the information provided, current irregular presence in Spain may prevent qualification for Spain's Non-Lucrative Visa."
+      },
+      "passport_validity_below_minimum": {
+        "text": "Based on the passport validity provided, you do not currently appear to meet the Spain Non-Lucrative Visa 1-year passport-validity requirement."
+      },
+      "health_insurance_unavailable": {
+        "text": "Spain's Non-Lucrative Visa requires qualifying health insurance with an insurer authorized to operate in Spain. Without qualifying coverage, eligibility cannot be confirmed."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Spain's Non-Lucrative Visa.",
+          "The next step is to verify your passive income or assets, health insurance, family route if applicable, and no-work qualification details before preparing an application."
+        ],
+        "action": {
+          "label": "Book a Spain NLV consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before Spain Non-Lucrative Visa eligibility can be confirmed.",
+          "The team should follow up by email with next steps or any follow-up questions."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory Spain Non-Lucrative Visa qualification requirements.",
+          "If your financial means, insurance, passport validity, or residence plans change, you can complete the eligibility check again or ask the team about alternative Spain pathways."
+        ],
+        "action": {
+          "label": "Review alternative Spain options",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "financial_evidence_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your financial evidence needs manual review before eligibility can be confirmed.",
+          "The team should verify whether your passive income or assets can satisfy the Spain Non-Lucrative Visa requirement."
+        ],
+        "action": {
+          "label": "Wait for financial review",
+          "type": "email_followup"
+        }
+      },
+      "spanish_company_no_labor_activity_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your Spanish company ownership details need manual review.",
+          "The team should verify whether your company ownership can support the case without labor or professional activity in Spain."
+        ],
+        "action": {
+          "label": "Wait for company-ownership review",
+          "type": "email_followup"
+        }
+      },
+      "minor_children_schooling_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your dependent minor-child schooling details need manual review.",
+          "The team should verify whether any compulsory-school-age children can satisfy Spain's schooling requirement."
+        ],
+        "action": {
+          "label": "Wait for dependent-route review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

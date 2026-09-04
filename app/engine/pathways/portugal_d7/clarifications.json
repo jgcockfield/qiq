@@ -1,0 +1,166 @@
+{
+  "pathway": "portugal_d7",
+  "visa_type": "Portugal D7 Passive Income Visa",
+  "clarifications": [
+    {
+      "requirement": "applicant_type_missing",
+      "title": "Applicant Type Needs Review",
+      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Family cases require dependent income calculations and relationship-document review."
+    },
+    {
+      "requirement": "dependents_count_missing",
+      "title": "Dependent Count Missing",
+      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case because the D7 financial threshold increases for each family member."
+    },
+    {
+      "requirement": "additional_adult_dependents_count_missing",
+      "title": "Additional Adult Dependents Missing",
+      "clarification": "The D7 dependent calculation adds 50% of the main applicant threshold for each additional adult dependent. The number of additional adult dependents is missing or unclear."
+    },
+    {
+      "requirement": "child_or_dependent_non_minor_count_missing",
+      "title": "Child or Dependent Non-Minor Count Missing",
+      "clarification": "The D7 dependent calculation adds 30% of the main applicant threshold for each child under 18 or dependent non-minor child. That count is missing or unclear."
+    },
+    {
+      "requirement": "dependent_count_mismatch_needs_review",
+      "title": "Dependent Count Mismatch",
+      "clarification": "The total dependent count does not match the number of additional adult dependents plus children or dependent non-minor children. The family income calculation should be reviewed."
+    },
+    {
+      "requirement": "dependent_relationships_missing",
+      "title": "Dependent Relationships Missing",
+      "clarification": "Family applications should identify each dependent's relationship to the main applicant so the accompanying-family route can be reviewed."
+    },
+    {
+      "requirement": "family_documents_needs_review",
+      "title": "Family Documents Need Review",
+      "clarification": "Family cases require relationship documents for each included family member. The availability of those documents is missing, unclear, or not confirmed."
+    },
+    {
+      "requirement": "application_country_needs_review",
+      "title": "Application Country Needs Review",
+      "clarification": "It is unclear whether the applicant is applying from their country of nationality. This matters because lawful residence evidence may be required when applying elsewhere."
+    },
+    {
+      "requirement": "lawful_residence_where_applying_unavailable",
+      "title": "Lawful Residence Where Applying Unavailable",
+      "clarification": "If applying outside the country of nationality, the applicant must prove lawful residence in the application country beyond the requested visa period. Without that status, the case does not appear to satisfy this requirement."
+    },
+    {
+      "requirement": "lawful_residence_where_applying_needs_review",
+      "title": "Lawful Residence Where Applying Needs Review",
+      "clarification": "The applicant is applying outside the country of nationality, but lawful residence status in the application country is unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "active_employment_or_non_passive_intent",
+      "title": "Passive-Income Intent Not Confirmed",
+      "clarification": "Portugal's D7 pathway is for people living from passive or own income. If the case is not based on passive or own income, this pathway does not appear to fit."
+    },
+    {
+      "requirement": "passive_own_income_intent_needs_review",
+      "title": "Passive-Income Intent Needs Review",
+      "clarification": "It is unclear whether the applicant's Portugal D7 case is based on passive or own income. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "annual_passive_income_missing_or_unrecognized",
+      "title": "Annual Passive Income Needs Review",
+      "clarification": "The annual passive or own-income amount is missing or could not be interpreted as a numeric EUR amount. The D7 financial threshold cannot be confirmed automatically."
+    },
+    {
+      "requirement": "insufficient_passive_income",
+      "title": "Insufficient Annual Passive Income",
+      "clarification": "Portugal D7 screening uses the 2026 minimum wage threshold: EUR 11,040 per year for the main applicant, plus 50% for each additional adult and 30% for each child or dependent non-minor. The stated income is below the calculated threshold."
+    },
+    {
+      "requirement": "employment_or_active_work_income_not_accepted",
+      "title": "Non-Qualifying Income Source",
+      "clarification": "The Portugal D7 pathway must be supported by passive or own income. Employment or active-work income does not appear to satisfy the D7 income-source requirement."
+    },
+    {
+      "requirement": "passive_income_source_needs_review",
+      "title": "Passive Income Source Needs Review",
+      "clarification": "The selected income sources do not clearly match qualifying passive or own-income sources such as pension, rental property income, dividends, royalties, financial investments, intellectual property, or savings."
+    },
+    {
+      "requirement": "income_evidence_needs_review",
+      "title": "Income Evidence Needs Review",
+      "clarification": "The selected documents do not clearly prove passive income, own income, or funds. Evidence may include bank statements, income proof, pension proof, investment income proof, property income proof, or royalty/intellectual-property income proof."
+    },
+    {
+      "requirement": "income_not_available_in_portugal",
+      "title": "Income Not Available in Portugal",
+      "clarification": "The D7 source reference requires the applicant to prove income availability in Portuguese territory. If income or funds cannot be made available in Portugal, this requirement does not appear to be met."
+    },
+    {
+      "requirement": "portuguese_bank_availability_needs_review",
+      "title": "Portuguese Bank Availability Needs Review",
+      "clarification": "The availability of income or funds in Portugal is unclear or depends on a future bank account opening or transfer. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "portugal_accommodation_12_months_unavailable",
+      "title": "12-Month Portugal Accommodation Unavailable",
+      "clarification": "The D7 pathway requires permanent accommodation in Portugal for at least 12 months. If qualifying accommodation is not available or is for less than 12 months, this requirement does not appear to be met."
+    },
+    {
+      "requirement": "portugal_accommodation_12_months_needs_review",
+      "title": "Portugal Accommodation Needs Review",
+      "clarification": "The applicant's Portugal accommodation status is missing or unclear. The case should be reviewed to confirm whether a lease, property deed, or other qualifying accommodation covers at least 12 months."
+    },
+    {
+      "requirement": "passport_validity_missing_or_unrecognized",
+      "title": "Passport Validity Needs Review",
+      "clarification": "Passport validity is missing or could not be interpreted as a number of months. Portugal D7 screening should confirm passport validity before eligibility is finalized."
+    },
+    {
+      "requirement": "passport_validity_below_minimum",
+      "title": "Passport Validity Below Minimum",
+      "clarification": "The source reference requires a passport or travel document valid at least 3 months beyond the estimated return or intended stay period. A passport below that threshold should be renewed."
+    },
+    {
+      "requirement": "health_travel_insurance_unavailable",
+      "title": "Health / Travel Insurance Unavailable",
+      "clarification": "Portugal D7 applicants must have valid insurance covering necessary medical expenses, urgent medical assistance, and possible repatriation unless a bilateral exception applies. Without qualifying coverage, this requirement is not met."
+    },
+    {
+      "requirement": "health_travel_insurance_needs_review",
+      "title": "Health / Travel Insurance Needs Review",
+      "clarification": "The applicant does not currently have qualifying health/travel insurance, or the coverage status is unclear. The case should be reviewed to confirm qualifying coverage or a bilateral exception."
+    },
+    {
+      "requirement": "police_clearance_unavailable",
+      "title": "Police Clearance Unavailable",
+      "clarification": "Portugal D7 applicants generally need a criminal record certificate from the country of nationality or any country where they lived over 1 year, unless under 16. If the certificate cannot be obtained, this requirement is not met."
+    },
+    {
+      "requirement": "police_clearance_needs_review",
+      "title": "Police Clearance Needs Review",
+      "clarification": "The police clearance status is unclear. The case should be reviewed to confirm whether the required criminal record certificate can be obtained or whether an under-16 exemption applies."
+    },
+    {
+      "requirement": "criminal_record_needs_review",
+      "title": "Criminal Record Needs Review",
+      "clarification": "A disclosed or uncertain criminal record should be reviewed before eligibility is confirmed. The review should determine whether any record affects the Portugal D7 application."
+    },
+    {
+      "requirement": "aima_residence_step_needs_review",
+      "title": "AIMA Residence Step Needs Review",
+      "clarification": "After D7 visa approval, the applicant must request a residence title from AIMA during the residence stage. The applicant's understanding of this post-approval step is unclear and should be reviewed."
+    },
+    {
+      "requirement": "discretionary_extra_documents_needs_review",
+      "title": "Discretionary Extra-Document Review",
+      "clarification": "Missing mandatory documents may lead to refusal, and the consular service may request supplementary documents. The applicant's understanding of this discretionary review is unclear."
+    },
+    {
+      "requirement": "false_statement_risk_not_acknowledged",
+      "title": "False Statement Risk Not Acknowledged",
+      "clarification": "False statements may cause refusal or annulment of an already granted visa and legal action under Portuguese law. If the applicant does not acknowledge this compliance requirement, the case does not appear ready to proceed."
+    },
+    {
+      "requirement": "truthful_documents_needs_review",
+      "title": "Truthful Documents Need Review",
+      "clarification": "The applicant's understanding of the truthful-document requirement is unclear. The case should be reviewed because inconsistent or false documentation can lead to refusal or annulment."
+    }
+  ]
+}

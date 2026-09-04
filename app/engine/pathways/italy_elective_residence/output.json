@@ -1,0 +1,239 @@
+{
+  "pathway": "italy_elective_residence",
+  "visa_type": "Italy Elective Residence Visa",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core qualification requirements for Italy's Elective Residence Visa."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your Italy Elective Residence Visa information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet one or more core Italy Elective Residence Visa requirements."
+      }
+    },
+    "requirement_variants": {
+      "no_work_in_italy_not_confirmed": {
+        "text": "Italy's Elective Residence Visa is a passive-income / no-work residence visa. Based on the information provided, this pathway does not appear to match plans involving work in Italy."
+      },
+      "extended_tourism_purpose": {
+        "text": "Italy's Elective Residence Visa is for stable residence in Italy, not extended tourism. Based on the information provided, this pathway does not appear to match the stated residence purpose."
+      },
+      "insufficient_passive_income": {
+        "text": "Based on the passive income provided, you do not currently appear to meet the Italy Elective Residence Visa financial threshold for your applicant route."
+      },
+      "employment_or_work_income_not_accepted": {
+        "text": "Italy's Elective Residence Visa must be supported by passive or private income. Based on the information provided, employment or active work income does not appear to satisfy this pathway."
+      },
+      "qualifying_italian_lodging_unavailable": {
+        "text": "Italy's Elective Residence Visa requires qualifying lodging in Italy, such as a registered lease, rental contract, or property deed. Without qualifying lodging, eligibility cannot be confirmed."
+      },
+      "health_insurance_unavailable": {
+        "text": "Italy's Elective Residence Visa requires overseas or international medical insurance valid in Italy. Without qualifying coverage, eligibility cannot be confirmed."
+      },
+      "passport_validity_below_minimum": {
+        "text": "Based on the passport validity provided, you do not currently appear to meet the baseline passport-validity requirement for Italy's Elective Residence Visa."
+      },
+      "fbi_background_unavailable": {
+        "text": "For a San Francisco filing, an FBI Identity History Summary may be required. Based on the information provided, that jurisdiction-specific requirement is not currently met."
+      },
+      "adult_child_dependency_not_met": {
+        "text": "Based on the family details provided, an included dependent adult child does not appear to satisfy the dependency requirement for the Italy Elective Residence family route."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Italy's Elective Residence Visa.",
+          "The next step is to verify your passive income, assets, no-work residence plan, Italian lodging, health insurance, passport, tax returns, and any family-dependent details before preparing an application."
+        ],
+        "action": {
+          "label": "Book an Italy Elective Residence consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before Italy Elective Residence Visa eligibility can be confirmed.",
+          "The team should follow up by email with next steps or any follow-up questions."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory Italy Elective Residence Visa qualification requirements.",
+          "If your passive income, financial assets, no-work plan, Italian lodging, insurance, passport validity, or family route changes, you can complete the eligibility check again or ask the team about alternative Italy pathways."
+        ],
+        "action": {
+          "label": "Review alternative Italy options",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "applicant_type_missing": {
+        "enabled": true,
+        "text": [
+          "Your applicant route needs manual review.",
+          "The team should confirm whether you are applying individually or with family dependents, because family cases affect financial and documentation review."
+        ],
+        "action": {
+          "label": "Wait for applicant-route review",
+          "type": "email_followup"
+        }
+      },
+      "consulate_jurisdiction_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your Italian consulate jurisdiction needs manual review.",
+          "The team should identify the filing consulate because requirements can vary for passport validity, FBI background checks, tax returns, insurance, lodging, and travel evidence."
+        ],
+        "action": {
+          "label": "Wait for consulate review",
+          "type": "email_followup"
+        }
+      },
+      "no_work_in_italy_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your no-work residence plan needs manual review.",
+          "The team should confirm that your Italy Elective Residence case is funded by passive or private income and does not involve working in Italy."
+        ],
+        "action": {
+          "label": "Wait for no-work review",
+          "type": "email_followup"
+        }
+      },
+      "passive_income_at_reference_threshold_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your passive income is at the reference threshold and needs manual review.",
+          "The team should evaluate whether your income and assets are strong enough for the relevant consulate's discretionary financial review."
+        ],
+        "action": {
+          "label": "Wait for financial review",
+          "type": "email_followup"
+        }
+      },
+      "financial_assets_need_review": {
+        "enabled": true,
+        "text": [
+          "Your financial assets need manual review.",
+          "The team should verify whether your available assets, together with passive income, support a stable residence case."
+        ],
+        "action": {
+          "label": "Wait for asset review",
+          "type": "email_followup"
+        }
+      },
+      "passive_income_source_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your passive income source needs manual review.",
+          "The team should verify whether your income comes from accepted private sources such as pensions, Social Security, annuities, property income, investments, trusts, or stable commercial activity."
+        ],
+        "action": {
+          "label": "Wait for income-source review",
+          "type": "email_followup"
+        }
+      },
+      "income_evidence_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your passive income evidence needs manual review.",
+          "The team should verify whether your bank letters, adviser letters, pension or Social Security letters, investment statements, tax returns, or property income documents can support the case."
+        ],
+        "action": {
+          "label": "Wait for income-evidence review",
+          "type": "email_followup"
+        }
+      },
+      "tax_returns_complete_schedules_need_review": {
+        "enabled": true,
+        "text": [
+          "Your tax returns need manual review.",
+          "The team should confirm whether the relevant consulate requires complete tax returns with schedules rather than basic returns only."
+        ],
+        "action": {
+          "label": "Wait for tax-return review",
+          "type": "email_followup"
+        }
+      },
+      "lodging_hotels_or_short_term_bookings_need_review": {
+        "enabled": true,
+        "text": [
+          "Your Italy lodging evidence needs manual review.",
+          "The team should verify whether hotels or short-term bookings are acceptable for your filing jurisdiction, or whether a registered lease, rental contract, or deed is required."
+        ],
+        "action": {
+          "label": "Wait for lodging review",
+          "type": "email_followup"
+        }
+      },
+      "health_insurance_coverage_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your health insurance coverage level needs manual review.",
+          "The team should verify whether the policy satisfies consular coverage expectations, including medical care, hospitalization, and any minimum coverage amount."
+        ],
+        "action": {
+          "label": "Wait for insurance review",
+          "type": "email_followup"
+        }
+      },
+      "passport_validity_san_francisco_threshold_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your passport validity needs manual review for a San Francisco filing.",
+          "The team should confirm whether the 15-month passport-validity threshold applies before preparing the application."
+        ],
+        "action": {
+          "label": "Wait for passport review",
+          "type": "email_followup"
+        }
+      },
+      "fbi_background_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your FBI background-check status needs manual review.",
+          "The team should confirm whether a recent FBI Identity History Summary is required for your jurisdiction and whether it can be obtained."
+        ],
+        "action": {
+          "label": "Wait for background-check review",
+          "type": "email_followup"
+        }
+      },
+      "family_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your family documents need manual review.",
+          "The team should verify marriage, birth, or other relationship documents for each included dependent."
+        ],
+        "action": {
+          "label": "Wait for family-document review",
+          "type": "email_followup"
+        }
+      },
+      "consulate_discretion_extra_documents_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your case needs manual review for consular discretion.",
+          "The team should confirm that you understand the consulate may request additional documents and that submitting all documents does not guarantee approval."
+        ],
+        "action": {
+          "label": "Wait for consular-discretion review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

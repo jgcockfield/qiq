@@ -1,0 +1,204 @@
+{
+  "pathway": "italy_dnv",
+  "visa_type": "Italy Digital Nomad / Remote Worker Visa",
+  "summary_statement": {
+    "variants": {
+      "eligible": {
+        "text": "Based on the information provided, you may meet the core qualification requirements for Italy's Digital Nomad / Remote Worker Visa."
+      },
+      "needs_review": {
+        "text": "Eligibility cannot be confirmed automatically. Your Italy Digital Nomad / Remote Worker Visa information requires manual review."
+      },
+      "not_eligible": {
+        "text": "Based on the information provided, you do not currently appear to meet one or more core Italy Digital Nomad / Remote Worker Visa requirements."
+      }
+    },
+    "requirement_variants": {
+      "eu_citizen_status": {
+        "text": "Italy's Digital Nomad / Remote Worker Visa screening is intended for non-EU citizens. Based on the information provided, this pathway may not match your citizenship status."
+      },
+      "highly_qualified_basis_not_met": {
+        "text": "Based on the information provided, you do not currently appear to meet the highly qualified worker basis required for Italy's Digital Nomad / Remote Worker Visa."
+      },
+      "income_below_minimum": {
+        "text": "Based on the annual income provided, you do not currently appear to meet the Italy Digital Nomad / Remote Worker Visa income threshold."
+      },
+      "passive_income_not_accepted": {
+        "text": "Italy Digital Nomad / Remote Worker screening requires work-derived income. Based on the information provided, passive income alone does not appear to satisfy this pathway."
+      },
+      "prior_experience_below_minimum": {
+        "text": "Based on the experience provided, you do not currently appear to meet the minimum prior-experience requirement for the remote activity you will perform from Italy."
+      },
+      "health_insurance_unavailable": {
+        "text": "Italy's Digital Nomad / Remote Worker Visa requires health insurance for medical care and hospitalization valid in Italy. Without qualifying coverage, eligibility cannot be confirmed."
+      },
+      "accommodation_unavailable": {
+        "text": "Italy's Digital Nomad / Remote Worker Visa requires suitable accommodation documentation for the visa period. Without qualifying housing evidence, eligibility cannot be confirmed."
+      },
+      "passport_validity_below_minimum": {
+        "text": "Based on the passport validity provided, you do not currently appear to meet the baseline passport-validity requirement for Italy's Digital Nomad / Remote Worker Visa."
+      },
+      "remote_worker_contract_unavailable": {
+        "text": "Remote workers must provide an employment or collaboration contract, or a binding offer. Based on the information provided, this route-specific requirement is not currently met."
+      },
+      "remote_worker_employer_clean_record_unavailable": {
+        "text": "Remote workers must provide an employer clean-record declaration. Based on the information provided, this route-specific requirement is not currently met."
+      },
+      "digital_nomad_self_employment_proof_unavailable": {
+        "text": "Self-employed digital nomads must document freelance or self-employment activity. Based on the information provided, this route-specific requirement is not currently met."
+      },
+      "adult_children_or_parents_family_route_not_supported": {
+        "text": "The Italy family route in this screening is focused on spouse and minor children. Adult children or parents do not appear to fit the supported family reunification route."
+      }
+    }
+  },
+  "next_steps_cta": {
+    "variants": {
+      "eligible": {
+        "enabled": true,
+        "text": [
+          "You may be a good fit for Italy's Digital Nomad / Remote Worker Visa.",
+          "The next step is to verify your worker route, highly qualified basis, work-derived income, insurance, accommodation, passport, and route-specific documents before preparing an application."
+        ],
+        "action": {
+          "label": "Book an Italy DNV consultation",
+          "type": "consultation"
+        }
+      },
+      "needs_review": {
+        "enabled": true,
+        "text": [
+          "Your answers need manual review before Italy Digital Nomad / Remote Worker Visa eligibility can be confirmed.",
+          "The team should follow up by email with next steps or any follow-up questions."
+        ],
+        "action": {
+          "label": "Wait for email follow-up",
+          "type": "email_followup"
+        }
+      },
+      "not_eligible": {
+        "enabled": true,
+        "text": [
+          "You do not currently appear to meet one or more mandatory Italy Digital Nomad / Remote Worker Visa qualification requirements.",
+          "If your worker route, qualification basis, income, insurance, accommodation, passport validity, or route-specific documents change, you can complete the eligibility check again or ask the team about alternative Italy pathways."
+        ],
+        "action": {
+          "label": "Review alternative Italy options",
+          "type": "informational"
+        }
+      }
+    },
+    "requirement_variants": {
+      "worker_category_missing_or_unrecognized": {
+        "enabled": true,
+        "text": [
+          "Your Italy worker route needs manual review.",
+          "The team should confirm whether your case fits the self-employed digital nomad route or the employee/collaborator remote worker route."
+        ],
+        "action": {
+          "label": "Wait for route review",
+          "type": "email_followup"
+        }
+      },
+      "highly_qualified_basis_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your highly qualified worker basis needs manual review.",
+          "The team should verify whether your degree, regulated-profession attestation, professional experience, or ICT executive/specialist experience satisfies the Italy requirement."
+        ],
+        "action": {
+          "label": "Wait for qualification review",
+          "type": "email_followup"
+        }
+      },
+      "income_source_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your income source needs manual review.",
+          "The team should verify whether your income is work-derived and tied to the remote work you will perform from Italy."
+        ],
+        "action": {
+          "label": "Wait for income-source review",
+          "type": "email_followup"
+        }
+      },
+      "income_evidence_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your income evidence needs manual review before eligibility can be confirmed.",
+          "The team should verify whether your payslips, tax returns, W-2 forms, bank statements, invoices, or other documents can support the Italy income requirement."
+        ],
+        "action": {
+          "label": "Wait for income-evidence review",
+          "type": "email_followup"
+        }
+      },
+      "health_insurance_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your health insurance status needs manual review.",
+          "The team should verify whether you can provide medical and hospitalization coverage valid in Italy for the stay period."
+        ],
+        "action": {
+          "label": "Wait for insurance review",
+          "type": "email_followup"
+        }
+      },
+      "accommodation_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your Italy accommodation evidence needs manual review.",
+          "The team should verify whether your lease, rental contract, property deed, or other housing evidence satisfies the visa requirement."
+        ],
+        "action": {
+          "label": "Wait for accommodation review",
+          "type": "email_followup"
+        }
+      },
+      "passport_validity_consular_threshold_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your passport validity needs manual review against consular guidance.",
+          "The team should confirm whether the relevant consulate requires the higher passport-validity threshold before filing."
+        ],
+        "action": {
+          "label": "Wait for passport review",
+          "type": "email_followup"
+        }
+      },
+      "remote_worker_employer_clean_record_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your employer clean-record declaration needs manual review.",
+          "The team should verify whether your employer can provide the required declaration and signer identification."
+        ],
+        "action": {
+          "label": "Wait for employer-document review",
+          "type": "email_followup"
+        }
+      },
+      "partita_iva_acknowledgement_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your self-employed after-entry tax setup needs manual review.",
+          "The team should confirm whether a Partita IVA and related Italian tax steps may apply after arrival."
+        ],
+        "action": {
+          "label": "Wait for tax-setup review",
+          "type": "email_followup"
+        }
+      },
+      "family_reunification_needs_review": {
+        "enabled": true,
+        "text": [
+          "Your family reunification route needs manual review.",
+          "The team should verify whether spouse or minor-child family reunification applies and what relationship documents are needed."
+        ],
+        "action": {
+          "label": "Wait for family-route review",
+          "type": "email_followup"
+        }
+      }
+    }
+  }
+}

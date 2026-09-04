@@ -1,0 +1,211 @@
+{
+  "pathway": "italy_elective_residence",
+  "visa_type": "Italy Elective Residence Visa",
+  "clarifications": [
+    {
+      "requirement": "applicant_type_missing",
+      "title": "Applicant Type Needs Review",
+      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Family cases require additional financial and relationship-document review."
+    },
+    {
+      "requirement": "dependents_count_missing",
+      "title": "Dependent Count Missing",
+      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case because each dependent may increase the expected financial support."
+    },
+    {
+      "requirement": "dependent_relationships_missing",
+      "title": "Dependent Relationships Missing",
+      "clarification": "Family applications should identify each dependent's relationship to the main applicant. Italy Elective Residence family routing may include a spouse, minor children, and certain dependent adult children."
+    },
+    {
+      "requirement": "adult_child_dependency_not_met",
+      "title": "Adult Child Dependency Not Met",
+      "clarification": "Dependent adult children may require proof that they live with and depend on the parent applicant. If that dependency is not met, the family route does not appear to satisfy the pathway requirement."
+    },
+    {
+      "requirement": "adult_child_dependency_needs_review",
+      "title": "Adult Child Dependency Needs Review",
+      "clarification": "It is unclear whether any included adult children live with and depend on the parent applicant. The case should be reviewed before family eligibility is confirmed."
+    },
+    {
+      "requirement": "family_documents_needs_review",
+      "title": "Family Documents Need Review",
+      "clarification": "Family cases may require marriage, birth, or other relationship documents for each included dependent, with a separate application packet per applicant. The document availability should be reviewed."
+    },
+    {
+      "requirement": "consulate_jurisdiction_needs_review",
+      "title": "Consulate Jurisdiction Needs Review",
+      "clarification": "The likely Italian consulate or jurisdiction is unclear. This matters because Elective Residence requirements can vary by consulate, including passport, FBI background, tax-return, insurance, travel, and lodging details."
+    },
+    {
+      "requirement": "no_work_in_italy_not_confirmed",
+      "title": "No-Work Requirement Not Confirmed",
+      "clarification": "The Italy Elective Residence Visa is a passive-income / no-work residence visa. If the applicant plans to work in Italy, this pathway does not appear to meet the core visa requirement."
+    },
+    {
+      "requirement": "no_work_in_italy_needs_review",
+      "title": "No-Work Requirement Needs Review",
+      "clarification": "It is unclear whether the applicant's Italy residence will be funded without work. The case should be reviewed because this visa is not a digital nomad or remote-work visa."
+    },
+    {
+      "requirement": "extended_tourism_purpose",
+      "title": "Extended Tourism Purpose",
+      "clarification": "The Elective Residence Visa is for stable residence in Italy, not extended tourism or avoiding Schengen tourist-stay limits. A tourism-purpose case does not appear to qualify."
+    },
+    {
+      "requirement": "stable_residence_intent_needs_review",
+      "title": "Stable Residence Intent Needs Review",
+      "clarification": "The applicant's intent to reside stably in Italy is unclear. The case should be reviewed to confirm it is a residence plan rather than extended tourism."
+    },
+    {
+      "requirement": "passive_income_missing_or_unrecognized",
+      "title": "Passive Income Needs Review",
+      "clarification": "The annual passive or private income amount is missing or could not be interpreted as a numeric EUR amount. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "insufficient_passive_income",
+      "title": "Insufficient Passive Income",
+      "clarification": "Italy Elective Residence screening uses approximately EUR 31,000 per year as a reference point for the main applicant, with additional support expected for dependents. The stated passive income is below the calculated threshold."
+    },
+    {
+      "requirement": "passive_income_at_reference_threshold_needs_review",
+      "title": "Income at Reference Threshold Needs Review",
+      "clarification": "The passive income appears to meet only the reference threshold. Consulates may treat that amount as a starting point rather than a guarantee, so the case should be reviewed for discretionary financial sufficiency."
+    },
+    {
+      "requirement": "financial_assets_need_review",
+      "title": "Financial Assets Need Review",
+      "clarification": "The source reference expects high self-sustaining income and financial assets. The available-assets amount is missing, zero, or unclear and should be reviewed."
+    },
+    {
+      "requirement": "employment_or_work_income_not_accepted",
+      "title": "Employment or Work Income Not Accepted",
+      "clarification": "Income from subordinate work or active work activity cannot support the Italy Elective Residence Visa. This pathway must be supported by passive or private income, not work income."
+    },
+    {
+      "requirement": "passive_income_source_needs_review",
+      "title": "Passive Income Source Needs Review",
+      "clarification": "The selected income sources do not clearly match accepted passive/private sources such as pensions, Social Security, annuities, property income, securities, investments, trusts, or stable commercial activity."
+    },
+    {
+      "requirement": "income_evidence_needs_review",
+      "title": "Income Evidence Needs Review",
+      "clarification": "The selected documents do not clearly prove passive income or private assets. Evidence may include bank letters, financial adviser letters, pension or Social Security letters, investment statements, tax returns, or property/rental income documents."
+    },
+    {
+      "requirement": "tax_returns_need_review",
+      "title": "Tax Returns Need Review",
+      "clarification": "Some consulates request the last 2 years of income tax returns. The applicant has less than 2 years available, is unsure, or the tax-return status is unclear."
+    },
+    {
+      "requirement": "tax_returns_complete_schedules_need_review",
+      "title": "Complete Tax Returns Need Review",
+      "clarification": "Some consulates, including San Francisco guidance, may request complete federal tax returns with schedules rather than basic returns only. The tax-return evidence should be reviewed."
+    },
+    {
+      "requirement": "qualifying_italian_lodging_unavailable",
+      "title": "Qualifying Italian Lodging Unavailable",
+      "clarification": "Applicants must show qualifying lodging in Italy, such as a registered lease, rental contract, or property deed. Without lodging evidence, the case does not appear to meet this requirement."
+    },
+    {
+      "requirement": "lodging_hotels_or_short_term_bookings_need_review",
+      "title": "Short-Term Lodging Needs Review",
+      "clarification": "Some consulates do not accept hotels or multiple short-term bookings as qualifying lodging for Elective Residence. The housing evidence should be reviewed against the filing consulate's requirements."
+    },
+    {
+      "requirement": "qualifying_italian_lodging_needs_review",
+      "title": "Italian Lodging Needs Review",
+      "clarification": "The Italian lodging status is missing or unclear. The case should be reviewed to confirm whether a registered lease, rental contract, or property deed can be provided."
+    },
+    {
+      "requirement": "health_insurance_unavailable",
+      "title": "Health Insurance Unavailable",
+      "clarification": "Applicants must have overseas or international medical insurance valid in Italy. If qualifying coverage cannot be obtained, the case does not appear to meet this requirement."
+    },
+    {
+      "requirement": "health_insurance_needs_review",
+      "title": "Health Insurance Needs Review",
+      "clarification": "The applicant does not currently have qualifying insurance or the insurance status is unclear. The case should be reviewed to confirm coverage can be obtained for the stay."
+    },
+    {
+      "requirement": "health_insurance_coverage_needs_review",
+      "title": "Insurance Coverage Level Needs Review",
+      "clarification": "Consular guidance may require broad medical coverage, hospitalization, emergency repatriation, and a minimum coverage amount such as EUR 30,000. The policy benefits should be reviewed."
+    },
+    {
+      "requirement": "passport_validity_missing_or_unrecognized",
+      "title": "Passport Validity Needs Review",
+      "clarification": "Passport validity is missing or could not be interpreted as a number of months. The case should be reviewed because passport-validity thresholds vary by consulate."
+    },
+    {
+      "requirement": "passport_validity_below_minimum",
+      "title": "Passport Validity Below Minimum",
+      "clarification": "The baseline passport-validity requirement is at least 3 months beyond the visa or stay period. A passport below that minimum should be renewed before the case can qualify."
+    },
+    {
+      "requirement": "passport_validity_san_francisco_threshold_needs_review",
+      "title": "San Francisco Passport Validity Needs Review",
+      "clarification": "San Francisco guidance may require passport validity of 15 months from the application date. The passport appears above the baseline minimum but below that jurisdiction-specific threshold."
+    },
+    {
+      "requirement": "passport_issued_too_old_for_paris",
+      "title": "Passport Issued Too Long Ago for Paris",
+      "clarification": "Paris guidance adds that the passport should have been issued within the previous 10 years. If the passport is older, the case does not appear to satisfy that jurisdiction-specific requirement."
+    },
+    {
+      "requirement": "passport_issue_date_needs_review",
+      "title": "Passport Issue Date Needs Review",
+      "clarification": "The passport issue date is unclear or may matter for the filing jurisdiction. The case should be reviewed, especially if filing through a consulate that applies a 10-year passport issuance rule."
+    },
+    {
+      "requirement": "passport_blank_pages_missing_or_unrecognized",
+      "title": "Blank Passport Pages Need Review",
+      "clarification": "The number of blank passport pages is missing or unclear. The case should be reviewed because some consulates require at least two blank passport pages."
+    },
+    {
+      "requirement": "passport_blank_pages_below_minimum",
+      "title": "Blank Passport Pages Below Minimum",
+      "clarification": "Some consular guidance requires at least two blank passport pages. If the passport has fewer than two blank pages, the case does not appear to meet that document requirement."
+    },
+    {
+      "requirement": "passport_blank_pages_need_review",
+      "title": "Blank Passport Pages Need Review",
+      "clarification": "The passport has fewer than two blank pages or the blank-page requirement depends on the filing jurisdiction. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "fbi_background_unavailable",
+      "title": "FBI Background Check Unavailable",
+      "clarification": "San Francisco guidance requires an FBI Identity History Summary issued within the last 6 months. If filing through San Francisco and this document cannot be obtained, the case does not appear to meet that requirement."
+    },
+    {
+      "requirement": "fbi_background_needs_review",
+      "title": "FBI Background Check Needs Review",
+      "clarification": "The FBI Identity History Summary status is unclear for a San Francisco filing. The case should be reviewed to confirm whether a recent FBI background check is required and available."
+    },
+    {
+      "requirement": "permesso_acknowledgement_missing",
+      "title": "Residence Permit Acknowledgment Missing",
+      "clarification": "Applicants must apply for a permesso di soggiorno within 8 days of entering Italy. If the applicant will not comply, the case does not appear to meet the after-entry requirement."
+    },
+    {
+      "requirement": "permesso_acknowledgement_needs_review",
+      "title": "Residence Permit Requirement Needs Review",
+      "clarification": "The applicant's understanding of the 8-day permesso di soggiorno requirement is unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "renewal_acknowledgement_missing",
+      "title": "Renewal Requirement Acknowledgment Missing",
+      "clarification": "The permit is renewed annually only if the applicant continues to satisfy income, housing, insurance, and other requirements. If the applicant will not maintain those conditions, the case does not appear to meet the renewal requirement."
+    },
+    {
+      "requirement": "renewal_acknowledgement_needs_review",
+      "title": "Renewal Requirement Needs Review",
+      "clarification": "The applicant's understanding of annual renewal requirements is unclear. The case should be reviewed to confirm the applicant can maintain income, housing, insurance, and related conditions."
+    },
+    {
+      "requirement": "consulate_discretion_extra_documents_needs_review",
+      "title": "Consular Discretion Needs Review",
+      "clarification": "Submitting all listed documents does not guarantee approval, and the consulate may request additional evidence. The applicant's understanding of this discretionary review should be confirmed."
+    }
+  ]
+}
