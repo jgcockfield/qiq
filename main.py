@@ -44,6 +44,8 @@ app.add_middleware(
     allow_origins=[
         "http://127.0.0.1:5500",
         "http://localhost:5500",
+        "https://gonimbleai.com",
+        "https://www.gonimbleai.com",
     ],
     allow_methods=["*"],
     allow_headers=["*"],
