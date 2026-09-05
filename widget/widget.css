@@ -17,6 +17,14 @@
   z-index: 1;
 }
 
+/* Override Chrome's blue autofill highlight on widget inputs */
+.qiq-widget input:-webkit-autofill,
+.qiq-widget input:-webkit-autofill:hover,
+.qiq-widget input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #eaeaea inset;
+  -webkit-text-fill-color: inherit;
+}
+
 /* ── Layer management ── */
 .qiq-layer { display: none !important; }
 .qiq-layer.active { display: flex !important; flex-direction: column; }
@@ -250,10 +258,16 @@ select.qiq-layer-0-input:disabled {
   margin-bottom: 12px;
   font-family: inherit;
   transition: background 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .qiq-layer-0-button:hover {
   background: #74c8e2;
+}
+
+.qiq-layer-0-button:active {
+  background: #000000;
 }
 
 .qiq-layer-0-note {
