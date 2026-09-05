@@ -249,10 +249,11 @@ select.qiq-layer-0-input:disabled {
   cursor: pointer;
   margin-bottom: 12px;
   font-family: inherit;
+  transition: background 0.2s;
 }
 
 .qiq-layer-0-button:hover {
-  background: #c4b5fd;
+  background: #74c8e2;
 }
 
 .qiq-layer-0-note {
