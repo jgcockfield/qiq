@@ -4,13 +4,13 @@
   "clarifications": [
     {
       "requirement": "income_below_minimum",
-      "title": "Income Below Spain DNV Screening Band",
-      "clarification": "Spain DNV screening requires the applicant's gross monthly income to meet at least the minimum qualifying band. Based on the selected income band, the application does not currently appear to meet that financial threshold."
+      "title": "Income Below Spain DNV Threshold",
+      "clarification": "Spain DNV screening requires gross monthly income of at least EUR 2,800. Based on the amount provided, the application does not currently appear to meet that financial threshold."
     },
     {
-      "requirement": "foreign_income_source_unconfirmed",
-      "title": "Foreign-Source Income Not Confirmed",
-      "clarification": "Spain DNV screening requires the income supporting the application to be earned from outside Spain. If the income source is not clearly foreign-sourced, the application does not currently appear to meet this core screening requirement."
+      "requirement": "income_amount_missing_or_unrecognized",
+      "title": "Income Amount Needs Review",
+      "clarification": "The monthly income amount was missing or could not be interpreted as a numeric EUR amount. The case should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "work_relationship_missing_or_unrecognized",
@@ -23,9 +23,79 @@
       "clarification": "Self-employed applicants may need to show business-to-business work relationships through service agreements, contracts, or similar documentation. If those agreements cannot be secured, the case should be reviewed before eligibility is confirmed."
     },
     {
-      "requirement": "income_band_missing_or_unrecognized",
-      "title": "Income Band Needs Review",
-      "clarification": "The income band needed for Spain DNV screening was not recognized. The case should be reviewed manually before an eligibility conclusion is provided."
+      "requirement": "business_owner_work_structure_needs_review",
+      "title": "Business Owner Work Structure Needs Review",
+      "clarification": "Spain's Digital Nomad Visa evaluates business owners as either a salaried employee of their business or a self-employed professional, depending on how they're paid. Whether this applicant is paid a salary or earns business/self-employment income is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "employee_employer_located_in_spain",
+      "title": "Employer Must Be Outside Spain",
+      "clarification": "Spain's Digital Nomad Visa requires employees to work for a company located outside Spain. Based on the information provided, the employer does not appear to meet this requirement."
+    },
+    {
+      "requirement": "employee_employer_location_needs_review",
+      "title": "Employer Location Needs Review",
+      "clarification": "Whether the employer is located outside Spain is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "employee_foreign_employment_duration_below_minimum",
+      "title": "Employment Relationship Too Recent",
+      "clarification": "Spain's Digital Nomad Visa requires the employment relationship with the foreign employer to have existed for at least 3 months. The provided duration is below that minimum."
+    },
+    {
+      "requirement": "employee_foreign_employment_duration_needs_review",
+      "title": "Employment Duration Needs Review",
+      "clarification": "The length of the employment relationship with the foreign employer is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "employee_remote_work_not_approved",
+      "title": "Remote Work Not Approved",
+      "clarification": "Spain's Digital Nomad Visa requires that the employment relationship can be carried out remotely with the employer's approval. Based on the information provided, this does not appear to be the case."
+    },
+    {
+      "requirement": "employee_remote_work_approval_needs_review",
+      "title": "Remote Work Approval Needs Review",
+      "clarification": "Whether the employer approves remote work from Spain is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "contractor_foreign_client_relationship_missing",
+      "title": "Foreign Client Relationship Required",
+      "clarification": "Spain's Digital Nomad Visa requires self-employed applicants to have a professional relationship with at least one client or company located outside Spain. Based on the information provided, this does not appear to be the case."
+    },
+    {
+      "requirement": "contractor_foreign_client_relationship_needs_review",
+      "title": "Foreign Client Relationship Needs Review",
+      "clarification": "Whether the applicant has a qualifying foreign client or company relationship is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "contractor_foreign_client_duration_below_minimum",
+      "title": "Client Relationship Too Recent",
+      "clarification": "Spain's Digital Nomad Visa requires the professional relationship with the foreign client or company to have existed for at least 3 months. The provided duration is below that minimum."
+    },
+    {
+      "requirement": "contractor_foreign_client_duration_needs_review",
+      "title": "Client Relationship Duration Needs Review",
+      "clarification": "The length of the professional relationship with the foreign client or company is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "contractor_spanish_activity_above_threshold",
+      "title": "Spanish Professional Activity Too High",
+      "clarification": "Spain permits self-employed applicants to perform up to 20% of their total professional activity for Spain-based clients or companies. Based on the percentage provided, the application exceeds that limit."
+    },
+    {
+      "requirement": "contractor_spanish_activity_needs_review",
+      "title": "Spanish Professional Activity Needs Review",
+      "clarification": "Whether any Spain-based professional activity is included, and what percentage it represents, is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "supporting_company_operating_history_below_minimum",
+      "title": "Company Operating History Too Short",
+      "clarification": "Spain's Digital Nomad Visa requires the company or group relied upon for the application to demonstrate real and continuous activity for at least 1 year. Based on the information provided, this does not appear to be the case."
+    },
+    {
+      "requirement": "supporting_company_operating_history_needs_review",
+      "title": "Company Operating History Needs Review",
+      "clarification": "Whether the company relied upon for the application has been operating for at least 1 year is missing or unclear. The case should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "income_duration_needs_review",
@@ -53,9 +123,19 @@
       "clarification": "Business-owner applicants should provide business-specific income evidence, such as bank statements, business registration, and tax returns or financial statements. If those documents are incomplete, the case should be reviewed to confirm whether alternative business evidence can support eligibility."
     },
     {
+      "requirement": "dependents_count_missing",
+      "title": "Dependent Count Missing",
+      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Dependent count can affect income review and family eligibility."
+    },
+    {
       "requirement": "passport_validity_needs_review",
       "title": "Passport Validity Needs Review",
       "clarification": "The passport validity answer is missing or below the screening threshold. The applicant may need to renew the passport or confirm validity before eligibility is confirmed."
+    },
+    {
+      "requirement": "health_insurance_not_ready",
+      "title": "Health Insurance Needs Review",
+      "clarification": "The applicant should have qualifying health insurance or be able to obtain it. If insurance status is unclear, the case should be reviewed."
     },
     {
       "requirement": "police_clearance_unavailable",
@@ -66,41 +146,6 @@
       "requirement": "criminal_record_needs_review",
       "title": "Criminal Background Needs Review",
       "clarification": "A disclosed criminal record should be reviewed before eligibility is confirmed. The review should determine whether the record affects the Spain DNV application."
-    },
-    {
-      "requirement": "health_insurance_not_ready",
-      "title": "Health Insurance Needs Review",
-      "clarification": "The applicant should have qualifying health insurance or be able to obtain it. If insurance status is unclear, the case should be reviewed."
-    },
-    {
-      "requirement": "dependents_count_missing",
-      "title": "Dependent Count Missing",
-      "clarification": "The application should confirm whether any family members are included. Dependent count can affect required documents and income review."
-    },
-    {
-      "requirement": "dependent_documents_unavailable",
-      "title": "Dependent Documents Unavailable",
-      "clarification": "When dependents are included, civil or relationship documents may be required. Missing dependent documents should be reviewed before eligibility is confirmed."
-    },
-    {
-      "requirement": "civil_documents_unavailable",
-      "title": "Civil Documents Unavailable",
-      "clarification": "Spain DNV eligibility screening may require identity, residence, or civil-status documents. If these documents are unavailable, the case should be reviewed before eligibility is confirmed."
-    },
-    {
-      "requirement": "apostille_translation_not_ready",
-      "title": "Apostille or Translation Needs Review",
-      "clarification": "Foreign documents may need apostille, legalization, or official Spanish translation. If the applicant cannot prepare these formalities, the case should be reviewed."
-    },
-    {
-      "requirement": "renewal_compliance_acknowledgement_missing",
-      "title": "Renewal or Compliance Acknowledgement Missing",
-      "clarification": "Spain DNV approval may involve renewal or ongoing compliance obligations. The applicant should confirm these obligations before eligibility is confirmed."
-    },
-    {
-      "requirement": "non_dnv_service_interest",
-      "title": "Non-DNV Service Interest",
-      "clarification": "The selected service interest does not appear to be primarily for the Spain Digital Nomad Visa. A team member should review the request and route it to the appropriate tax or advisory follow-up."
     },
     {
       "requirement": "needs_manual_review",

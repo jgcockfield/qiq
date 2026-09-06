@@ -14,8 +14,26 @@
       }
     },
     "requirement_variants": {
-      "non_dnv_service_interest": {
-        "text": "Your request appears to relate to tax or non-Digital Nomad Visa services. Our team should follow up by email with the appropriate next step."
+      "employee_employer_located_in_spain": {
+        "text": "Spain's Digital Nomad Visa requires employees to work for a company located outside Spain. Based on the information provided, this pathway does not appear to match your employment situation."
+      },
+      "employee_foreign_employment_duration_below_minimum": {
+        "text": "Based on the information provided, your employment relationship with the foreign employer does not yet meet the 3-month minimum required for Spain's Digital Nomad Visa."
+      },
+      "employee_remote_work_not_approved": {
+        "text": "Spain's Digital Nomad Visa requires that your role can be performed remotely with your employer's approval. Based on the information provided, this pathway does not currently appear to match your situation."
+      },
+      "contractor_foreign_client_relationship_missing": {
+        "text": "Spain's Digital Nomad Visa requires self-employed applicants to have a professional relationship with at least one client or company located outside Spain. Based on the information provided, this pathway does not appear to match your situation."
+      },
+      "contractor_foreign_client_duration_below_minimum": {
+        "text": "Based on the information provided, your professional relationship with the foreign client or company does not yet meet the 3-month minimum required for Spain's Digital Nomad Visa."
+      },
+      "contractor_spanish_activity_above_threshold": {
+        "text": "Spain limits self-employed applicants to 20% of total professional activity for Spain-based clients or companies. Based on the percentage provided, this pathway does not currently appear to match your situation."
+      },
+      "supporting_company_operating_history_below_minimum": {
+        "text": "Spain's Digital Nomad Visa requires the company you're relying on for this application to have been operating for at least 1 year. Based on the information provided, this pathway does not currently appear to match your situation."
       }
     }
   },
@@ -56,15 +74,81 @@
       }
     },
     "requirement_variants": {
-      "non_dnv_service_interest": {
+      "employee_employer_located_in_spain": {
         "enabled": true,
         "text": [
-          "Your request appears to relate to tax consultation or setup services rather than the Spain Digital Nomad Visa.",
-          "The team should follow up by email with the appropriate tax-service next step."
+          "Spain's Digital Nomad Visa requires your employer to be located outside Spain.",
+          "If your employment situation changes, you can complete the eligibility check again or ask the team about alternative options."
         ],
         "action": {
-          "label": "Wait for tax-service follow-up",
-          "type": "email_followup"
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      },
+      "employee_foreign_employment_duration_below_minimum": {
+        "enabled": true,
+        "text": [
+          "Your employment relationship with the foreign employer needs to reach the 3-month minimum before applying.",
+          "You can complete the eligibility check again once that threshold is met."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      },
+      "employee_remote_work_not_approved": {
+        "enabled": true,
+        "text": [
+          "Spain's Digital Nomad Visa requires your employer's approval to work remotely from Spain.",
+          "If your employer's approval changes, you can complete the eligibility check again or ask the team about alternative options."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      },
+      "contractor_foreign_client_relationship_missing": {
+        "enabled": true,
+        "text": [
+          "Spain's Digital Nomad Visa requires a professional relationship with at least one client or company located outside Spain.",
+          "If your client relationships change, you can complete the eligibility check again or ask the team about alternative options."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      },
+      "contractor_foreign_client_duration_below_minimum": {
+        "enabled": true,
+        "text": [
+          "Your professional relationship with the foreign client or company needs to reach the 3-month minimum before applying.",
+          "You can complete the eligibility check again once that threshold is met."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      },
+      "contractor_spanish_activity_above_threshold": {
+        "enabled": true,
+        "text": [
+          "Spain limits self-employed applicants to 20% of total professional activity for Spain-based clients or companies.",
+          "If your mix of clients changes, you can complete the eligibility check again or ask the team about alternative options."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
+        }
+      },
+      "supporting_company_operating_history_below_minimum": {
+        "enabled": true,
+        "text": [
+          "The company you're relying on for this application needs to reach 1 year of operating history.",
+          "You can complete the eligibility check again once that threshold is met."
+        ],
+        "action": {
+          "label": "Review alternative options",
+          "type": "informational"
         }
       }
     }

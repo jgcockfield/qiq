@@ -56,38 +56,50 @@ def _walk_spain_dnv_flow(client, answers: Dict[str, Any]) -> tuple[Dict[str, Any
     raise AssertionError("Spain DNV flow did not terminate within 30 steps")
 
 
+def _walk_spain_dnv_until(
+    client, answers: Dict[str, Any], until_key: str
+) -> Dict[str, Any]:
+    """Walk the flow, answering questions from `answers`, and return the
+    response body at the point `until_key` is asked (without answering it)."""
+    payload: Dict[str, Any] = {
+        "session_id": "test-spain-dnv-e2e-until",
+    }
+
+    for _ in range(60):
+        body = _post_evaluate(client, payload)
+        next_key = body.get("next_field_key")
+        if next_key == until_key:
+            return body
+        if next_key is None:
+            raise AssertionError(f"Flow ended without asking {until_key}")
+
+        assert next_key in answers, f"Missing test answer for {next_key}"
+        _set_dotted(payload, next_key, answers[next_key])
+
+    raise AssertionError(f"Spain DNV flow did not reach {until_key} within 60 steps")
+
+
 VALID_SPAIN_DNV_ANSWERS = {
     "routing.country": "spain",
     "routing.pathway": "spain_dnv",
-    "routing.service_interest": "digital_nomad_visa",
     "routing.work_relationship": "employee",
-    "role.profession_description": "Software Engineer",
-    "routing.income_foreign_only": "yes",
-    "role.employee.gross_monthly_income_band_eur": "eur_5000_10000",
+    "role.employee.employer_outside_spain": "yes",
+    "role.employee.foreign_employment_months": "12",
+    "role.employee.remote_work_approved": "yes",
+    "role.employee.monthly_income_eur": "5000",
     "role.employee.income_evidence_types": [
         "bank_statements",
         "employment_contract",
         "pay_stubs",
     ],
     "role.employee.income_evidence_months": "12_or_more",
+    "routing.supporting_company_operating_1_year": "yes",
+    "routing.applicant_type": "individual",
+    "identity.nationality": "United States",
     "routing.passport_validity_months": "24",
+    "routing.health_insurance_status": "will_obtain",
     "documents.police_clearance_available": "yes",
     "routing.criminal_record_flag": "no",
-    "routing.health_insurance_status": "will_obtain",
-    "routing.has_dependents": "no",
-    "identity.first_name": "Sofia",
-    "identity.last_name": "Navarro",
-    "phone": "+15551234567",
-    "email": "sofia@example.com",
-    "identity.nationality": "United States",
-    "identity.country_of_residence": "United States of America",
-    "documents.civil_documents_available": "yes",
-    "documents.apostille_translation_ready": "yes",
-    "routing.renewal_compliance_acknowledged": "yes",
-    "consent.terms_conditions": "yes",
-    "consent.privacy_policy": "yes",
-    "consent.judicial_data_processing": "yes",
-    "consent.marketing": "no",
 }
 
 
@@ -97,34 +109,25 @@ def test_spain_dnv_valid_applicant_full_evaluate_flow(client):
     assert asked_keys == [
         "routing.country",
         "routing.pathway",
-        "routing.service_interest",
         "routing.work_relationship",
-        "role.profession_description",
-        "routing.income_foreign_only",
-        "role.employee.gross_monthly_income_band_eur",
+        "role.employee.employer_outside_spain",
+        "role.employee.foreign_employment_months",
+        "role.employee.remote_work_approved",
+        "role.employee.monthly_income_eur",
         "role.employee.income_evidence_types",
         "role.employee.income_evidence_months",
-        "routing.has_dependents",
+        "routing.supporting_company_operating_1_year",
+        "routing.applicant_type",
         "identity.nationality",
-        "identity.country_of_residence",
         "routing.passport_validity_months",
         "routing.health_insurance_status",
         "documents.police_clearance_available",
         "routing.criminal_record_flag",
-        "documents.civil_documents_available",
-        "documents.apostille_translation_ready",
-        "routing.renewal_compliance_acknowledged",
-        "identity.first_name",
-        "identity.last_name",
-        "phone",
-        "email",
-        "consent.terms_conditions",
-        "consent.privacy_policy",
-        "consent.judicial_data_processing",
-        "consent.marketing",
     ]
-    assert "routing.applicant_type" not in asked_keys
-    assert "routing.income_foreign_only" in asked_keys
+    assert "routing.service_interest" not in asked_keys
+    assert "role.profession_description" not in asked_keys
+    assert "documents.civil_documents_available" not in asked_keys
+    assert "consent.terms_conditions" not in asked_keys
 
     result = body["result"]
     assert result["meta"]["status"] == "eligible"
@@ -137,20 +140,397 @@ def test_spain_dnv_valid_applicant_full_evaluate_flow(client):
 
 def test_spain_dnv_below_2800_full_evaluate_flow_returns_not_eligible(client):
     answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
-    answers["role.employee.gross_monthly_income_band_eur"] = "below_2800"
+    answers["role.employee.monthly_income_eur"] = "2799"
 
     body, asked_keys = _walk_spain_dnv_flow(client, answers)
 
     assert asked_keys[0] == "routing.country"
     assert asked_keys[1] == "routing.pathway"
-    assert asked_keys[2] == "routing.service_interest"
+    assert asked_keys[2] == "routing.work_relationship"
     result = body["result"]
     assert result["meta"]["status"] == "not_eligible"
     assert result["meta"]["visa_type"] == "Spain Digital Nomad Visa"
     assert "do not currently appear to meet" in result["summary"]
     assert result["next_steps"]["action"]["type"] == "informational"
     assert result["clarifications"][0]["requirement"] == "income_below_minimum"
-    assert "minimum qualifying band" in result["clarifications"][0]["clarification"]
+    assert "EUR 2,800" in result["clarifications"][0]["clarification"]
+
+
+VALID_SPAIN_DNV_CONTRACTOR_ANSWERS = {
+    "routing.country": "spain",
+    "routing.pathway": "spain_dnv",
+    "routing.work_relationship": "contractor",
+    "role.contractor.foreign_client_relationship": "yes",
+    "role.contractor.foreign_client_relationship_months": "12",
+    "role.contractor.spanish_clients_flag": "no",
+    "role.contractor.service_agreements_available": "can_secure_service_agreements",
+    "role.contractor.monthly_income_eur": "4000",
+    "role.contractor.income_evidence_types": [
+        "bank_statements",
+        "service_agreements_or_contracts",
+        "invoices",
+    ],
+    "role.contractor.income_evidence_months": "12_or_more",
+    "routing.supporting_company_operating_1_year": "yes",
+    "routing.applicant_type": "individual",
+    "identity.nationality": "United States",
+    "routing.passport_validity_months": "24",
+    "routing.health_insurance_status": "will_obtain",
+    "documents.police_clearance_available": "yes",
+    "routing.criminal_record_flag": "no",
+}
+
+
+def test_spain_dnv_contractor_full_evaluate_flow(client):
+    body, asked_keys = _walk_spain_dnv_flow(client, VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+
+    assert asked_keys == [
+        "routing.country",
+        "routing.pathway",
+        "routing.work_relationship",
+        "role.contractor.foreign_client_relationship",
+        "role.contractor.foreign_client_relationship_months",
+        "role.contractor.spanish_clients_flag",
+        "role.contractor.service_agreements_available",
+        "role.contractor.monthly_income_eur",
+        "role.contractor.income_evidence_types",
+        "role.contractor.income_evidence_months",
+        "routing.supporting_company_operating_1_year",
+        "routing.applicant_type",
+        "identity.nationality",
+        "routing.passport_validity_months",
+        "routing.health_insurance_status",
+        "documents.police_clearance_available",
+        "routing.criminal_record_flag",
+    ]
+    assert not any(key.startswith("role.employee.") for key in asked_keys)
+    assert not any(key.startswith("role.business_owner.") for key in asked_keys)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+    assert result["meta"]["visa_type"] == "Spain Digital Nomad Visa"
+    assert result["clarifications"] == []
+
+
+VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS = {
+    "routing.country": "spain",
+    "routing.pathway": "spain_dnv",
+    "routing.work_relationship": "business_owner",
+    "role.business_owner.work_structure": "salary_as_employee",
+    "role.business_owner.employer_outside_spain": "yes",
+    "role.business_owner.foreign_employment_months": "12",
+    "role.business_owner.remote_work_approved": "yes",
+    "role.business_owner.monthly_income_eur": "6000",
+    "role.business_owner.income_evidence_types": [
+        "bank_statements",
+        "business_registration",
+        "tax_returns_or_financial_statements",
+    ],
+    "role.business_owner.income_evidence_months": "12_or_more",
+    "routing.supporting_company_operating_1_year": "yes",
+    "routing.applicant_type": "individual",
+    "identity.nationality": "United States",
+    "routing.passport_validity_months": "24",
+    "routing.health_insurance_status": "will_obtain",
+    "documents.police_clearance_available": "yes",
+    "routing.criminal_record_flag": "no",
+}
+
+VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS = {
+    "routing.country": "spain",
+    "routing.pathway": "spain_dnv",
+    "routing.work_relationship": "business_owner",
+    "role.business_owner.work_structure": "business_or_self_employment_income",
+    "role.business_owner.foreign_client_relationship": "yes",
+    "role.business_owner.foreign_client_relationship_months": "12",
+    "role.business_owner.spanish_clients_flag": "no",
+    "role.business_owner.monthly_income_eur": "6000",
+    "role.business_owner.income_evidence_types": [
+        "bank_statements",
+        "business_registration",
+        "tax_returns_or_financial_statements",
+    ],
+    "role.business_owner.income_evidence_months": "12_or_more",
+    "routing.supporting_company_operating_1_year": "yes",
+    "routing.applicant_type": "individual",
+    "identity.nationality": "United States",
+    "routing.passport_validity_months": "24",
+    "routing.health_insurance_status": "will_obtain",
+    "documents.police_clearance_available": "yes",
+    "routing.criminal_record_flag": "no",
+}
+
+
+def test_spain_dnv_business_owner_full_evaluate_flow(client):
+    body, asked_keys = _walk_spain_dnv_flow(
+        client, VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS
+    )
+
+    assert asked_keys == [
+        "routing.country",
+        "routing.pathway",
+        "routing.work_relationship",
+        "role.business_owner.work_structure",
+        "role.business_owner.employer_outside_spain",
+        "role.business_owner.foreign_employment_months",
+        "role.business_owner.remote_work_approved",
+        "role.business_owner.monthly_income_eur",
+        "role.business_owner.income_evidence_types",
+        "role.business_owner.income_evidence_months",
+        "routing.supporting_company_operating_1_year",
+        "routing.applicant_type",
+        "identity.nationality",
+        "routing.passport_validity_months",
+        "routing.health_insurance_status",
+        "documents.police_clearance_available",
+        "routing.criminal_record_flag",
+    ]
+    assert not any(key.startswith("role.employee.") for key in asked_keys)
+    assert not any(key.startswith("role.contractor.") for key in asked_keys)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+    assert result["meta"]["visa_type"] == "Spain Digital Nomad Visa"
+    assert result["clarifications"] == []
+
+
+def test_spain_dnv_business_owner_self_employment_full_evaluate_flow(client):
+    body, asked_keys = _walk_spain_dnv_flow(
+        client, VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS
+    )
+
+    assert asked_keys == [
+        "routing.country",
+        "routing.pathway",
+        "routing.work_relationship",
+        "role.business_owner.work_structure",
+        "role.business_owner.foreign_client_relationship",
+        "role.business_owner.foreign_client_relationship_months",
+        "role.business_owner.spanish_clients_flag",
+        "role.business_owner.monthly_income_eur",
+        "role.business_owner.income_evidence_types",
+        "role.business_owner.income_evidence_months",
+        "routing.supporting_company_operating_1_year",
+        "routing.applicant_type",
+        "identity.nationality",
+        "routing.passport_validity_months",
+        "routing.health_insurance_status",
+        "documents.police_clearance_available",
+        "routing.criminal_record_flag",
+    ]
+    assert "role.business_owner.spanish_activity_percentage" not in asked_keys
+    assert not any(key.startswith("role.employee.") for key in asked_keys)
+    assert not any(key.startswith("role.contractor.") for key in asked_keys)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+    assert result["meta"]["visa_type"] == "Spain Digital Nomad Visa"
+    assert result["clarifications"] == []
+
+
+def test_spain_dnv_business_owner_salary_employer_in_spain_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS)
+    answers["role.business_owner.employer_outside_spain"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert result["clarifications"][0]["requirement"] == "employee_employer_located_in_spain"
+
+
+def test_spain_dnv_business_owner_salary_below_3_months_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS)
+    answers["role.business_owner.foreign_employment_months"] = "2"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "employee_foreign_employment_duration_below_minimum"
+    )
+
+
+def test_spain_dnv_business_owner_salary_at_3_months_is_not_a_failure(client):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS)
+    answers["role.business_owner.foreign_employment_months"] = "3"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    assert body["result"]["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_business_owner_salary_remote_not_approved_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS)
+    answers["role.business_owner.remote_work_approved"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert result["clarifications"][0]["requirement"] == "employee_remote_work_not_approved"
+
+
+def test_spain_dnv_business_owner_salary_company_below_1_year_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS)
+    answers["routing.supporting_company_operating_1_year"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "supporting_company_operating_history_below_minimum"
+    )
+
+
+def test_spain_dnv_business_owner_self_employment_no_foreign_relationship_returns_not_eligible(
+    client,
+):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS)
+    answers["role.business_owner.foreign_client_relationship"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "contractor_foreign_client_relationship_missing"
+    )
+
+
+def test_spain_dnv_business_owner_self_employment_below_3_months_returns_not_eligible(
+    client,
+):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS)
+    answers["role.business_owner.foreign_client_relationship_months"] = "2"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "contractor_foreign_client_duration_below_minimum"
+    )
+
+
+def test_spain_dnv_business_owner_self_employment_spanish_activity_within_20_percent_is_eligible(
+    client,
+):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS)
+    answers["role.business_owner.spanish_clients_flag"] = "yes"
+    answers["role.business_owner.spanish_activity_percentage"] = "20"
+
+    body, asked_keys = _walk_spain_dnv_flow(client, answers)
+
+    assert "role.business_owner.spanish_activity_percentage" in asked_keys
+    assert body["result"]["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_business_owner_self_employment_spanish_activity_above_20_percent_returns_not_eligible(
+    client,
+):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS)
+    answers["role.business_owner.spanish_clients_flag"] = "yes"
+    answers["role.business_owner.spanish_activity_percentage"] = "21"
+
+    body, asked_keys = _walk_spain_dnv_flow(client, answers)
+
+    assert "role.business_owner.spanish_activity_percentage" in asked_keys
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "contractor_spanish_activity_above_threshold"
+    )
+
+
+def test_spain_dnv_business_owner_self_employment_company_below_1_year_returns_not_eligible(
+    client,
+):
+    answers = deepcopy(VALID_SPAIN_DNV_BUSINESS_OWNER_SELF_EMPLOYMENT_ANSWERS)
+    answers["routing.supporting_company_operating_1_year"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "supporting_company_operating_history_below_minimum"
+    )
+
+
+VALID_SPAIN_DNV_FAMILY_ANSWERS = {
+    "routing.country": "spain",
+    "routing.pathway": "spain_dnv",
+    "routing.work_relationship": "employee",
+    "role.employee.employer_outside_spain": "yes",
+    "role.employee.foreign_employment_months": "12",
+    "role.employee.remote_work_approved": "yes",
+    "role.employee.monthly_income_eur": "5000",
+    "role.employee.income_evidence_types": [
+        "bank_statements",
+        "employment_contract",
+        "pay_stubs",
+    ],
+    "role.employee.income_evidence_months": "12_or_more",
+    "routing.supporting_company_operating_1_year": "yes",
+    "routing.applicant_type": "family",
+    "routing.dependents_count": "2",
+    "routing.dependent_relationships": "Spouse, child",
+    "routing.dependent_ages": "38, 9",
+    "identity.nationality": "United States",
+    "routing.passport_validity_months": "24",
+    "routing.health_insurance_status": "will_obtain",
+    "documents.police_clearance_available": "yes",
+    "routing.criminal_record_flag": "no",
+}
+
+
+def test_spain_dnv_family_applicant_full_evaluate_flow(client):
+    body, asked_keys = _walk_spain_dnv_flow(client, VALID_SPAIN_DNV_FAMILY_ANSWERS)
+
+    assert asked_keys == [
+        "routing.country",
+        "routing.pathway",
+        "routing.work_relationship",
+        "role.employee.employer_outside_spain",
+        "role.employee.foreign_employment_months",
+        "role.employee.remote_work_approved",
+        "role.employee.monthly_income_eur",
+        "role.employee.income_evidence_types",
+        "role.employee.income_evidence_months",
+        "routing.supporting_company_operating_1_year",
+        "routing.applicant_type",
+        "routing.dependents_count",
+        "routing.dependent_relationships",
+        "routing.dependent_ages",
+        "identity.nationality",
+        "routing.passport_validity_months",
+        "routing.health_insurance_status",
+        "documents.police_clearance_available",
+        "routing.criminal_record_flag",
+    ]
+
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+    assert result["meta"]["visa_type"] == "Spain Digital Nomad Visa"
+    assert result["clarifications"] == []
+
+
+def test_spain_dnv_health_insurance_question_has_expected_choices(client):
+    body = _walk_spain_dnv_until(
+        client, VALID_SPAIN_DNV_ANSWERS, "routing.health_insurance_status"
+    )
+
+    assert body["field"]["input_type"] == "choice"
+    assert body["field"]["choices"] == ["have_it", "will_obtain"]
 
 
 def test_costa_rica_full_evaluate_behavior_still_returns_default_output(client):
@@ -190,6 +570,190 @@ def test_costa_rica_full_evaluate_behavior_still_returns_default_output(client):
     assert body["result"]["next_steps"]["action"]["label"] == "Book a consultation with Great Expatations"
 
 
+def test_spain_dnv_employee_employer_in_spain_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
+    answers["role.employee.employer_outside_spain"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert result["clarifications"][0]["requirement"] == "employee_employer_located_in_spain"
+
+
+def test_spain_dnv_employee_foreign_employment_below_3_months_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
+    answers["role.employee.foreign_employment_months"] = "2"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "employee_foreign_employment_duration_below_minimum"
+    )
+
+
+def test_spain_dnv_employee_foreign_employment_at_3_months_is_not_a_failure(client):
+    answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
+    answers["role.employee.foreign_employment_months"] = "3"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_employee_remote_work_not_approved_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
+    answers["role.employee.remote_work_approved"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert result["clarifications"][0]["requirement"] == "employee_remote_work_not_approved"
+
+
+def test_spain_dnv_contractor_without_foreign_client_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+    answers["role.contractor.foreign_client_relationship"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "contractor_foreign_client_relationship_missing"
+    )
+
+
+def test_spain_dnv_contractor_foreign_client_below_3_months_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+    answers["role.contractor.foreign_client_relationship_months"] = "2"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "contractor_foreign_client_duration_below_minimum"
+    )
+
+
+def test_spain_dnv_contractor_foreign_client_at_3_months_is_not_a_failure(client):
+    answers = deepcopy(VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+    answers["role.contractor.foreign_client_relationship_months"] = "3"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_contractor_no_spanish_clients_does_not_ask_percentage(client):
+    body, asked_keys = _walk_spain_dnv_flow(client, VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+
+    assert "role.contractor.spanish_activity_percentage" not in asked_keys
+    assert body["result"]["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_contractor_spanish_activity_within_20_percent_is_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+    answers["role.contractor.spanish_clients_flag"] = "yes"
+    answers["role.contractor.spanish_activity_percentage"] = "20"
+
+    body, asked_keys = _walk_spain_dnv_flow(client, answers)
+
+    assert "role.contractor.spanish_activity_percentage" in asked_keys
+    result = body["result"]
+    assert result["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_contractor_spanish_activity_above_20_percent_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+    answers["role.contractor.spanish_clients_flag"] = "yes"
+    answers["role.contractor.spanish_activity_percentage"] = "21"
+
+    body, asked_keys = _walk_spain_dnv_flow(client, answers)
+
+    assert "role.contractor.spanish_activity_percentage" in asked_keys
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "contractor_spanish_activity_above_threshold"
+    )
+
+
+def test_spain_dnv_employee_supporting_company_below_1_year_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_ANSWERS)
+    answers["routing.supporting_company_operating_1_year"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "supporting_company_operating_history_below_minimum"
+    )
+
+
+def test_spain_dnv_contractor_supporting_company_below_1_year_returns_not_eligible(client):
+    answers = deepcopy(VALID_SPAIN_DNV_CONTRACTOR_ANSWERS)
+    answers["routing.supporting_company_operating_1_year"] = "no"
+
+    body, _ = _walk_spain_dnv_flow(client, answers)
+
+    result = body["result"]
+    assert result["meta"]["status"] == "not_eligible"
+    assert (
+        result["clarifications"][0]["requirement"]
+        == "supporting_company_operating_history_below_minimum"
+    )
+
+
+def test_spain_dnv_business_owner_flow_is_asked_supporting_company_history(client):
+    # business_owner is now routed through the employee-style or
+    # contractor-style statutory checks based on work_structure, and shares
+    # the same company-operating-history gate as those branches.
+    body, asked_keys = _walk_spain_dnv_flow(
+        client, VALID_SPAIN_DNV_BUSINESS_OWNER_SALARY_ANSWERS
+    )
+
+    assert "routing.supporting_company_operating_1_year" in asked_keys
+    assert not any(
+        key.startswith("role.employee.") or key.startswith("role.contractor.")
+        for key in asked_keys
+    )
+    assert body["result"]["meta"]["status"] == "eligible"
+
+
+def test_spain_dnv_no_escape_choices_anywhere_in_schema():
+    import json
+    from pathlib import Path
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
 def test_stage_one_selector_over_api(client):
     first = _post_evaluate(client, {"session_id": "test-selector"})
     assert first["next_field_key"] == "routing.country"
@@ -200,7 +764,11 @@ def test_stage_one_selector_over_api(client):
         {"session_id": "test-selector", "routing": {"country": "spain"}},
     )
     assert spain["next_field_key"] == "routing.pathway"
-    assert spain["field"]["choices"] == ["spain_dnv"]
+    assert spain["field"]["choices"] == [
+        "spain_dnv",
+        "spain_nlv",
+        "spain_student_visa",
+    ]
 
     costa_rica = _post_evaluate(
         client,
@@ -213,7 +781,7 @@ def test_stage_one_selector_over_api(client):
         client,
         {"session_id": "test-selector", "routing": {"country": "spain", "pathway": "spain_dnv"}},
     )
-    assert spain_next["next_field_key"] == "routing.service_interest"
+    assert spain_next["next_field_key"] == "routing.work_relationship"
 
     costa_next = _post_evaluate(
         client,

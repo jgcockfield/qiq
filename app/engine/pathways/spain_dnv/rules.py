@@ -9,11 +9,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Set
 
 
-ELIGIBLE_INCOME_BANDS = {
-    "eur_2800_5000",
-    "eur_5000_10000",
-    "above_10000",
-}
+MINIMUM_MONTHLY_INCOME_EUR = 2800
 
 VALID_INCOME_HISTORY_BANDS = {
     "3_to_5",
@@ -22,6 +18,14 @@ VALID_INCOME_HISTORY_BANDS = {
 }
 
 MINIMUM_PASSPORT_VALIDITY_MONTHS = 12
+
+# Statutory thresholds from Ley 14/2013, Arts. 74 bis / 74 ter (Spain's Digital
+# Nomad Visa) and the UGE official FAQ: the foreign employment/professional
+# relationship relied upon must be at least 3 months old, and a self-employed
+# applicant's Spain-based professional activity may not exceed 20% of total
+# activity.
+MINIMUM_FOREIGN_RELATIONSHIP_MONTHS = 3
+MAXIMUM_SPANISH_ACTIVITY_PERCENTAGE = 20
 
 REQUIRED_EVIDENCE_BY_WORK_TYPE: Dict[str, Set[str]] = {
     "employee": {"bank_statements", "employment_contract", "pay_stubs"},
@@ -43,9 +47,24 @@ EVIDENCE_FAILURE_BY_WORK_TYPE = {
     "business_owner": "business_owner_income_evidence_incomplete",
 }
 
+# NOTE: Spain's Ley 14/2013 (Arts. 74 bis / 74 ter) recognizes only two
+# statutory work categories for the Digital Nomad Visa: employment activity
+# and self-employed/professional activity. QIQ's "business_owner" is not a
+# distinct statutory category, so business_owner applicants are first routed
+# by role.business_owner.work_structure into whichever statutory category
+# actually describes how they're paid, then evaluated with the SAME
+# employee-style or contractor-style checks (and the same requirement codes)
+# below — see _evaluate_employee_style_foreign_relationship /
+# _evaluate_contractor_style_foreign_relationship.
 HARD_FAILURES = {
     "income_below_minimum",
-    "foreign_income_source_unconfirmed",
+    "employee_employer_located_in_spain",
+    "employee_foreign_employment_duration_below_minimum",
+    "employee_remote_work_not_approved",
+    "contractor_foreign_client_relationship_missing",
+    "contractor_foreign_client_duration_below_minimum",
+    "contractor_spanish_activity_above_threshold",
+    "supporting_company_operating_history_below_minimum",
 }
 
 
@@ -68,6 +87,15 @@ def _as_values(value: Any) -> List[str]:
     return []
 
 
+def _as_float(value: Any) -> float | None:
+    if isinstance(value, str):
+        value = value.replace(",", "").strip()
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _as_int(value: Any) -> int | None:
     try:
         return int(value)
@@ -77,6 +105,10 @@ def _as_int(value: Any) -> int | None:
 
 def _is_yes(value: Any) -> bool:
     return value == "yes" or value is True
+
+
+def _is_no(value: Any) -> bool:
+    return value == "no" or value is False
 
 
 def _has_required_income_evidence(work_type: Any, evidence_types: List[str]) -> bool:
@@ -99,14 +131,114 @@ def _get_role_value(payload: Dict[str, Any], work_type: Any, field_name: str) ->
     return _get_dotted(payload, dotted_key)
 
 
+def _evaluate_employee_style_foreign_relationship(
+    payload: Dict[str, Any], failed: List[str], role_prefix: str
+) -> None:
+    """Statutory "employment activity" checks: employer outside Spain, >=3
+    months, remote-work approval. Used for the employee branch, and reused
+    for business_owner applicants who are paid a salary by their business
+    (role.business_owner.work_structure == "salary_as_employee")."""
+    employer_outside_spain = _get_dotted(
+        payload, f"role.{role_prefix}.employer_outside_spain"
+    )
+    if _is_no(employer_outside_spain):
+        failed.append("employee_employer_located_in_spain")
+    elif not _is_yes(employer_outside_spain):
+        failed.append("employee_employer_location_needs_review")
+
+    foreign_employment_months = _as_int(
+        _get_dotted(payload, f"role.{role_prefix}.foreign_employment_months")
+    )
+    if foreign_employment_months is None:
+        failed.append("employee_foreign_employment_duration_needs_review")
+    elif foreign_employment_months < MINIMUM_FOREIGN_RELATIONSHIP_MONTHS:
+        failed.append("employee_foreign_employment_duration_below_minimum")
+
+    remote_work_approved = _get_dotted(
+        payload, f"role.{role_prefix}.remote_work_approved"
+    )
+    if _is_no(remote_work_approved):
+        failed.append("employee_remote_work_not_approved")
+    elif not _is_yes(remote_work_approved):
+        failed.append("employee_remote_work_approval_needs_review")
+
+
+def _evaluate_contractor_style_foreign_relationship(
+    payload: Dict[str, Any], failed: List[str], role_prefix: str
+) -> None:
+    """Statutory "self-employed/professional activity" checks: qualifying
+    foreign client/company relationship, >=3 months, <=20% Spain-based
+    activity. Used for the contractor branch, and reused for business_owner
+    applicants who earn business/self-employment income (
+    role.business_owner.work_structure == "business_or_self_employment_income")."""
+    foreign_client_relationship = _get_dotted(
+        payload, f"role.{role_prefix}.foreign_client_relationship"
+    )
+    if _is_no(foreign_client_relationship):
+        failed.append("contractor_foreign_client_relationship_missing")
+    elif not _is_yes(foreign_client_relationship):
+        failed.append("contractor_foreign_client_relationship_needs_review")
+
+    foreign_client_months = _as_int(
+        _get_dotted(payload, f"role.{role_prefix}.foreign_client_relationship_months")
+    )
+    if foreign_client_months is None:
+        failed.append("contractor_foreign_client_duration_needs_review")
+    elif foreign_client_months < MINIMUM_FOREIGN_RELATIONSHIP_MONTHS:
+        failed.append("contractor_foreign_client_duration_below_minimum")
+
+    spanish_clients_flag = _get_dotted(
+        payload, f"role.{role_prefix}.spanish_clients_flag"
+    )
+    if _is_yes(spanish_clients_flag):
+        spanish_activity_percentage = _as_float(
+            _get_dotted(payload, f"role.{role_prefix}.spanish_activity_percentage")
+        )
+        if spanish_activity_percentage is None:
+            failed.append("contractor_spanish_activity_needs_review")
+        elif spanish_activity_percentage > MAXIMUM_SPANISH_ACTIVITY_PERCENTAGE:
+            failed.append("contractor_spanish_activity_above_threshold")
+    elif not _is_no(spanish_clients_flag):
+        failed.append("contractor_spanish_activity_needs_review")
+
+
+def _evaluate_business_owner_foreign_relationship(
+    payload: Dict[str, Any], failed: List[str]
+) -> None:
+    """business_owner has no distinct statutory category under Ley 14/2013 —
+    route to whichever real category (employment or self-employed/
+    professional activity) the applicant identified via work_structure, and
+    apply that category's checks and requirement codes unchanged."""
+    work_structure = _get_dotted(payload, "role.business_owner.work_structure")
+    if work_structure == "salary_as_employee":
+        _evaluate_employee_style_foreign_relationship(
+            payload, failed, role_prefix="business_owner"
+        )
+    elif work_structure == "business_or_self_employment_income":
+        _evaluate_contractor_style_foreign_relationship(
+            payload, failed, role_prefix="business_owner"
+        )
+    else:
+        failed.append("business_owner_work_structure_needs_review")
+
+
+def _evaluate_supporting_company_history(
+    payload: Dict[str, Any], failed: List[str]
+) -> None:
+    operating_1_year = _get_dotted(
+        payload, "routing.supporting_company_operating_1_year"
+    )
+    if _is_no(operating_1_year):
+        failed.append("supporting_company_operating_history_below_minimum")
+    elif not _is_yes(operating_1_year):
+        failed.append("supporting_company_operating_history_needs_review")
+
+
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     routing = payload.get("routing", {}) if isinstance(payload, dict) else {}
-    service_interest = _as_values(_get_dotted(payload, "routing.service_interest"))
     work_type = _get_dotted(payload, "routing.work_relationship")
-    income_band = _get_role_value(
-        payload,
-        work_type,
-        "gross_monthly_income_band_eur",
+    monthly_income = _as_float(
+        _get_role_value(payload, work_type, "monthly_income_eur")
     )
     income_history = _get_role_value(payload, work_type, "income_evidence_months")
     income_evidence = _as_values(
@@ -119,17 +251,13 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     failed: List[str] = []
 
-    if "digital_nomad_visa" not in service_interest:
-        return {
-            "eligibility_status": "needs_review",
-            "failed_requirements": ["non_dnv_service_interest"],
-            "routing": routing,
-            "work_type": work_type,
-            "visa_type": "Spain Digital Nomad Visa",
-        }
-
     if work_type not in {"business_owner", "contractor", "employee"}:
         failed.append("work_relationship_missing_or_unrecognized")
+
+    if work_type == "employee":
+        _evaluate_employee_style_foreign_relationship(
+            payload, failed, role_prefix="employee"
+        )
 
     if (
         work_type == "contractor"
@@ -137,13 +265,21 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     ):
         failed.append("contractor_service_agreements_unavailable")
 
-    if not _is_yes(_get_dotted(payload, "routing.income_foreign_only")):
-        failed.append("foreign_income_source_unconfirmed")
+    if work_type == "contractor":
+        _evaluate_contractor_style_foreign_relationship(
+            payload, failed, role_prefix="contractor"
+        )
 
-    if income_band == "below_2800":
+    if work_type == "business_owner":
+        _evaluate_business_owner_foreign_relationship(payload, failed)
+
+    if work_type in {"employee", "contractor", "business_owner"}:
+        _evaluate_supporting_company_history(payload, failed)
+
+    if monthly_income is None:
+        failed.append("income_amount_missing_or_unrecognized")
+    elif monthly_income < MINIMUM_MONTHLY_INCOME_EUR:
         failed.append("income_below_minimum")
-    elif income_band not in ELIGIBLE_INCOME_BANDS:
-        failed.append("income_band_missing_or_unrecognized")
 
     if income_history not in VALID_INCOME_HISTORY_BANDS:
         failed.append("income_duration_needs_review")
@@ -156,6 +292,13 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
             )
         )
 
+    applicant_type = _get_dotted(payload, "routing.applicant_type")
+    dependents_count = _get_dotted(payload, "routing.dependents_count")
+    if applicant_type == "family" and dependents_count in (None, ""):
+        failed.append("dependents_count_missing")
+    elif applicant_type not in {"individual", "family"}:
+        failed.append("dependents_count_missing")
+
     passport_months = _as_int(_get_dotted(payload, "routing.passport_validity_months"))
     if (
         passport_months is None
@@ -163,34 +306,15 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     ):
         failed.append("passport_validity_needs_review")
 
+    health_insurance_status = _get_dotted(payload, "routing.health_insurance_status")
+    if health_insurance_status not in {"have_it", "will_obtain"}:
+        failed.append("health_insurance_not_ready")
+
     if not _is_yes(_get_dotted(payload, "documents.police_clearance_available")):
         failed.append("police_clearance_unavailable")
 
     if _is_yes(_get_dotted(payload, "routing.criminal_record_flag")):
         failed.append("criminal_record_needs_review")
-
-    health_insurance_status = _get_dotted(payload, "routing.health_insurance_status")
-    if health_insurance_status not in {"have_it", "will_obtain"}:
-        failed.append("health_insurance_not_ready")
-
-    has_dependents = _get_dotted(payload, "routing.has_dependents")
-    dependents_count = _get_dotted(payload, "routing.dependents_count")
-    if has_dependents == "yes":
-        if dependents_count in (None, ""):
-            failed.append("dependents_count_missing")
-        if not _is_yes(_get_dotted(payload, "documents.dependent_documents_available")):
-            failed.append("dependent_documents_unavailable")
-    elif has_dependents != "no":
-        failed.append("dependents_count_missing")
-
-    if not _is_yes(_get_dotted(payload, "documents.civil_documents_available")):
-        failed.append("civil_documents_unavailable")
-
-    if not _is_yes(_get_dotted(payload, "documents.apostille_translation_ready")):
-        failed.append("apostille_translation_not_ready")
-
-    if not _is_yes(_get_dotted(payload, "routing.renewal_compliance_acknowledged")):
-        failed.append("renewal_compliance_acknowledgement_missing")
 
     if any(requirement in HARD_FAILURES for requirement in failed):
         status = "not_eligible"
