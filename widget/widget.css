@@ -483,7 +483,7 @@ select.qiq-layer-0-input:disabled {
 .qiq-chat-send {
   width: 40px;
   height: 40px;
-  background: #e8e9f9;
+  background: #eaeaea;
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -495,9 +495,10 @@ select.qiq-layer-0-input:disabled {
 }
 
 .qiq-chat-send:disabled { background: #e5e7ff; cursor: not-allowed; }
-.qiq-chat-send.active { background: #cacdff; }
+.qiq-chat-send.active { background: #000000; }
 
-.qiq-chat-send svg { fill: #fff; }
+.qiq-chat-send svg { fill: #1a1a2e; }
+.qiq-chat-send.active svg { fill: #fff; }
 
 /* ── Layer 3: Results ── */
 .qiq-layer-3 {
