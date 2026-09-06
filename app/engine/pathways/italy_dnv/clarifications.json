@@ -20,7 +20,9 @@
     {
       "requirement": "partita_iva_acknowledgement_needs_review",
       "title": "Partita IVA Requirement Needs Review",
-      "clarification": "Self-employed digital nomads may need to request an Italian VAT number after entry. The applicant's understanding of this after-entry requirement is unclear and should be reviewed."
+      "clarification": "Self-employed digital nomads may need to request an Italian VAT number after entry. The applicant's understanding of this after-entry requirement is unclear and should be reviewed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer emitted by rules.py's live eligibility screening — role.digital_nomad.partita_iva_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "remote_worker_contract_unavailable",
@@ -155,22 +157,30 @@
     {
       "requirement": "permesso_acknowledgement_missing",
       "title": "Residence Permit Acknowledgment Missing",
-      "clarification": "Applicants must apply for a permesso di soggiorno within 8 working days of entering Italy. If the applicant will not comply with this requirement, the case does not appear to satisfy the after-entry compliance obligation."
+      "clarification": "Applicants must apply for a permesso di soggiorno within 8 working days of entering Italy. If the applicant will not comply with this requirement, the case does not appear to satisfy the after-entry compliance obligation.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer a HARD_FAILURES entry and no longer emitted by rules.py's live eligibility screening — compliance.permesso_8_day_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "permesso_acknowledgement_needs_review",
       "title": "Residence Permit Requirement Needs Review",
-      "clarification": "The applicant's understanding of the 8-working-day permesso di soggiorno requirement is unclear. The case should be reviewed before eligibility is confirmed."
+      "clarification": "The applicant's understanding of the 8-working-day permesso di soggiorno requirement is unclear. The case should be reviewed before eligibility is confirmed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer emitted by rules.py's live eligibility screening — see compliance.permesso_8_day_acknowledged in questions.json's post_eligibility_checklist block."
     },
     {
       "requirement": "tax_social_security_acknowledgement_missing",
       "title": "Tax and Social-Security Acknowledgment Missing",
-      "clarification": "Italy verifies tax and contribution compliance, and Italian social-security rules may apply if no bilateral agreement exists. If the applicant will not comply, the case does not appear to satisfy this requirement."
+      "clarification": "Italy verifies tax and contribution compliance, and Italian social-security rules may apply if no bilateral agreement exists. If the applicant will not comply, the case does not appear to satisfy this requirement.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer a HARD_FAILURES entry and no longer emitted by rules.py's live eligibility screening — compliance.tax_social_security_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "tax_social_security_acknowledgement_needs_review",
       "title": "Tax and Social-Security Requirement Needs Review",
-      "clarification": "The applicant's understanding of Italian tax and contribution compliance is unclear. The case should be reviewed to confirm the applicant can address these after-entry obligations."
+      "clarification": "The applicant's understanding of Italian tax and contribution compliance is unclear. The case should be reviewed to confirm the applicant can address these after-entry obligations.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer emitted by rules.py's live eligibility screening — see compliance.tax_social_security_acknowledged in questions.json's post_eligibility_checklist block."
     },
     {
       "requirement": "family_reunification_needs_review",

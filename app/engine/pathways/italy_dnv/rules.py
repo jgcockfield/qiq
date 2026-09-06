@@ -5,15 +5,15 @@ CONSULAR_REVIEW_PASSPORT_VALIDITY_MONTHS = 15
 MINIMUM_BLANK_PASSPORT_PAGES = 2
 
 VALID_WORKER_CATEGORIES = {
-    "digital_nomad_self_employed",
-    "remote_worker_employee",
+    "self_employed_freelance",
+    "employee_or_collaborator",
 }
 
 VALID_HIGHLY_QUALIFIED_BASES = {
-    "degree",
-    "regulated_profession_attestation",
-    "five_years_professional_experience",
-    "three_years_ict_executive_or_specialist_experience",
+    "have_a_relevant_degree",
+    "certified_in_a_regulated_profession",
+    "5plus_years_professional_experience",
+    "3plus_years_it_executive_or_specialist_experience",
 }
 
 VALID_INCOME_EVIDENCE_TYPES = {
@@ -25,12 +25,11 @@ VALID_INCOME_EVIDENCE_TYPES = {
     "income_proof",
 }
 
-VALID_ACCOMMODATION_STATUSES = {
-    "registered_lease",
-    "rental_contract",
-    "property_deed",
-}
-
+# permesso_acknowledgement_missing and tax_social_security_acknowledgement_missing
+# were removed from HARD_FAILURES (and from the eligibility flow entirely, see
+# _evaluate_documents_and_compliance below) because they describe post-entry
+# compliance steps, not pre-visa eligibility facts. See questions.json's
+# "post_eligibility_checklist" block for the preserved question content.
 HARD_FAILURES = {
     "adult_children_or_parents_family_route_not_supported",
     "accommodation_unavailable",
@@ -42,12 +41,10 @@ HARD_FAILURES = {
     "passive_income_not_accepted",
     "passport_blank_pages_below_minimum",
     "passport_validity_below_minimum",
-    "permesso_acknowledgement_missing",
     "prior_experience_below_minimum",
     "remote_technological_work_not_confirmed",
     "remote_worker_contract_unavailable",
     "remote_worker_employer_clean_record_unavailable",
-    "tax_social_security_acknowledgement_missing",
 }
 
 
@@ -102,12 +99,9 @@ def _evaluate_route(answers, failed_requirements, routing):
         failed_requirements.append("worker_category_missing_or_unrecognized")
         return
 
-    if worker_category == "digital_nomad_self_employed":
+    if worker_category == "self_employed_freelance":
         proof_available = _get_dotted(
             answers, "role.digital_nomad.self_employment_proof_available"
-        )
-        partita_iva_acknowledged = _get_dotted(
-            answers, "role.digital_nomad.partita_iva_acknowledged"
         )
 
         if _is_no(proof_available):
@@ -117,12 +111,7 @@ def _evaluate_route(answers, failed_requirements, routing):
         elif not _is_yes(proof_available):
             failed_requirements.append("digital_nomad_self_employment_proof_needs_review")
 
-        if _is_no(partita_iva_acknowledged):
-            failed_requirements.append("partita_iva_acknowledgement_needs_review")
-        elif not _is_yes(partita_iva_acknowledged):
-            failed_requirements.append("partita_iva_acknowledgement_needs_review")
-
-    if worker_category == "remote_worker_employee":
+    if worker_category == "employee_or_collaborator":
         contract_available = _get_dotted(
             answers, "role.remote_worker.contract_available"
         )
@@ -161,7 +150,7 @@ def _evaluate_core_eligibility(answers, failed_requirements):
         failed_requirements.append("remote_technological_work_needs_review")
 
     highly_qualified_basis = _get_dotted(answers, "work.highly_qualified_basis")
-    if highly_qualified_basis == "none":
+    if highly_qualified_basis == "none_of_these":
         failed_requirements.append("highly_qualified_basis_not_met")
     elif highly_qualified_basis not in VALID_HIGHLY_QUALIFIED_BASES:
         failed_requirements.append("highly_qualified_basis_needs_review")
@@ -185,7 +174,7 @@ def _evaluate_financials(answers, failed_requirements):
     income_source_type = _get_dotted(answers, "financial.income_source_type")
     if income_source_type == "passive_income":
         failed_requirements.append("passive_income_not_accepted")
-    elif income_source_type != "work_to_be_performed_in_italy":
+    elif income_source_type != "remote_work_from_italy":
         failed_requirements.append("income_source_needs_review")
 
     evidence_types = set(
@@ -205,7 +194,7 @@ def _evaluate_documents_and_compliance(answers, failed_requirements):
     accommodation_status = _get_dotted(answers, "housing.accommodation_status")
     if accommodation_status == "not_available":
         failed_requirements.append("accommodation_unavailable")
-    elif accommodation_status not in VALID_ACCOMMODATION_STATUSES:
+    elif accommodation_status != "have_qualifying_accommodation":
         failed_requirements.append("accommodation_needs_review")
 
     passport_validity_months = _as_int(
@@ -218,38 +207,29 @@ def _evaluate_documents_and_compliance(answers, failed_requirements):
     elif passport_validity_months < CONSULAR_REVIEW_PASSPORT_VALIDITY_MONTHS:
         failed_requirements.append("passport_validity_consular_threshold_needs_review")
 
+    # Severity intentionally unchanged (still hard) per current cleanup scope.
     passport_blank_pages = _as_int(_get_dotted(answers, "routing.passport_blank_pages"))
     if passport_blank_pages is None:
         failed_requirements.append("passport_blank_pages_needs_review")
     elif passport_blank_pages < MINIMUM_BLANK_PASSPORT_PAGES:
         failed_requirements.append("passport_blank_pages_below_minimum")
 
-    permesso_acknowledged = _get_dotted(
-        answers, "compliance.permesso_8_day_acknowledged"
-    )
-    if _is_no(permesso_acknowledged):
-        failed_requirements.append("permesso_acknowledgement_missing")
-    elif not _is_yes(permesso_acknowledged):
-        failed_requirements.append("permesso_acknowledgement_needs_review")
-
-    tax_social_security_acknowledged = _get_dotted(
-        answers, "compliance.tax_social_security_acknowledged"
-    )
-    if _is_no(tax_social_security_acknowledged):
-        failed_requirements.append("tax_social_security_acknowledgement_missing")
-    elif not _is_yes(tax_social_security_acknowledged):
-        failed_requirements.append("tax_social_security_acknowledgement_needs_review")
+    # NOTE: permesso_8_day and tax_social_security acknowledgements were removed
+    # from this function (and from questions.json's live flow) because they are
+    # post-entry compliance steps, not pre-visa eligibility facts. See
+    # questions.json's "post_eligibility_checklist" block and clarifications.json
+    # for the preserved question/requirement content.
 
 
 def _evaluate_family_route(answers, failed_requirements, routing):
     family_intent = _get_dotted(answers, "routing.family_reunification_intent")
     routing["family_reunification_intent"] = family_intent
 
-    if family_intent in (None, "", "not_sure"):
+    if family_intent in (None, ""):
         failed_requirements.append("family_reunification_needs_review")
         return
 
-    if family_intent == "no_family":
+    if family_intent == "no_one_else":
         return
 
     if family_intent == "adult_children_or_parents":

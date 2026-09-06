@@ -9,10 +9,10 @@
     {
       "key": "routing.worker_category",
       "depends_on": [],
-      "label": "Which Italy Digital Nomad / Remote Worker route best describes you?",
+      "label": "How do you work?",
       "input_type": "choice",
       "required": true,
-      "choices": ["digital_nomad_self_employed", "remote_worker_employee", "not_sure"]
+      "choices": ["self_employed_freelance", "employee_or_collaborator"]
     },
     {
       "key": "identity.nationality",
@@ -24,32 +24,31 @@
     {
       "key": "identity.eu_citizen_status",
       "depends_on": ["identity.nationality"],
-      "label": "Are you an EU citizen?",
+      "label": "Do you hold citizenship of an EU, EEA, or Swiss country (in addition to any other citizenship)?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no", "not_sure_dual_national"]
     },
     {
       "key": "work.remote_technological_tools_confirmed",
       "depends_on": ["identity.eu_citizen_status"],
-      "label": "Will you perform highly qualified work remotely using technological tools while in Italy?",
+      "label": "Will your work be performed remotely, using a computer or other technology, while you're in Italy?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "work.highly_qualified_basis",
       "depends_on": ["work.remote_technological_tools_confirmed"],
-      "label": "Which highly qualified worker basis can you document?",
+      "label": "Which of these best describes your qualifications?",
       "input_type": "choice",
       "required": true,
       "choices": [
-        "degree",
-        "regulated_profession_attestation",
-        "five_years_professional_experience",
-        "three_years_ict_executive_or_specialist_experience",
-        "not_sure",
-        "none"
+        "have_a_relevant_degree",
+        "certified_in_a_regulated_profession",
+        "5plus_years_professional_experience",
+        "3plus_years_it_executive_or_specialist_experience",
+        "none_of_these"
       ]
     },
     {
@@ -70,14 +69,13 @@
     {
       "key": "financial.income_source_type",
       "depends_on": ["financial.annual_work_income_eur"],
-      "label": "What is the source of the income supporting your Italy Digital Nomad / Remote Worker case?",
+      "label": "Where does this income come from?",
       "input_type": "choice",
       "required": true,
       "choices": [
-        "work_to_be_performed_in_italy",
+        "remote_work_from_italy",
         "other_work_income",
-        "passive_income",
-        "not_sure"
+        "passive_income"
       ]
     },
     {
@@ -102,17 +100,8 @@
       "label": "As a self-employed digital nomad, can you document your self-employment or freelance activity?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.worker_category", "digital_nomad_self_employed"] }
-    },
-    {
-      "key": "role.digital_nomad.partita_iva_acknowledged",
-      "depends_on": ["role.digital_nomad.self_employment_proof_available"],
-      "label": "Do you understand that self-employed digital nomads may need to request an Italian VAT number after entry?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.worker_category", "digital_nomad_self_employed"] }
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.worker_category", "self_employed_freelance"] }
     },
     {
       "key": "role.remote_worker.contract_available",
@@ -120,8 +109,8 @@
       "label": "As a remote worker, can you provide an employment or collaboration contract, or a binding offer?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.worker_category", "remote_worker_employee"] }
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.worker_category", "employee_or_collaborator"] }
     },
     {
       "key": "role.remote_worker.employer_clean_record_declaration_available",
@@ -130,7 +119,7 @@
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.worker_category", "remote_worker_employee"] }
+      "applies_when": { "equals": ["routing.worker_category", "employee_or_collaborator"] }
     },
     {
       "key": "routing.health_insurance_status",
@@ -147,12 +136,9 @@
       "input_type": "choice",
       "required": true,
       "choices": [
-        "registered_lease",
-        "rental_contract",
-        "property_deed",
-        "will_secure",
-        "not_available",
-        "not_sure"
+        "have_qualifying_accommodation",
+        "will_secure_before_travel",
+        "not_available"
       ]
     },
     {
@@ -170,28 +156,12 @@
       "required": true
     },
     {
-      "key": "compliance.permesso_8_day_acknowledged",
-      "depends_on": ["routing.passport_blank_pages"],
-      "label": "Do you understand you must apply for a permesso di soggiorno within 8 working days of entering Italy?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.tax_social_security_acknowledged",
-      "depends_on": ["compliance.permesso_8_day_acknowledged"],
-      "label": "Do you understand Italy will verify tax and contribution compliance, including Italian social-security rules if no bilateral agreement applies?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
       "key": "routing.family_reunification_intent",
-      "depends_on": ["compliance.tax_social_security_acknowledged"],
-      "label": "Do you intend to request family reunification for spouse or minor children?",
+      "depends_on": ["routing.passport_blank_pages"],
+      "label": "Will you be including a spouse or children on this application?",
       "input_type": "choice",
       "required": true,
-      "choices": ["no_family", "spouse_or_minor_children", "adult_children_or_parents", "not_sure"]
+      "choices": ["no_one_else", "spouse_or_minor_children", "adult_children_or_parents"]
     },
     {
       "key": "routing.family_documents_available",
@@ -199,7 +169,7 @@
       "label": "Can you provide family relationship documents for the spouse or minor children you intend to include?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.family_reunification_intent", "spouse_or_minor_children"] }
     },
     {
@@ -209,5 +179,32 @@
       "input_type": "text",
       "required": false
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "These are real Italy DNV obligations sourced from requirements_reference.md, but they describe post-entry compliance steps rather than pre-visa eligibility facts. They were removed from the live eligibility-screening flow and are preserved here for a future post-eligibility checklist / output surface. Their former requirement codes still exist in clarifications.json and output.json for that purpose.",
+    "fields": [
+      {
+        "key": "role.digital_nomad.partita_iva_acknowledged",
+        "label": "Do you understand that self-employed digital nomads may need to request an Italian VAT number after entry?",
+        "input_type": "choice",
+        "choices": ["yes", "no", "not_sure"],
+        "applies_when": { "equals": ["routing.worker_category", "self_employed_freelance"] },
+        "related_requirement": "partita_iva_acknowledgement_needs_review"
+      },
+      {
+        "key": "compliance.permesso_8_day_acknowledged",
+        "label": "Do you understand you must apply for a permesso di soggiorno within 8 working days of entering Italy?",
+        "input_type": "choice",
+        "choices": ["yes", "no", "not_sure"],
+        "related_requirements": ["permesso_acknowledgement_missing", "permesso_acknowledgement_needs_review"]
+      },
+      {
+        "key": "compliance.tax_social_security_acknowledged",
+        "label": "Do you understand Italy will verify tax and contribution compliance, including Italian social-security rules if no bilateral agreement applies?",
+        "input_type": "choice",
+        "choices": ["yes", "no", "not_sure"],
+        "related_requirements": ["tax_social_security_acknowledgement_missing", "tax_social_security_acknowledgement_needs_review"]
+      }
+    ]
+  }
 }

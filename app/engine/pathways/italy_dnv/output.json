@@ -186,7 +186,9 @@
         "action": {
           "label": "Wait for tax-setup review",
           "type": "email_followup"
-        }
+        },
+        "stage": "post_eligibility_checklist",
+        "stage_note": "Preserved for a future post-eligibility checklist. No longer emitted by rules.py's live eligibility screening — role.digital_nomad.partita_iva_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
       },
       "family_reunification_needs_review": {
         "enabled": true,
