@@ -107,7 +107,7 @@
     {
       "requirement": "income_evidence_needs_review",
       "title": "Income Evidence Needs Review",
-      "clarification": "The selected documents do not clearly show qualifying work-derived income. Income proof may include payslips, tax returns, W-2 forms, bank statements, invoices, or other work-income proof."
+      "clarification": "The selected documents do not clearly show qualifying work-derived income. Income proof may include payslips, tax returns, bank statements, invoices, or other work-income proof."
     },
     {
       "requirement": "health_insurance_unavailable",
@@ -152,7 +152,7 @@
     {
       "requirement": "passport_blank_pages_below_minimum",
       "title": "Blank Passport Pages Below Minimum",
-      "clarification": "Consular guidance may require at least two blank passport pages. If the passport has fewer than two blank pages, the case does not appear to meet this document requirement."
+      "clarification": "Consular guidance may require at least two blank passport pages. If the passport has fewer than two blank pages, this is typically fixable by requesting additional pages or a renewed passport before filing, so the case should be reviewed rather than treated as a substantive disqualifier."
     },
     {
       "requirement": "permesso_acknowledgement_missing",

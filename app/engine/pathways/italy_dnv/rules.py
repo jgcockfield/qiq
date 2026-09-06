@@ -10,16 +10,15 @@ VALID_WORKER_CATEGORIES = {
 }
 
 VALID_HIGHLY_QUALIFIED_BASES = {
-    "have_a_relevant_degree",
-    "certified_in_a_regulated_profession",
-    "5plus_years_professional_experience",
-    "3plus_years_it_executive_or_specialist_experience",
+    "university_degree",
+    "licensed_professional",
+    "at_least_5_years_experience",
+    "at_least_3_years_senior_tech_experience",
 }
 
 VALID_INCOME_EVIDENCE_TYPES = {
     "payslips",
     "tax_return",
-    "w2",
     "bank_statements",
     "invoices",
     "income_proof",
@@ -30,6 +29,17 @@ VALID_INCOME_EVIDENCE_TYPES = {
 # _evaluate_documents_and_compliance below) because they describe post-entry
 # compliance steps, not pre-visa eligibility facts. See questions.json's
 # "post_eligibility_checklist" block for the preserved question content.
+#
+# remote_technological_work_not_confirmed is restored (see work.remote_work_confirmed
+# in questions.json): an earlier cleanup pass folded the remote-work confirmation
+# into routing.worker_category's description text only, which incorrectly dropped
+# a distinct, explicit eligibility question and hard-failure for this requirement.
+#
+# passport_blank_pages_below_minimum was softened out of HARD_FAILURES: the
+# 2-blank-page rule is sourced to a specific consulate (New York) rather than
+# universal guidance, and is normally fixable (added pages / renewal) rather
+# than a substantive disqualifier — the same treatment already given to the
+# analogous consulate-specific 15-month passport-validity threshold.
 HARD_FAILURES = {
     "adult_children_or_parents_family_route_not_supported",
     "accommodation_unavailable",
@@ -39,7 +49,6 @@ HARD_FAILURES = {
     "highly_qualified_basis_not_met",
     "income_below_minimum",
     "passive_income_not_accepted",
-    "passport_blank_pages_below_minimum",
     "passport_validity_below_minimum",
     "prior_experience_below_minimum",
     "remote_technological_work_not_confirmed",
@@ -135,19 +144,17 @@ def _evaluate_route(answers, failed_requirements, routing):
 
 
 def _evaluate_core_eligibility(answers, failed_requirements):
+    remote_work_confirmed = _get_dotted(answers, "work.remote_work_confirmed")
+    if _is_no(remote_work_confirmed):
+        failed_requirements.append("remote_technological_work_not_confirmed")
+    elif not _is_yes(remote_work_confirmed):
+        failed_requirements.append("remote_technological_work_needs_review")
+
     eu_citizen_status = _get_dotted(answers, "identity.eu_citizen_status")
     if _is_yes(eu_citizen_status):
         failed_requirements.append("eu_citizen_status")
     elif eu_citizen_status != "no":
         failed_requirements.append("eu_citizen_status_needs_review")
-
-    remote_tools_confirmed = _get_dotted(
-        answers, "work.remote_technological_tools_confirmed"
-    )
-    if _is_no(remote_tools_confirmed):
-        failed_requirements.append("remote_technological_work_not_confirmed")
-    elif not _is_yes(remote_tools_confirmed):
-        failed_requirements.append("remote_technological_work_needs_review")
 
     highly_qualified_basis = _get_dotted(answers, "work.highly_qualified_basis")
     if highly_qualified_basis == "none_of_these":
@@ -171,10 +178,18 @@ def _evaluate_financials(answers, failed_requirements):
     elif annual_income < MINIMUM_ANNUAL_INCOME_EUR:
         failed_requirements.append("income_below_minimum")
 
-    income_source_type = _get_dotted(answers, "financial.income_source_type")
-    if income_source_type == "passive_income":
-        failed_requirements.append("passive_income_not_accepted")
-    elif income_source_type != "remote_work_from_italy":
+    income_from_remote_work = _get_dotted(
+        answers, "financial.income_from_remote_work_confirmed"
+    )
+    if _is_yes(income_from_remote_work):
+        pass
+    elif _is_no(income_from_remote_work):
+        non_remote_source = _get_dotted(answers, "financial.non_remote_income_source")
+        if non_remote_source == "passive_income":
+            failed_requirements.append("passive_income_not_accepted")
+        else:
+            failed_requirements.append("income_source_needs_review")
+    else:
         failed_requirements.append("income_source_needs_review")
 
     evidence_types = set(
@@ -207,7 +222,7 @@ def _evaluate_documents_and_compliance(answers, failed_requirements):
     elif passport_validity_months < CONSULAR_REVIEW_PASSPORT_VALIDITY_MONTHS:
         failed_requirements.append("passport_validity_consular_threshold_needs_review")
 
-    # Severity intentionally unchanged (still hard) per current cleanup scope.
+    # Softened: needs_review, not hard. See HARD_FAILURES comment above.
     passport_blank_pages = _as_int(_get_dotted(answers, "routing.passport_blank_pages"))
     if passport_blank_pages is None:
         failed_requirements.append("passport_blank_pages_needs_review")

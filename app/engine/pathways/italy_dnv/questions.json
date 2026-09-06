@@ -10,13 +10,23 @@
       "key": "routing.worker_category",
       "depends_on": [],
       "label": "How do you work?",
+      "description": "This visa is for people who do highly qualified work remotely, using a computer or similar technology, while living in Italy.",
       "input_type": "choice",
       "required": true,
       "choices": ["self_employed_freelance", "employee_or_collaborator"]
     },
     {
-      "key": "identity.nationality",
+      "key": "work.remote_work_confirmed",
       "depends_on": ["routing.worker_category"],
+      "label": "Will you be working remotely while living in Italy?",
+      "description": "This includes work performed using a computer or similar technology, from anywhere in Italy.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "identity.nationality",
+      "depends_on": ["work.remote_work_confirmed"],
       "label": "What is your nationality?",
       "input_type": "text",
       "required": true
@@ -27,27 +37,20 @@
       "label": "Do you hold citizenship of an EU, EEA, or Swiss country (in addition to any other citizenship)?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure_dual_national"]
-    },
-    {
-      "key": "work.remote_technological_tools_confirmed",
-      "depends_on": ["identity.eu_citizen_status"],
-      "label": "Will your work be performed remotely, using a computer or other technology, while you're in Italy?",
-      "input_type": "choice",
-      "required": true,
       "choices": ["yes", "no"]
     },
     {
       "key": "work.highly_qualified_basis",
-      "depends_on": ["work.remote_technological_tools_confirmed"],
+      "depends_on": ["identity.eu_citizen_status"],
       "label": "Which of these best describes your qualifications?",
+      "description": "Italy's visa rules require meeting one of these 'highly qualified worker' categories.",
       "input_type": "choice",
       "required": true,
       "choices": [
-        "have_a_relevant_degree",
-        "certified_in_a_regulated_profession",
-        "5plus_years_professional_experience",
-        "3plus_years_it_executive_or_specialist_experience",
+        "university_degree",
+        "licensed_professional",
+        "at_least_5_years_experience",
+        "at_least_3_years_senior_tech_experience",
         "none_of_these"
       ]
     },
@@ -67,27 +70,32 @@
       "required": true
     },
     {
-      "key": "financial.income_source_type",
+      "key": "financial.income_from_remote_work_confirmed",
       "depends_on": ["financial.annual_work_income_eur"],
-      "label": "Where does this income come from?",
+      "label": "Is this income from the remote work you'll be doing while in Italy?",
       "input_type": "choice",
       "required": true,
-      "choices": [
-        "remote_work_from_italy",
-        "other_work_income",
-        "passive_income"
-      ]
+      "choices": ["yes", "no"]
+    },
+    {
+      "key": "financial.non_remote_income_source",
+      "depends_on": ["financial.income_from_remote_work_confirmed"],
+      "label": "What is this income from instead?",
+      "description": "Passive income (investments, rental income, etc.) doesn't qualify for this visa. Other active income will need manual review.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["passive_income", "other_active_work"],
+      "applies_when": { "equals": ["financial.income_from_remote_work_confirmed", "no"] }
     },
     {
       "key": "financial.income_evidence_types",
-      "depends_on": ["financial.income_source_type"],
+      "depends_on": ["financial.income_from_remote_work_confirmed"],
       "label": "Which documents can you provide as proof of work-derived income?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
         "payslips",
         "tax_return",
-        "w2",
         "bank_statements",
         "invoices",
         "income_proof",
@@ -115,10 +123,10 @@
     {
       "key": "role.remote_worker.employer_clean_record_declaration_available",
       "depends_on": ["role.remote_worker.contract_available"],
-      "label": "Can your employer provide a declaration that it has no relevant convictions in the previous 5 years?",
+      "label": "Can your employer confirm they have a clean legal record from the past 5 years?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.worker_category", "employee_or_collaborator"] }
     },
     {
@@ -132,7 +140,7 @@
     {
       "key": "housing.accommodation_status",
       "depends_on": ["routing.health_insurance_status"],
-      "label": "Can you document suitable accommodation in Italy for the visa period?",
+      "label": "Do you have accommodation arranged in Italy for the visa period?",
       "input_type": "choice",
       "required": true,
       "choices": [

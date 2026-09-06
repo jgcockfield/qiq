@@ -126,7 +126,7 @@
         "enabled": true,
         "text": [
           "Your income evidence needs manual review before eligibility can be confirmed.",
-          "The team should verify whether your payslips, tax returns, W-2 forms, bank statements, invoices, or other documents can support the Italy income requirement."
+          "The team should verify whether your payslips, tax returns, bank statements, invoices, or other documents can support the Italy income requirement."
         ],
         "action": {
           "label": "Wait for income-evidence review",
