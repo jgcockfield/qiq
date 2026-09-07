@@ -8,19 +8,29 @@
       "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Dependent count affects the financial threshold for Spain NLV screening."
     },
     {
-      "requirement": "eu_eea_swiss_or_free_movement_status",
-      "title": "EU Free-Movement Status",
-      "clarification": "Spain NLV screening is for non-EU, non-EEA, non-Swiss applicants who are not covered by EU free-movement rules. If the applicant is covered by those rules, this pathway does not appear to be the right category."
+      "requirement": "eu_eea_swiss_citizen",
+      "title": "EU, EEA, or Swiss Citizen",
+      "clarification": "Spain NLV screening is for applicants who are not EU, EEA, or Swiss citizens. If the applicant holds one of those citizenships, this pathway does not appear to be the right category."
     },
     {
-      "requirement": "eu_eea_swiss_or_free_movement_status_needs_review",
-      "title": "Nationality Status Needs Review",
-      "clarification": "The applicant's EU, EEA, Swiss, or free-movement status is unclear. The case should be reviewed before Spain NLV eligibility is confirmed."
+      "requirement": "eu_eea_swiss_citizen_needs_review",
+      "title": "Citizenship Status Needs Review",
+      "clarification": "Whether the applicant is an EU, EEA, or Swiss citizen is unclear. The case should be reviewed before Spain NLV eligibility is confirmed."
     },
     {
-      "requirement": "no_work_activity_needs_review",
+      "requirement": "eu_family_member_route",
+      "title": "EU Family-Member Residence Route",
+      "clarification": "Spain NLV screening is not for applicants residing in Spain under EU family-member residence rules (as the spouse, child, or parent of an EU, EEA, or Swiss citizen). If that route applies, this pathway does not appear to be the right category."
+    },
+    {
+      "requirement": "eu_family_member_route_needs_review",
+      "title": "EU Family-Member Route Needs Review",
+      "clarification": "Whether the applicant is applying under EU family-member residence rules is unclear. The case should be reviewed before Spain NLV eligibility is confirmed."
+    },
+    {
+      "requirement": "work_intent_needs_review",
       "title": "No-Work Requirement Needs Review",
-      "clarification": "Spain NLV is for residence without labor or professional activity in Spain. If the applicant is unsure whether their plans count as work, the case should be reviewed."
+      "clarification": "Spain NLV is for residence without labor or professional activity in Spain. Whether the applicant plans to work is unclear, so the case should be reviewed."
     },
     {
       "requirement": "work_activity_in_spain",
@@ -83,8 +93,8 @@
       "clarification": "If funds come from ownership in a Spanish company, the applicant must not perform labor or professional activity for that company. Performing labor activity there is incompatible with the non-lucrative pathway."
     },
     {
-      "requirement": "spanish_company_no_labor_activity_needs_review",
-      "title": "Spanish Company Ownership Needs Review",
+      "requirement": "spanish_company_labor_activity_needs_review",
+      "title": "Spanish Company Labor Activity Needs Review",
       "clarification": "The applicant owns or receives funds from a Spanish company, but it is unclear whether they perform labor or professional activity for that company. The case should be reviewed before eligibility is confirmed."
     },
     {
@@ -145,7 +155,9 @@
     {
       "requirement": "renewal_residence_days_needs_review",
       "title": "Renewal Residence Days Need Review",
-      "clarification": "For renewal, the reference notes that the applicant must actually reside in Spain more than 183 days per calendar year. If renewal plans are uncertain or below that threshold, the case should be reviewed."
+      "clarification": "For renewal, the reference notes that the applicant must actually reside in Spain more than 183 days per calendar year. If renewal plans are uncertain or below that threshold, the case should be reviewed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility / renewal-guidance checklist. No longer emitted by rules.py's live eligibility screening -- routing.renewal_residence_days_expected was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "needs_manual_review",

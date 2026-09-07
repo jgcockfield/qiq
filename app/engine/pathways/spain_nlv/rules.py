@@ -22,8 +22,21 @@ VALID_FUNDS_EVIDENCE_TYPES = {
     "passive_income_proof",
 }
 
+# NOTE: routing.renewal_residence_days_expected was removed from the live
+# eligibility flow (and from this function) because the >183-days-per-year
+# rule is a RENEWAL-stage requirement per requirements_reference.md, not a
+# fact needed to determine INITIAL eligibility. See questions.json's
+# "post_eligibility_checklist" block for the preserved question content and
+# clarifications.json for the preserved (now dormant) requirement code.
+#
+# NOTE: a disclosed criminal record is intentionally kept as
+# "criminal_record_needs_review" (soft, manual review) rather than an
+# automatic hard failure -- Spanish law disqualifies only for "offenses
+# recognized under Spanish law," which requires case-by-case legal judgment
+# that this screening does not attempt to make.
 HARD_FAILURES = {
-    "eu_eea_swiss_or_free_movement_status",
+    "eu_eea_swiss_citizen",
+    "eu_family_member_route",
     "work_activity_in_spain",
     "irregular_presence_in_spain",
     "insufficient_financial_means",
@@ -87,6 +100,24 @@ def _required_monthly_financial_means(dependents_count: int) -> float:
     return IPREM_MONTHLY_EUR * multiplier
 
 
+def _evaluate_eu_status(payload: Dict[str, Any], failed: List[str]) -> None:
+    eu_citizen = _get_dotted(payload, "identity.eu_eea_swiss_citizen")
+    if _is_yes(eu_citizen):
+        failed.append("eu_eea_swiss_citizen")
+        return
+    if not _is_no(eu_citizen):
+        failed.append("eu_eea_swiss_citizen_needs_review")
+        return
+
+    # Only reachable (and only asked in the live flow) once eu_citizen is
+    # confirmed "no" -- see questions.json's applies_when.
+    family_member_route = _get_dotted(payload, "identity.eu_family_member_route")
+    if _is_yes(family_member_route):
+        failed.append("eu_family_member_route")
+    elif not _is_no(family_member_route):
+        failed.append("eu_family_member_route_needs_review")
+
+
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     routing = payload.get("routing", {}) if isinstance(payload, dict) else {}
     failed: List[str] = []
@@ -95,18 +126,13 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     if applicant_type not in {"individual", "family"}:
         failed.append("applicant_type_missing")
 
-    if _is_yes(_get_dotted(payload, "identity.eu_eea_swiss_or_free_movement_status")):
-        failed.append("eu_eea_swiss_or_free_movement_status")
-    elif not _is_no(
-        _get_dotted(payload, "identity.eu_eea_swiss_or_free_movement_status")
-    ):
-        failed.append("eu_eea_swiss_or_free_movement_status_needs_review")
+    _evaluate_eu_status(payload, failed)
 
-    if not _is_yes(_get_dotted(payload, "routing.no_work_activity_acknowledged")):
-        if _get_dotted(payload, "routing.no_work_activity_acknowledged") == "not_sure":
-            failed.append("no_work_activity_needs_review")
-        else:
-            failed.append("work_activity_in_spain")
+    intends_to_work = _get_dotted(payload, "work.intends_to_work_in_spain")
+    if _is_yes(intends_to_work):
+        failed.append("work_activity_in_spain")
+    elif not _is_no(intends_to_work):
+        failed.append("work_intent_needs_review")
 
     irregular_presence = _get_dotted(payload, "routing.irregular_presence_spain")
     if _is_yes(irregular_presence):
@@ -129,7 +155,7 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
 
         schooling = _get_dotted(
             payload,
-            "routing.minor_children_schooling_acknowledged",
+            "routing.minor_children_schooling_status",
         )
         if schooling == "cannot_enroll":
             failed.append("minor_children_schooling_issue")
@@ -154,14 +180,14 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         "financial.spanish_company_ownership",
     )
     if _is_yes(spanish_company_ownership):
-        no_labor_activity = _get_dotted(
+        performs_labor = _get_dotted(
             payload,
-            "financial.spanish_company_no_labor_activity_acknowledged",
+            "financial.performs_labor_for_spanish_company",
         )
-        if _is_no(no_labor_activity):
+        if _is_yes(performs_labor):
             failed.append("spanish_company_labor_activity")
-        elif not _is_yes(no_labor_activity):
-            failed.append("spanish_company_no_labor_activity_needs_review")
+        elif not _is_no(performs_labor):
+            failed.append("spanish_company_labor_activity_needs_review")
     elif not _is_no(spanish_company_ownership):
         failed.append("spanish_company_ownership_needs_review")
 
@@ -207,12 +233,6 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         failed.append("serious_public_health_disease")
     elif public_health_disease != "no":
         failed.append("public_health_needs_review")
-
-    renewal_days = _get_dotted(payload, "routing.renewal_residence_days_expected")
-    if renewal_days in {"183_days_or_less", "not_sure"}:
-        failed.append("renewal_residence_days_needs_review")
-    elif renewal_days not in {"more_than_183_days", "not_planning_to_renew"}:
-        failed.append("renewal_residence_days_needs_review")
 
     if any(requirement in HARD_FAILURES for requirement in failed):
         status = "not_eligible"

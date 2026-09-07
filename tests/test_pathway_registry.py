@@ -302,6 +302,484 @@ def _pensionado_payload(
     }
 
 
+def _spain_nlv_payload(
+    *,
+    applicant_type="individual",
+    eu_eea_swiss_citizen="no",
+    eu_family_member_route="no",
+    intends_to_work_in_spain="no",
+    monthly_financial_means="2400",
+    dependents_count=None,
+    minor_children_schooling_status="can_enroll",
+    spanish_company_ownership="no",
+    performs_labor_for_spanish_company=None,
+    health_insurance_status="have_it",
+    background_check_available="yes",
+    criminal_record_flag="no",
+    public_order_security_risk_flag="no",
+    public_health_disease_flag="no",
+):
+    payload = {
+        "routing": {
+            "applicant_type": applicant_type,
+            "irregular_presence_spain": "no",
+            "passport_validity_months": "24",
+            "health_insurance_status": health_insurance_status,
+            "background_check_available": background_check_available,
+            "criminal_record_flag": criminal_record_flag,
+            "public_order_security_risk_flag": public_order_security_risk_flag,
+            "public_health_disease_flag": public_health_disease_flag,
+        },
+        "identity": {
+            "nationality": "United States",
+            "eu_eea_swiss_citizen": eu_eea_swiss_citizen,
+        },
+        "work": {
+            "intends_to_work_in_spain": intends_to_work_in_spain,
+        },
+        "financial": {
+            "monthly_passive_income_or_assets_eur": monthly_financial_means,
+            "funds_evidence_types": ["bank_certificates"],
+            "spanish_company_ownership": spanish_company_ownership,
+        },
+    }
+
+    if eu_eea_swiss_citizen == "no":
+        payload["identity"]["eu_family_member_route"] = eu_family_member_route
+
+    if applicant_type == "family":
+        payload["routing"].update(
+            {
+                "dependents_count": "1" if dependents_count is None else dependents_count,
+                "dependent_relationships": "spouse, child",
+                "dependent_ages": "38, 9",
+                "minor_children_schooling_status": minor_children_schooling_status,
+            }
+        )
+
+    if performs_labor_for_spanish_company is not None:
+        payload["financial"][
+            "performs_labor_for_spanish_company"
+        ] = performs_labor_for_spanish_company
+
+    return payload
+
+
+def test_spain_nlv_aliases_load_first_question():
+    result_dash = evaluate({}, pathway="spain-nlv")
+    result_underscore = evaluate({}, pathway="spain_nlv")
+
+    assert result_dash == result_underscore
+    assert result_dash["next_field_key"] == "routing.applicant_type"
+    assert result_dash["field"]["input_type"] == "choice"
+    assert result_dash["field"]["choices"] == ["individual", "family"]
+
+
+def test_spain_nlv_valid_individual_returns_eligible():
+    result = evaluate_eligibility(_spain_nlv_payload(), pathway="spain-nlv")
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["pathway"] == "spain_nlv"
+    assert result["visa_type"] == "Spain Non-Lucrative Visa"
+
+
+def test_spain_nlv_insufficient_funds_returns_not_eligible():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(monthly_financial_means="2399"),
+        pathway="spain_nlv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["insufficient_financial_means"]
+
+
+def test_spain_nlv_family_route_calculates_dependent_threshold():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(
+            applicant_type="family",
+            dependents_count="2",
+            monthly_financial_means="3000",
+        ),
+        pathway="spain-nlv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["insufficient_financial_means"]
+    assert result["required_monthly_financial_means_eur"] == 3600
+
+
+def test_spain_nlv_individual_question_sequence():
+    answers = {
+        "routing.applicant_type": "individual",
+        "identity.nationality": "United States",
+        "identity.eu_eea_swiss_citizen": "no",
+        "identity.eu_family_member_route": "no",
+        "work.intends_to_work_in_spain": "no",
+        "routing.irregular_presence_spain": "no",
+        "financial.monthly_passive_income_or_assets_eur": "2400",
+        "financial.funds_evidence_types": ["bank_certificates"],
+        "financial.spanish_company_ownership": "no",
+        "routing.passport_validity_months": "24",
+        "routing.health_insurance_status": "have_it",
+        "routing.background_check_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "routing.public_order_security_risk_flag": "no",
+        "routing.public_health_disease_flag": "no",
+    }
+    expected_order = [
+        "routing.applicant_type",
+        "identity.nationality",
+        "identity.eu_eea_swiss_citizen",
+        "identity.eu_family_member_route",
+        "work.intends_to_work_in_spain",
+        "routing.irregular_presence_spain",
+        "financial.monthly_passive_income_or_assets_eur",
+        "financial.funds_evidence_types",
+        "financial.spanish_company_ownership",
+        "routing.passport_validity_months",
+        "routing.health_insurance_status",
+        "routing.background_check_available",
+        "routing.criminal_record_flag",
+        "routing.public_order_security_risk_flag",
+        "routing.public_health_disease_flag",
+    ]
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="spain-nlv")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-nlv")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    # The renewal question must never appear in the live flow.
+    assert "routing.renewal_residence_days_expected" not in asked_keys
+
+
+def test_spain_nlv_family_question_sequence():
+    answers = {
+        "routing.applicant_type": "family",
+        "identity.nationality": "United States",
+        "identity.eu_eea_swiss_citizen": "no",
+        "identity.eu_family_member_route": "no",
+        "work.intends_to_work_in_spain": "no",
+        "routing.irregular_presence_spain": "no",
+        "financial.monthly_passive_income_or_assets_eur": "3000",
+        "financial.funds_evidence_types": ["bank_certificates"],
+        "financial.spanish_company_ownership": "no",
+        "routing.dependents_count": "1",
+        "routing.dependent_relationships": "spouse",
+        "routing.dependent_ages": "9",
+        "routing.minor_children_schooling_status": "can_enroll",
+        "routing.passport_validity_months": "24",
+        "routing.health_insurance_status": "have_it",
+        "routing.background_check_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "routing.public_order_security_risk_flag": "no",
+        "routing.public_health_disease_flag": "no",
+    }
+    expected_order = [
+        "routing.applicant_type",
+        "identity.nationality",
+        "identity.eu_eea_swiss_citizen",
+        "identity.eu_family_member_route",
+        "work.intends_to_work_in_spain",
+        "routing.irregular_presence_spain",
+        "financial.monthly_passive_income_or_assets_eur",
+        "financial.funds_evidence_types",
+        "financial.spanish_company_ownership",
+        "routing.dependents_count",
+        "routing.dependent_relationships",
+        "routing.dependent_ages",
+        "routing.minor_children_schooling_status",
+        "routing.passport_validity_months",
+        "routing.health_insurance_status",
+        "routing.background_check_available",
+        "routing.criminal_record_flag",
+        "routing.public_order_security_risk_flag",
+        "routing.public_health_disease_flag",
+    ]
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="spain-nlv")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-nlv")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "routing.renewal_residence_days_expected" not in asked_keys
+
+
+def test_spain_nlv_eu_eea_swiss_citizen_hard_excludes_pathway():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(eu_eea_swiss_citizen="yes"),
+        pathway="spain-nlv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["eu_eea_swiss_citizen"]
+
+
+def test_spain_nlv_eu_family_member_route_only_asked_when_not_citizen():
+    payload = {
+        "routing": {"applicant_type": "individual"},
+        "identity": {"nationality": "United States", "eu_eea_swiss_citizen": "yes"},
+    }
+
+    result = evaluate(payload, pathway="spain-nlv")
+
+    # Once eu_eea_swiss_citizen is "yes", the family-member question does not
+    # apply (applies_when) and the flow moves straight past it.
+    assert result["next_field_key"] != "identity.eu_family_member_route"
+
+
+def test_spain_nlv_eu_family_member_route_hard_excludes_pathway():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(eu_eea_swiss_citizen="no", eu_family_member_route="yes"),
+        pathway="spain-nlv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["eu_family_member_route"]
+
+
+def test_spain_nlv_neither_eu_citizen_nor_family_member_continues():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(eu_eea_swiss_citizen="no", eu_family_member_route="no"),
+        pathway="spain-nlv",
+    )
+
+    assert "eu_eea_swiss_citizen" not in result["failed_requirements"]
+    assert "eu_family_member_route" not in result["failed_requirements"]
+
+
+def test_spain_nlv_work_intent_polarity():
+    # Planning to work in Spain is a hard failure.
+    working = evaluate_eligibility(
+        _spain_nlv_payload(intends_to_work_in_spain="yes"),
+        pathway="spain-nlv",
+    )
+    assert working["eligibility_status"] == "not_eligible"
+    assert working["failed_requirements"] == ["work_activity_in_spain"]
+
+    # Not planning to work passes this requirement.
+    not_working = evaluate_eligibility(
+        _spain_nlv_payload(intends_to_work_in_spain="no"),
+        pathway="spain-nlv",
+    )
+    assert "work_activity_in_spain" not in not_working["failed_requirements"]
+    assert "work_intent_needs_review" not in not_working["failed_requirements"]
+
+
+def test_spain_nlv_spanish_company_labor_activity_polarity():
+    # Performing labor for the Spanish company funding the case is a hard failure.
+    performs_labor = evaluate_eligibility(
+        _spain_nlv_payload(
+            spanish_company_ownership="yes",
+            performs_labor_for_spanish_company="yes",
+        ),
+        pathway="spain-nlv",
+    )
+    assert performs_labor["eligibility_status"] == "not_eligible"
+    assert performs_labor["failed_requirements"] == ["spanish_company_labor_activity"]
+
+    # Not performing labor for it passes.
+    no_labor = evaluate_eligibility(
+        _spain_nlv_payload(
+            spanish_company_ownership="yes",
+            performs_labor_for_spanish_company="no",
+        ),
+        pathway="spain-nlv",
+    )
+    assert "spanish_company_labor_activity" not in no_labor["failed_requirements"]
+
+    # Unclear/missing answer is a soft needs_review, not a hard failure.
+    unclear = evaluate_eligibility(
+        _spain_nlv_payload(
+            monthly_financial_means="2400",
+            spanish_company_ownership="yes",
+        ),
+        pathway="spain-nlv",
+    )
+    assert unclear["eligibility_status"] == "needs_review"
+    assert unclear["failed_requirements"] == [
+        "spanish_company_labor_activity_needs_review"
+    ]
+
+
+def test_spain_nlv_minor_children_schooling_branch():
+    cannot_enroll = evaluate_eligibility(
+        _spain_nlv_payload(
+            applicant_type="family",
+            monthly_financial_means="3000",
+            minor_children_schooling_status="cannot_enroll",
+        ),
+        pathway="spain-nlv",
+    )
+    assert cannot_enroll["eligibility_status"] == "needs_review"
+    assert "minor_children_schooling_issue" in cannot_enroll["failed_requirements"]
+    # Schooling issues are conditional/review, never a hard failure.
+    import app.engine.pathways.spain_nlv.rules as spain_nlv_rules
+
+    assert "minor_children_schooling_issue" not in spain_nlv_rules.HARD_FAILURES
+
+    can_enroll = evaluate_eligibility(
+        _spain_nlv_payload(
+            applicant_type="family",
+            monthly_financial_means="3000",
+            minor_children_schooling_status="can_enroll",
+        ),
+        pathway="spain-nlv",
+    )
+    assert "minor_children_schooling_issue" not in can_enroll["failed_requirements"]
+
+    no_minor_children = evaluate_eligibility(
+        _spain_nlv_payload(
+            applicant_type="family",
+            monthly_financial_means="3000",
+            minor_children_schooling_status="no_minor_children",
+        ),
+        pathway="spain-nlv",
+    )
+    assert no_minor_children["eligibility_status"] == "eligible"
+
+
+def test_spain_nlv_health_insurance_three_state_behavior():
+    have_it = evaluate_eligibility(
+        _spain_nlv_payload(health_insurance_status="have_it"), pathway="spain-nlv"
+    )
+    assert have_it["eligibility_status"] == "eligible"
+
+    will_obtain = evaluate_eligibility(
+        _spain_nlv_payload(health_insurance_status="will_obtain"), pathway="spain-nlv"
+    )
+    assert will_obtain["eligibility_status"] == "needs_review"
+    assert will_obtain["failed_requirements"] == ["health_insurance_needs_review"]
+
+    cannot_obtain = evaluate_eligibility(
+        _spain_nlv_payload(health_insurance_status="cannot_obtain"), pathway="spain-nlv"
+    )
+    assert cannot_obtain["eligibility_status"] == "not_eligible"
+    assert cannot_obtain["failed_requirements"] == ["health_insurance_unavailable"]
+
+
+def test_spain_nlv_background_check_availability_choices_are_binary():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_nlv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    field = next(
+        f
+        for f in data["taxonomy_fields"]
+        if f["key"] == "routing.background_check_available"
+    )
+    assert field["choices"] == ["yes", "no"]
+
+
+def test_spain_nlv_criminal_record_disclosure_is_manual_review_not_hard_failure():
+    disclosed = evaluate_eligibility(
+        _spain_nlv_payload(criminal_record_flag="yes"), pathway="spain-nlv"
+    )
+    assert disclosed["eligibility_status"] == "needs_review"
+    assert disclosed["failed_requirements"] == ["criminal_record_needs_review"]
+
+    import app.engine.pathways.spain_nlv.rules as spain_nlv_rules
+
+    assert "criminal_record_needs_review" not in spain_nlv_rules.HARD_FAILURES
+    assert "criminal_record_flag" not in spain_nlv_rules.HARD_FAILURES
+
+
+def test_spain_nlv_public_order_security_risk_is_hard_failure():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(public_order_security_risk_flag="yes"),
+        pathway="spain-nlv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["public_order_security_risk"]
+
+
+def test_spain_nlv_public_health_disease_is_hard_failure():
+    result = evaluate_eligibility(
+        _spain_nlv_payload(public_health_disease_flag="yes"),
+        pathway="spain-nlv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["serious_public_health_disease"]
+
+
+def test_spain_nlv_renewal_question_absent_from_live_taxonomy_fields():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_nlv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.renewal_residence_days_expected" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert "routing.renewal_residence_days_expected" in checklist_keys
+
+    import app.engine.pathways.spain_nlv.rules as spain_nlv_rules
+    import inspect
+
+    source = inspect.getsource(spain_nlv_rules.evaluate_eligibility)
+    assert "renewal_residence_days_expected" not in source
+
+
+def test_spain_nlv_no_escape_choices_anywhere_in_schema():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_nlv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
 def test_costa_rica_pensionado_aliases_load_first_question():
     result_dash = evaluate({}, pathway="costa-rica-pensionado")
     result_underscore = evaluate({}, pathway="costa_rica_pensionado")

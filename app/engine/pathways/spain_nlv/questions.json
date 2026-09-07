@@ -22,34 +22,43 @@
       "required": true
     },
     {
-      "key": "identity.eu_eea_swiss_or_free_movement_status",
+      "key": "identity.eu_eea_swiss_citizen",
       "depends_on": ["identity.nationality"],
-      "label": "Are you an EU, EEA, or Swiss citizen, or covered by EU free-movement rules?",
+      "label": "Are you a citizen of an EU, EEA, or Swiss country?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
-      "key": "routing.no_work_activity_acknowledged",
-      "depends_on": ["identity.eu_eea_swiss_or_free_movement_status"],
-      "label": "Is your Spain Non-Lucrative Visa case based on living in Spain without working or carrying out professional activity there?",
+      "key": "identity.eu_family_member_route",
+      "depends_on": ["identity.eu_eea_swiss_citizen"],
+      "label": "Are you applying in Spain under EU family-member residence rules?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["identity.eu_eea_swiss_citizen", "no"] }
+    },
+    {
+      "key": "work.intends_to_work_in_spain",
+      "depends_on": ["identity.eu_eea_swiss_citizen", "identity.eu_family_member_route"],
+      "label": "Do you plan to work or carry out any paid professional activity while living in Spain?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.irregular_presence_spain",
-      "depends_on": ["routing.no_work_activity_acknowledged"],
-      "label": "Are you currently irregularly present in Spain?",
+      "depends_on": ["work.intends_to_work_in_spain"],
+      "label": "Are you currently living in Spain without valid legal status — for example, overstaying a visa or having entered without authorization?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "financial.monthly_passive_income_or_assets_eur",
       "depends_on": ["routing.irregular_presence_spain"],
       "label": "What monthly amount in EUR can you support from passive income or available assets without working in Spain?",
-      "description": "Spain NLV screening uses the official IPREM-based financial requirement for the main applicant and any dependents.",
+      "description": "Spain NLV screening requires monthly passive income or assets equal to at least 400% of Spain's IPREM (a public income reference index the government updates periodically) for the main applicant, plus 100% of IPREM for each dependent.",
       "input_type": "number",
       "required": true
     },
@@ -77,12 +86,12 @@
       "choices": ["yes", "no"]
     },
     {
-      "key": "financial.spanish_company_no_labor_activity_acknowledged",
+      "key": "financial.performs_labor_for_spanish_company",
       "depends_on": ["financial.spanish_company_ownership"],
-      "label": "If those funds come from a Spanish company, can you confirm you do not perform labor or professional activity for that company?",
+      "label": "Do you perform any labor or professional work for that company?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["financial.spanish_company_ownership", "yes"] }
     },
     {
@@ -110,17 +119,17 @@
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
-      "key": "routing.minor_children_schooling_acknowledged",
+      "key": "routing.minor_children_schooling_status",
       "depends_on": ["routing.dependent_ages"],
-      "label": "If any dependent children are of compulsory school age, can they be enrolled during your stay in Spain?",
+      "label": "If any of your dependent children are of compulsory school age (typically 6–16), can they be enrolled in school during your stay in Spain?",
       "input_type": "choice",
       "required": true,
-      "choices": ["no_minor_children", "can_enroll", "cannot_enroll", "not_sure"],
+      "choices": ["no_minor_children", "can_enroll", "cannot_enroll"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
       "key": "routing.passport_validity_months",
-      "depends_on": ["identity.nationality"],
+      "depends_on": ["financial.spanish_company_ownership", "routing.minor_children_schooling_status"],
       "label": "How many months will your passport be valid from your intended Spain application or entry date?",
       "input_type": "number",
       "required": true
@@ -139,7 +148,7 @@
       "label": "Can you obtain criminal record certificates for your country of origin and countries of residence during the previous 5 years?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.criminal_record_flag",
@@ -147,38 +156,43 @@
       "label": "Do you have any criminal convictions that may appear on those background checks?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.public_order_security_risk_flag",
       "depends_on": ["routing.criminal_record_flag"],
-      "label": "Are you aware of any public-order, security, or entry-ban issue that may affect admission to Spain?",
+      "label": "Have you ever been refused entry to Spain or another Schengen country, been deported, or been flagged as a public-order or security risk?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.public_health_disease_flag",
       "depends_on": ["routing.public_order_security_risk_flag"],
       "label": "Do you have any disease with serious public-health implications under the International Health Regulations?",
+      "description": "This is a rare requirement under international health rules and does not apply to common or manageable conditions.",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "routing.renewal_residence_days_expected",
-      "depends_on": ["routing.public_health_disease_flag"],
-      "label": "If you plan to renew, do you expect to reside in Spain more than 183 days per calendar year?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["more_than_183_days", "183_days_or_less", "not_sure", "not_planning_to_renew"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.additional_information",
-      "depends_on": ["routing.renewal_residence_days_expected"],
+      "depends_on": ["routing.public_health_disease_flag"],
       "label": "What else about your Spain Non-Lucrative Visa situation should QIQ consider?",
       "input_type": "text",
       "required": false
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "This is a real Spain NLV renewal-stage requirement sourced from requirements_reference.md, but it describes a future renewal condition rather than a fact needed to determine INITIAL eligibility. It was removed from the live eligibility-screening flow and is preserved here for a future post-eligibility / renewal-guidance surface. Its former requirement code still exists in clarifications.json for that purpose.",
+    "fields": [
+      {
+        "key": "routing.renewal_residence_days_expected",
+        "label": "If you plan to renew, do you expect to reside in Spain more than 183 days per calendar year?",
+        "input_type": "choice",
+        "choices": ["more_than_183_days", "183_days_or_less", "not_planning_to_renew"],
+        "related_requirement": "renewal_residence_days_needs_review"
+      }
+    ]
+  }
 }
