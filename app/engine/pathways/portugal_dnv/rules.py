@@ -310,27 +310,16 @@ def _evaluate_compliance(
     failed: List[str],
     visa_route: str | None,
 ) -> None:
-    if visa_route == "residence_visa":
-        aima_acknowledged = _get_dotted(
-            payload,
-            "compliance.aima_residence_permit_acknowledged",
-        )
-        if not _is_yes(aima_acknowledged):
-            failed.append("aima_residence_permit_acknowledgement_needs_review")
-
-        renewal_acknowledged = _get_dotted(
-            payload,
-            "compliance.renewal_acknowledged",
-        )
-        if not _is_yes(renewal_acknowledged):
-            failed.append("renewal_acknowledgement_needs_review")
-
-    extra_documents_acknowledged = _get_dotted(
-        payload,
-        "consulate.discretion_extra_documents_acknowledged",
-    )
-    if not _is_yes(extra_documents_acknowledged):
-        failed.append("discretionary_extra_documents_needs_review")
+    # NOTE: compliance.aima_residence_permit_acknowledged and
+    # compliance.renewal_acknowledged were removed from the live eligibility flow
+    # (and from this function) because they describe post-entry / renewal-stage
+    # compliance steps, not facts needed to determine INITIAL visa eligibility.
+    # See questions.json's "post_eligibility_checklist" block and
+    # clarifications.json for the preserved question/requirement content.
+    #
+    # NOTE: consulate.discretion_extra_documents_acknowledged was removed entirely
+    # (not preserved) -- it was a pure consular-discretion disclaimer with no
+    # eligibility fact behind it.
 
     truthful_documents_acknowledged = _get_dotted(
         payload,

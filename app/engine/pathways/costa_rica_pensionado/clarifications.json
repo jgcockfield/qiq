@@ -100,7 +100,9 @@
     {
       "requirement": "ccss_renewal_not_ready",
       "title": "CCSS Renewal Status",
-      "clarification": "For renewal where applicable, residents must prove CCSS or Costa Rican social insurance coverage. Cases without registration or a plan to register after approval need manual review."
+      "clarification": "For renewal where applicable, residents must prove CCSS or Costa Rican social insurance coverage. Cases without registration or a plan to register after approval need manual review.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility / renewal-guidance checklist. No longer emitted by rules.py's live eligibility screening -- documents.ccss_renewal_ready was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "pension_receipt_costa_rica_evidence_unavailable",
@@ -110,17 +112,14 @@
     {
       "requirement": "work_authorization_acknowledgement_missing",
       "title": "Not a Work-Authorizing Category",
-      "clarification": "Pensionado status is based on pension income, not Costa Rican employment. The applicant should understand that this is not a work-authorizing category."
-    },
-    {
-      "requirement": "temporary_residence_acknowledgement_missing",
-      "title": "Temporary Residence Category",
-      "clarification": "Pensionado is a temporary-residence category. The applicant should confirm that this category matches their Costa Rica residence goal."
+      "clarification": "Pensionado status is based on pension income, not Costa Rican employment. If the applicant plans to work in Costa Rica, the case does not appear to satisfy this core category requirement."
     },
     {
       "requirement": "renewal_acknowledgement_missing",
       "title": "Biennial Renewal",
-      "clarification": "Pensionado temporary residence must be renewed every 2 years. Renewal may require updated status, pension, CCSS, and DIMEX evidence."
+      "clarification": "Pensionado temporary residence must be renewed every 2 years. Renewal may require updated status, pension, CCSS, and DIMEX evidence.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility / renewal-guidance checklist. No longer emitted by rules.py's live eligibility screening -- routing.renewal_every_two_years_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "needs_manual_review",

@@ -12,7 +12,7 @@
       "label": "Which Portugal remote-work visa route are you considering?",
       "input_type": "choice",
       "required": true,
-      "choices": ["residence_visa", "temporary_stay_under_1_year", "not_sure"]
+      "choices": ["residence_visa", "temporary_stay_under_1_year"]
     },
     {
       "key": "routing.work_relationship",
@@ -20,7 +20,7 @@
       "label": "Which remote-work category best describes you?",
       "input_type": "choice",
       "required": true,
-      "choices": ["remote_employee", "freelancer_independent", "business_owner_company_service", "not_sure"]
+      "choices": ["remote_employee", "freelancer_independent", "business_owner_company_service"]
     },
     {
       "key": "work.entities_outside_portugal",
@@ -28,7 +28,7 @@
       "label": "Will your professional activity be performed remotely for entities outside Portugal?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "role.employee.contract_or_declaration_available",
@@ -36,7 +36,7 @@
       "label": "As a remote employee, can you provide an employment contract, promise of contract, or employer declaration confirming the work relationship?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.work_relationship", "remote_employee"] }
     },
     {
@@ -45,7 +45,7 @@
       "label": "As an independent professional, can you provide service contracts, a written service proposal, or proof of services to one or more entities?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.work_relationship", "freelancer_independent"] }
     },
     {
@@ -54,7 +54,7 @@
       "label": "As a business owner, can you provide company documents plus contracts, proposals, or client proof showing services to entities outside Portugal?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.work_relationship", "business_owner_company_service"] }
     },
     {
@@ -86,7 +86,7 @@
       "label": "Can you provide a tax residence certificate or document attesting fiscal residence?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.applicant_type",
@@ -118,7 +118,7 @@
       "label": "Can you provide family relationship proof for each included dependent?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -127,7 +127,7 @@
       "label": "Can you show stable and regular means sufficient for you and your included family members for the stay or 12 months, whichever is less?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -143,7 +143,7 @@
       "label": "Are you applying from your country of nationality?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.lawful_residence_where_applying",
@@ -151,7 +151,7 @@
       "label": "If applying outside your country of nationality, can you prove lawful residence there beyond the requested visa period?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.application_country_matches_nationality", "no"] }
     },
     {
@@ -175,7 +175,7 @@
       "label": "Can you obtain the required criminal record certificate from your nationality country or any country where you lived over 1 year?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "under_16_exempt", "no", "not_sure"]
+      "choices": ["yes", "under_16_exempt", "no"]
     },
     {
       "key": "routing.criminal_record_flag",
@@ -183,7 +183,7 @@
       "label": "Do you have any criminal convictions that may appear on the required certificate?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.removal_or_refusal_alert_flag",
@@ -191,7 +191,7 @@
       "label": "Are you aware of any active entry or stay ban, removal order, or SII/UCFE refusal alert that may affect residence in Portugal?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "housing.settlement_statement_ready",
@@ -199,37 +199,11 @@
       "label": "Can you provide a personal statement explaining your reason for settling in Portugal, intended area of residence, and accommodation type?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.aima_residence_permit_acknowledged",
-      "depends_on": ["housing.settlement_statement_ready"],
-      "label": "Do you understand that after entry with a residence visa, you must apply to AIMA for the residence permit?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.visa_route", "residence_visa"] }
-    },
-    {
-      "key": "compliance.renewal_acknowledged",
-      "depends_on": ["compliance.aima_residence_permit_acknowledged"],
-      "label": "Do you understand the remote-work residence authorization is initially valid for 2 years and may be renewed for successive 3-year periods if requirements remain satisfied?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.visa_route", "residence_visa"] }
-    },
-    {
-      "key": "consulate.discretion_extra_documents_acknowledged",
-      "depends_on": ["compliance.renewal_acknowledged"],
-      "label": "Do you understand missing mandatory documents may lead to rejection and the consulate may request supplementary documents?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "compliance.truthful_documents_acknowledged",
-      "depends_on": ["consulate.discretion_extra_documents_acknowledged"],
+      "depends_on": ["housing.settlement_statement_ready"],
       "label": "Do you understand false statements can cause refusal or annulment of a visa and legal action under Portuguese law?",
       "input_type": "choice",
       "required": true,
@@ -242,5 +216,26 @@
       "input_type": "text",
       "required": false
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "These are real Portugal Digital Nomad Visa requirements sourced from requirements_reference.md, but they describe post-entry / renewal-stage compliance steps rather than facts needed to determine INITIAL visa eligibility. They were removed from the live eligibility-screening flow and are preserved here for a future post-eligibility guidance surface. Their former requirement codes still exist in clarifications.json for that purpose.",
+    "fields": [
+      {
+        "key": "compliance.aima_residence_permit_acknowledged",
+        "label": "Do you understand that after entry with a residence visa, you must apply to AIMA for the residence permit?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "applies_when": { "equals": ["routing.visa_route", "residence_visa"] },
+        "related_requirement": "aima_residence_permit_acknowledgement_needs_review"
+      },
+      {
+        "key": "compliance.renewal_acknowledged",
+        "label": "Do you understand the remote-work residence authorization is initially valid for 2 years and may be renewed for successive 3-year periods if requirements remain satisfied?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "applies_when": { "equals": ["routing.visa_route", "residence_visa"] },
+        "related_requirement": "renewal_acknowledgement_needs_review"
+      }
+    ]
+  }
 }

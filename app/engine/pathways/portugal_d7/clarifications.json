@@ -145,12 +145,9 @@
     {
       "requirement": "aima_residence_step_needs_review",
       "title": "AIMA Residence Step Needs Review",
-      "clarification": "After D7 visa approval, the applicant must request a residence title from AIMA during the residence stage. The applicant's understanding of this post-approval step is unclear and should be reviewed."
-    },
-    {
-      "requirement": "discretionary_extra_documents_needs_review",
-      "title": "Discretionary Extra-Document Review",
-      "clarification": "Missing mandatory documents may lead to refusal, and the consular service may request supplementary documents. The applicant's understanding of this discretionary review is unclear."
+      "clarification": "After D7 visa approval, the applicant must request a residence title from AIMA during the residence stage. The applicant's understanding of this post-approval step is unclear and should be reviewed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.aima_residence_step_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "false_statement_risk_not_acknowledged",

@@ -142,9 +142,6 @@
       "family_documents_needs_review": {
         "text": "Family relationship documents are missing, unclear, or not confirmed and need manual review."
       },
-      "portal_ari_family_process_needs_review": {
-        "text": "The Portal ARI family process acknowledgment is missing or unclear for the family reunification route."
-      },
       "passport_unavailable": {
         "text": "Portugal ARI guidance requires a valid passport. Based on the information provided, this requirement is not currently met."
       },
@@ -203,16 +200,14 @@
         "text": "The sworn investment-maintenance declaration is missing or unclear and needs manual review."
       },
       "minimum_stay_acknowledgement_needs_review": {
-        "text": "The Portugal ARI minimum physical stay requirement acknowledgment is missing or unclear and needs manual review."
-      },
-      "portal_ari_process_needs_review": {
-        "text": "The Portal ARI process acknowledgment is missing or unclear and needs manual review."
+        "text": "The Portugal ARI minimum physical stay requirement acknowledgment is missing or unclear and needs manual review.",
+        "stage": "post_eligibility_checklist",
+        "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.minimum_stay_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
       },
       "renewal_investment_maintenance_needs_review": {
-        "text": "The renewal investment-maintenance acknowledgment is missing or unclear and needs manual review."
-      },
-      "permanent_residence_later_stage_needs_review": {
-        "text": "The permanent residence later-stage acknowledgment is missing or unclear and needs manual review."
+        "text": "The renewal investment-maintenance acknowledgment is missing or unclear and needs manual review.",
+        "stage": "post_eligibility_checklist",
+        "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.renewal_investment_maintenance_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
       }
     }
   },
@@ -473,7 +468,9 @@
         "action": {
           "label": "Wait for minimum-stay review",
           "type": "email_followup"
-        }
+        },
+        "stage": "post_eligibility_checklist",
+        "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.minimum_stay_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
       },
       "family_documents_needs_review": {
         "enabled": true,
@@ -486,28 +483,6 @@
           "type": "email_followup"
         }
       },
-      "portal_ari_process_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your Portal ARI process acknowledgment needs manual review.",
-          "The team should confirm you understand Portal ARI registration, document upload, fee payment, and AIMA appointment scheduling."
-        ],
-        "action": {
-          "label": "Wait for Portal ARI review",
-          "type": "email_followup"
-        }
-      },
-      "portal_ari_family_process_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your Portal ARI family process acknowledgment needs manual review.",
-          "The team should confirm how family reunification applications will be handled through Portal ARI."
-        ],
-        "action": {
-          "label": "Wait for family-process review",
-          "type": "email_followup"
-        }
-      },
       "renewal_investment_maintenance_needs_review": {
         "enabled": true,
         "text": [
@@ -517,18 +492,9 @@
         "action": {
           "label": "Wait for renewal review",
           "type": "email_followup"
-        }
-      },
-      "permanent_residence_later_stage_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your permanent residence later-stage acknowledgment needs manual review.",
-          "The team should confirm you understand permanent residence is a later-stage option only if Article 80 requirements are met."
-        ],
-        "action": {
-          "label": "Wait for later-stage review",
-          "type": "email_followup"
-        }
+        },
+        "stage": "post_eligibility_checklist",
+        "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.renewal_investment_maintenance_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
       }
     }
   }

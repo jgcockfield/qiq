@@ -34,26 +34,25 @@
         "boston",
         "los_angeles",
         "paris",
-        "other",
-        "not_sure"
+        "other"
       ]
     },
     {
-      "key": "routing.no_work_in_italy_acknowledged",
+      "key": "work.intends_to_work_in_italy",
       "depends_on": ["routing.consulate_jurisdiction"],
-      "label": "Is your Italy Elective Residence Visa case based on living in Italy without working there?",
+      "label": "Do you plan to work while living in Italy under this visa?",
       "description": "This pathway is a passive-income / no-work residence visa, not a digital nomad or remote-work visa.",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.stable_residence_intent",
-      "depends_on": ["routing.no_work_in_italy_acknowledged"],
+      "depends_on": ["work.intends_to_work_in_italy"],
       "label": "Is your intent to reside stably in Italy rather than use this visa for extended tourism?",
       "input_type": "choice",
       "required": true,
-      "choices": ["stable_residence", "extended_tourism", "not_sure"]
+      "choices": ["stable_residence", "extended_tourism"]
     },
     {
       "key": "financial.annual_passive_income_eur",
@@ -85,8 +84,7 @@
         "trusts",
         "stable_commercial_activity",
         "employment_or_work_income",
-        "other",
-        "not_sure"
+        "other"
       ]
     },
     {
@@ -114,8 +112,7 @@
       "choices": [
         "two_years_complete_with_schedules",
         "two_years_basic_returns_only",
-        "less_than_two_years",
-        "not_sure"
+        "less_than_two_years"
       ]
     },
     {
@@ -129,8 +126,7 @@
         "rental_contract",
         "property_deed",
         "hotel_or_short_term_bookings",
-        "not_available",
-        "not_sure"
+        "not_available"
       ]
     },
     {
@@ -147,7 +143,7 @@
       "label": "Does or will the insurance cover medical care, hospitalization, and consular minimum coverage such as EUR 30,000 where required?",
       "input_type": "choice",
       "required": true,
-      "choices": ["meets_consular_coverage", "partial_or_unclear", "not_sure"]
+      "choices": ["meets_consular_coverage", "partial_or_unclear"]
     },
     {
       "key": "routing.passport_validity_months",
@@ -162,7 +158,7 @@
       "label": "Was your passport issued within the previous 10 years?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.passport_blank_pages",
@@ -177,7 +173,7 @@
       "label": "If filing through San Francisco, can you provide an FBI Identity History Summary issued within the last 6 months?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.consulate_jurisdiction", "san_francisco"] }
     },
     {
@@ -202,7 +198,7 @@
       "label": "If any dependent adult children are included, do they live with and depend on the parent applicant?",
       "input_type": "choice",
       "required": true,
-      "choices": ["no_adult_children", "yes", "no", "not_sure"],
+      "choices": ["no_adult_children", "yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -211,7 +207,7 @@
       "label": "Can you provide marriage, birth, or other family relationship documents for each included dependent?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -231,16 +227,8 @@
       "choices": ["yes", "no", "not_sure"]
     },
     {
-      "key": "consulate.additional_documents_acknowledged",
-      "depends_on": ["compliance.annual_renewal_acknowledged"],
-      "label": "Do you understand the consulate may request additional documents and that submitting all documents does not guarantee approval?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
       "key": "routing.additional_information",
-      "depends_on": ["consulate.additional_documents_acknowledged"],
+      "depends_on": ["compliance.annual_renewal_acknowledged"],
       "label": "What else about your Italy Elective Residence Visa situation should QIQ consider?",
       "input_type": "text",
       "required": false

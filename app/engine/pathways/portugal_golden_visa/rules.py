@@ -315,12 +315,11 @@ def _evaluate_applicant_route(payload: Dict[str, Any], failed: List[str]) -> Non
     elif not _is_yes(family_documents):
         failed.append("family_documents_needs_review")
 
-    portal_family = _get_dotted(
-        payload,
-        "process.portal_ari_family_application_acknowledged",
-    )
-    if not _is_yes(portal_family):
-        failed.append("portal_ari_family_process_needs_review")
+    # NOTE: process.portal_ari_family_application_acknowledged was removed from
+    # the live eligibility flow (and from this function) because it describes a
+    # portal/process step, not a fact needed to determine INITIAL eligibility.
+    # See questions.json's "post_eligibility_checklist" block and
+    # clarifications.json for the preserved question/requirement content.
 
 
 def _evaluate_documents_and_disqualifiers(
@@ -412,27 +411,18 @@ def _evaluate_compliance(payload: Dict[str, Any], failed: List[str]) -> None:
         review_key="investment_maintenance_declaration_needs_review",
     )
 
-    minimum_stay = _get_dotted(payload, "compliance.minimum_stay_acknowledged")
-    if not _is_yes(minimum_stay):
-        failed.append("minimum_stay_acknowledgement_needs_review")
-
-    portal_ari = _get_dotted(payload, "process.portal_ari_acknowledged")
-    if not _is_yes(portal_ari):
-        failed.append("portal_ari_process_needs_review")
-
-    renewal = _get_dotted(
-        payload,
-        "compliance.renewal_investment_maintenance_acknowledged",
-    )
-    if not _is_yes(renewal):
-        failed.append("renewal_investment_maintenance_needs_review")
-
-    permanent_residence = _get_dotted(
-        payload,
-        "compliance.permanent_residence_later_stage_acknowledged",
-    )
-    if not _is_yes(permanent_residence):
-        failed.append("permanent_residence_later_stage_needs_review")
+    # NOTE: compliance.minimum_stay_acknowledged and
+    # compliance.renewal_investment_maintenance_acknowledged were removed from
+    # the live eligibility flow (and from this function) because they describe
+    # post-approval / renewal-stage steps, not facts needed to determine INITIAL
+    # eligibility. They are preserved in questions.json's
+    # "post_eligibility_checklist" block and in clarifications.json.
+    #
+    # NOTE: process.portal_ari_acknowledged and
+    # compliance.permanent_residence_later_stage_acknowledged were removed
+    # entirely (not preserved) -- the former is a pure portal-process
+    # disclaimer, and the latter describes a separate, later-stage application
+    # (permanent residence) with no ARI-eligibility relevance.
 
 
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:

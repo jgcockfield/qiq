@@ -188,11 +188,6 @@
       "clarification": "Family reunification cases require relationship documents for each included family member. The availability or sufficiency of those documents is missing, unclear, or not confirmed."
     },
     {
-      "requirement": "portal_ari_family_process_needs_review",
-      "title": "Portal ARI Family Process Needs Review",
-      "clarification": "When family members are included, the applicant should understand that family applications may be handled through Portal ARI as part of family reunification. This acknowledgment is missing or unclear."
-    },
-    {
       "requirement": "passport_unavailable",
       "title": "Valid Passport Missing",
       "clarification": "Portugal ARI guidance requires a valid passport. Without a valid passport, the case does not appear to meet this mandatory document requirement."
@@ -290,22 +285,16 @@
     {
       "requirement": "minimum_stay_acknowledgement_needs_review",
       "title": "Minimum Stay Requirement Needs Review",
-      "clarification": "Portugal ARI requires at least 7 days of physical presence in the first year and 14 days in subsequent years. The applicant's acknowledgment of this minimum-stay requirement is missing or unclear."
-    },
-    {
-      "requirement": "portal_ari_process_needs_review",
-      "title": "Portal ARI Process Needs Review",
-      "clarification": "Portal ARI is used to register the application, upload documents, pay fees, and schedule the AIMA appointment. The applicant's acknowledgment of this process is missing or unclear."
+      "clarification": "Portugal ARI requires at least 7 days of physical presence in the first year and 14 days in subsequent years. The applicant's acknowledgment of this minimum-stay requirement is missing or unclear.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.minimum_stay_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "renewal_investment_maintenance_needs_review",
       "title": "Renewal Investment-Maintenance Needs Review",
-      "clarification": "Portugal ARI renewal requires maintaining the qualifying investment requirements and may require updated investment proof, compliance certificates, and criminal checks. The applicant's acknowledgment is missing or unclear."
-    },
-    {
-      "requirement": "permanent_residence_later_stage_needs_review",
-      "title": "Permanent Residence Later-Stage Note Needs Review",
-      "clarification": "Permanent residence is a later-stage option only if Article 80 requirements are met. The applicant's acknowledgment of this later-stage distinction is missing or unclear."
+      "clarification": "Portugal ARI renewal requires maintaining the qualifying investment requirements and may require updated investment proof, compliance certificates, and criminal checks. The applicant's acknowledgment is missing or unclear.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.renewal_investment_maintenance_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     }
   ]
 }

@@ -45,20 +45,21 @@
       "choices": ["yes", "no"]
     },
     {
-      "key": "routing.no_work_authorization_acknowledged",
+      "key": "work.intends_to_work_in_costa_rica",
       "depends_on": ["role.pensionado.pension_retirement_based"],
-      "label": "Is your Costa Rica Pensionado case based on pension income rather than Costa Rican employment?",
+      "label": "Do you plan to work in Costa Rica under this pensionado status?",
+      "description": "Pensionado status is based on pension income, not Costa Rican employment.",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
     },
     {
       "key": "role.pensionado.pension_foreign_source_confirmed",
-      "depends_on": ["routing.no_work_authorization_acknowledged"],
+      "depends_on": ["work.intends_to_work_in_costa_rica"],
       "label": "Is the pension income issued from outside Costa Rica?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "role.pensionado.monthly_pension_usd",
@@ -85,8 +86,7 @@
       "choices": [
         "lifetime_or_indefinite",
         "fixed_term_12_months_or_more",
-        "fixed_term_less_than_12_months",
-        "not_sure"
+        "fixed_term_less_than_12_months"
       ]
     },
     {
@@ -136,16 +136,8 @@
       "choices": ["yes", "no"]
     },
     {
-      "key": "documents.ccss_renewal_ready",
-      "depends_on": ["documents.passport_copy_available"],
-      "label": "Do you have CCSS or Costa Rican social insurance coverage, or will you register after approval?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["already_registered", "will_register_after_approval", "not_ready"]
-    },
-    {
       "key": "documents.police_clearance_available",
-      "depends_on": ["documents.ccss_renewal_ready"],
+      "depends_on": ["documents.passport_copy_available"],
       "label": "Can you obtain a criminal background certificate from your country of origin or legal residence?",
       "input_type": "choice",
       "required": true,
@@ -216,27 +208,30 @@
       "choices": ["can_document", "will_document_after_approval", "cannot_document"]
     },
     {
-      "key": "routing.temporary_residence_acknowledged",
-      "depends_on": ["documents.pension_receipt_costa_rica_evidence_available"],
-      "label": "Are you seeking Costa Rica Pensionado as a temporary residence category?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"]
-    },
-    {
-      "key": "routing.renewal_every_two_years_acknowledged",
-      "depends_on": ["routing.temporary_residence_acknowledged"],
-      "label": "Will you renew Pensionado temporary residence every 2 years if approved?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"]
-    },
-    {
       "key": "routing.additional_information",
-      "depends_on": ["routing.renewal_every_two_years_acknowledged"],
+      "depends_on": ["documents.pension_receipt_costa_rica_evidence_available"],
       "label": "What else about your pension, dependents, or Costa Rica residency plans should QIQ consider?",
       "input_type": "text",
       "required": false
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "These are real Costa Rica Pensionado requirements sourced from requirements_reference.md, but they describe renewal-stage or post-approval compliance steps rather than facts needed to determine INITIAL eligibility. They were removed from the live eligibility-screening flow and are preserved here for a future post-eligibility / renewal-guidance surface. Their former requirement codes still exist in clarifications.json for that purpose.",
+    "fields": [
+      {
+        "key": "documents.ccss_renewal_ready",
+        "label": "Do you have CCSS or Costa Rican social insurance coverage, or will you register after approval?",
+        "input_type": "choice",
+        "choices": ["already_registered", "will_register_after_approval", "not_ready"],
+        "related_requirement": "ccss_renewal_not_ready"
+      },
+      {
+        "key": "routing.renewal_every_two_years_acknowledged",
+        "label": "Will you renew Pensionado temporary residence every 2 years if approved?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "related_requirement": "renewal_acknowledgement_missing"
+      }
+    ]
+  }
 }

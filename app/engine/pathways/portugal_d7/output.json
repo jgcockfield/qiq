@@ -246,18 +246,9 @@
         "action": {
           "label": "Wait for AIMA-step review",
           "type": "email_followup"
-        }
-      },
-      "discretionary_extra_documents_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your consular extra-document acknowledgment needs manual review.",
-          "The team should confirm that you understand the consulate may request supplementary documents and that missing mandatory documents can lead to refusal."
-        ],
-        "action": {
-          "label": "Wait for consular-discretion review",
-          "type": "email_followup"
-        }
+        },
+        "stage": "post_eligibility_checklist",
+        "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.aima_residence_step_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
       },
       "truthful_documents_needs_review": {
         "enabled": true,

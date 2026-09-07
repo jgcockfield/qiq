@@ -154,13 +154,13 @@ def _evaluate_route_intent(payload: Dict[str, Any], failed: List[str]) -> None:
     if consulate_jurisdiction in {None, "", "not_sure", "other"}:
         failed.append("consulate_jurisdiction_needs_review")
 
-    no_work_acknowledged = _get_dotted(
+    intends_to_work = _get_dotted(
         payload,
-        "routing.no_work_in_italy_acknowledged",
+        "work.intends_to_work_in_italy",
     )
-    if _is_no(no_work_acknowledged):
+    if _is_yes(intends_to_work):
         failed.append("no_work_in_italy_not_confirmed")
-    elif not _is_yes(no_work_acknowledged):
+    elif not _is_no(intends_to_work):
         failed.append("no_work_in_italy_needs_review")
 
     residence_intent = _get_dotted(payload, "routing.stable_residence_intent")
@@ -299,12 +299,9 @@ def _evaluate_background_and_compliance(
     elif not _is_yes(renewal_acknowledged):
         failed.append("renewal_acknowledgement_needs_review")
 
-    extra_documents_acknowledged = _get_dotted(
-        payload,
-        "consulate.additional_documents_acknowledged",
-    )
-    if not _is_yes(extra_documents_acknowledged):
-        failed.append("consulate_discretion_extra_documents_needs_review")
+    # NOTE: consulate.additional_documents_acknowledged was removed entirely (not
+    # preserved) -- it was a pure consular-discretion disclaimer ("submitting all
+    # documents does not guarantee approval") with no eligibility fact behind it.
 
 
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:

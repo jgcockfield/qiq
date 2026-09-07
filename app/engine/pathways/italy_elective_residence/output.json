@@ -222,17 +222,6 @@
           "label": "Wait for family-document review",
           "type": "email_followup"
         }
-      },
-      "consulate_discretion_extra_documents_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your case needs manual review for consular discretion.",
-          "The team should confirm that you understand the consulate may request additional documents and that submitting all documents does not guarantee approval."
-        ],
-        "action": {
-          "label": "Wait for consular-discretion review",
-          "type": "email_followup"
-        }
       }
     }
   }

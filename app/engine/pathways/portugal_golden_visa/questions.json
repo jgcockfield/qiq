@@ -20,7 +20,7 @@
       "description": "Portugal Golden Visa / ARI is not available to Portuguese, EU, EEA, Andorra, or Swiss nationals.",
       "input_type": "choice",
       "required": true,
-      "choices": ["third_country_national", "portuguese_eu_eea_andorra_swiss", "not_sure"]
+      "choices": ["third_country_national", "portuguese_eu_eea_andorra_swiss"]
     },
     {
       "key": "investment.route",
@@ -34,8 +34,7 @@
         "arts_cultural_heritage",
         "non_real_estate_investment_fund",
         "company_capitalization_jobs",
-        "real_estate_only",
-        "not_sure"
+        "real_estate_only"
       ]
     },
     {
@@ -45,7 +44,7 @@
       "description": "AIMA's current ARI page does not list real-estate purchase or real-estate rehabilitation as qualifying categories.",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "not_equals": ["investment.route", "real_estate_only"] }
     },
     {
@@ -63,7 +62,7 @@
       "label": "Can you provide employment creation proof, company records, and Social Security evidence for the job creation route?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "job_creation"] }
     },
     {
@@ -81,7 +80,7 @@
       "label": "Can you provide transfer proof and confirmation from the qualifying scientific research institution?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "scientific_research"] }
     },
     {
@@ -99,7 +98,7 @@
       "label": "Can you provide transfer proof and confirmation from the qualifying arts or cultural heritage entity?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "arts_cultural_heritage"] }
     },
     {
@@ -117,7 +116,7 @@
       "label": "Is the fund a non-real-estate collective investment under Portuguese law?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "non_real_estate_investment_fund"] }
     },
     {
@@ -126,7 +125,7 @@
       "label": "Does the fund have 5-year maturity and at least 60% invested in Portuguese companies?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "non_real_estate_investment_fund"] }
     },
     {
@@ -135,7 +134,7 @@
       "label": "Can you provide fund subscription proof and fund documentation?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "non_real_estate_investment_fund"] }
     },
     {
@@ -156,8 +155,7 @@
       "choices": [
         "create_5_permanent_jobs",
         "maintain_10_jobs_minimum_5_permanent_for_3_years",
-        "does_not_meet_job_requirement",
-        "not_sure"
+        "does_not_meet_job_requirement"
       ],
       "applies_when": { "equals": ["investment.route", "company_capitalization_jobs"] }
     },
@@ -167,7 +165,7 @@
       "label": "Can you provide capital transfer proof, commercial registry records, and employment records for the company capitalization route?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["investment.route", "company_capitalization_jobs"] }
     },
     {
@@ -176,7 +174,7 @@
       "label": "Can you provide investment transfer proof, fund documentation, company records, or other evidence required for your selected investment route?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.applicant_type",
@@ -208,16 +206,7 @@
       "label": "Can you provide family relationship documents for each included family member?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
-      "key": "process.portal_ari_family_application_acknowledged",
-      "depends_on": ["routing.family_documents_available"],
-      "label": "Do you understand that family applications may be handled through Portal ARI as part of the family reunification process?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -226,7 +215,7 @@
       "label": "Do you have a valid passport available for the Portugal ARI application?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "documents.criminal_record_certificate_available",
@@ -237,8 +226,7 @@
       "choices": [
         "yes_recent_translated_apostilled",
         "available_but_needs_translation_or_apostille",
-        "no",
-        "not_sure"
+        "no"
       ]
     },
     {
@@ -247,7 +235,7 @@
       "label": "Do you have a conviction for a crime punishable in Portugal by imprisonment over 1 year?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.entry_stay_ban_flag",
@@ -255,7 +243,7 @@
       "label": "Are you under any entry or stay ban after removal?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.sii_ucfe_refusal_alert_flag",
@@ -263,7 +251,7 @@
       "label": "Are you flagged in SII or UCFE for refusal of entry, stay, or return?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "documents.portuguese_tax_clearance_status",
@@ -271,7 +259,7 @@
       "label": "Can you provide a Portuguese Tax Authority certificate of no debts or proof of non-registration?",
       "input_type": "choice",
       "required": true,
-      "choices": ["debt_clearance_certificate", "non_registration_proof", "has_tax_debts", "not_sure"]
+      "choices": ["debt_clearance_certificate", "non_registration_proof", "has_tax_debts"]
     },
     {
       "key": "documents.social_security_clearance_status",
@@ -279,7 +267,7 @@
       "label": "Can you provide a Social Security certificate of no debts or proof of non-registration?",
       "input_type": "choice",
       "required": true,
-      "choices": ["debt_clearance_certificate", "non_registration_proof", "has_social_security_debts", "not_sure"]
+      "choices": ["debt_clearance_certificate", "non_registration_proof", "has_social_security_debts"]
     },
     {
       "key": "documents.foreign_tax_id_disclosure_available",
@@ -287,7 +275,7 @@
       "label": "Can you provide personal tax identification numbers from your country of origin, residence, or tax residence, or proof that none exists?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "proof_none_exists", "no", "not_sure"]
+      "choices": ["yes", "proof_none_exists", "no"]
     },
     {
       "key": "compliance.investment_maintenance_declaration_available",
@@ -295,46 +283,33 @@
       "label": "Can you provide a sworn statement confirming compliance with the minimum quantitative and time requirements for your investment?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.minimum_stay_acknowledged",
-      "depends_on": ["compliance.investment_maintenance_declaration_available"],
-      "label": "Do you understand the Portugal ARI minimum-stay requirement of at least 7 days in the first year and 14 days in subsequent years?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "process.portal_ari_acknowledged",
-      "depends_on": ["compliance.minimum_stay_acknowledged"],
-      "label": "Do you understand that Portal ARI is used to register the application, upload documents, pay fees, and schedule the AIMA appointment?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.renewal_investment_maintenance_acknowledged",
-      "depends_on": ["process.portal_ari_acknowledged"],
-      "label": "Do you understand that ARI renewal requires maintaining the qualifying investment requirements and may require updated investment proof, compliance certificates, and criminal checks?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.permanent_residence_later_stage_acknowledged",
-      "depends_on": ["compliance.renewal_investment_maintenance_acknowledged"],
-      "label": "Do you understand that permanent residence is a later-stage option only if Article 80 requirements are met?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.additional_information",
-      "depends_on": ["compliance.permanent_residence_later_stage_acknowledged"],
+      "depends_on": ["compliance.investment_maintenance_declaration_available"],
       "label": "What else about your Portugal Golden Visa / ARI situation should QIQ consider?",
       "input_type": "text",
       "required": false
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "These are real Portugal Golden Visa / ARI requirements sourced from requirements_reference.md, but they describe post-approval / renewal-stage / portal-process steps rather than facts needed to determine INITIAL eligibility. They were removed from the live eligibility-screening flow and are preserved here for a future post-eligibility guidance surface. Their former requirement codes still exist in clarifications.json for that purpose.",
+    "fields": [
+      {
+        "key": "compliance.minimum_stay_acknowledged",
+        "label": "Do you understand the Portugal ARI minimum-stay requirement of at least 7 days in the first year and 14 days in subsequent years?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "related_requirement": "minimum_stay_acknowledgement_needs_review"
+      },
+      {
+        "key": "compliance.renewal_investment_maintenance_acknowledged",
+        "label": "Do you understand that ARI renewal requires maintaining the qualifying investment requirements and may require updated investment proof, compliance certificates, and criminal checks?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "related_requirement": "renewal_investment_maintenance_needs_review"
+      }
+    ]
+  }
 }

@@ -27,7 +27,7 @@
       "label": "Are you an EU, EEA, or Swiss citizen, or covered by EU free-movement rules?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.irregular_presence_spain",
@@ -35,7 +35,7 @@
       "label": "Are you currently irregularly present in Spain?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.application_route",
@@ -43,7 +43,7 @@
       "label": "Where do you expect to file the Spain Student Visa or study-stay application?",
       "input_type": "choice",
       "required": true,
-      "choices": ["consular_outside_spain", "in_spain", "not_sure"]
+      "choices": ["consular_outside_spain", "in_spain"]
     },
     {
       "key": "routing.lawful_status_in_spain",
@@ -51,7 +51,7 @@
       "label": "If filing from Spain, are you legally present in Spain now?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.application_route", "in_spain"] }
     },
     {
@@ -76,7 +76,7 @@
       "label": "Have you been accepted by an authorized or recognized institution, center, or program in Spain?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "study.full_time_recognized_program",
@@ -84,7 +84,7 @@
       "label": "Is the program full-time and recognized for the study category you selected?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "study.modality",
@@ -92,7 +92,7 @@
       "label": "What is the study modality for the program?",
       "input_type": "choice",
       "required": true,
-      "choices": ["in_person", "hybrid", "online", "not_sure"]
+      "choices": ["in_person", "hybrid", "online"]
     },
     {
       "key": "study.in_person_requirement_met",
@@ -100,7 +100,7 @@
       "label": "Does the program meet Spain's in-person or hybrid attendance requirement for your study category?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "study.program_duration_months",
@@ -115,7 +115,7 @@
       "label": "Will your stay in Spain be longer than 6 months?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "study.application_timing_status",
@@ -126,8 +126,7 @@
       "choices": [
         "at_least_2_months_before_start",
         "less_than_2_months_with_justification",
-        "less_than_2_months_no_justification",
-        "not_sure"
+        "less_than_2_months_no_justification"
       ]
     },
     {
@@ -139,8 +138,7 @@
       "choices": [
         "paid_or_proven",
         "responsible_declaration_available",
-        "not_available",
-        "not_sure"
+        "not_available"
       ]
     },
     {
@@ -157,7 +155,7 @@
       "label": "Is accommodation prepaid for the full stay?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "financial.funds_evidence_types",
@@ -203,7 +201,7 @@
       "label": "Are any included dependents minor children?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -212,7 +210,7 @@
       "label": "Is your study category eligible to include family dependents?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -221,7 +219,7 @@
       "label": "Will any included family member work in Spain under the student-family stay?",
       "input_type": "choice",
       "required": true,
-      "choices": ["no_work", "intend_to_work", "not_sure"],
+      "choices": ["no_work", "intend_to_work"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -245,7 +243,7 @@
       "label": "If the stay is longer than 6 months, are you of criminal age in the relevant jurisdiction?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["study.stay_over_6_months", "yes"] }
     },
     {
@@ -254,7 +252,7 @@
       "label": "Can you obtain criminal record certificates for your country of origin and countries of residence during the previous 5 years?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["study.stay_over_6_months", "yes"] }
     },
     {
@@ -263,7 +261,7 @@
       "label": "Do you have any criminal convictions that may appear on those background checks?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["study.stay_over_6_months", "yes"] }
     },
     {
@@ -272,7 +270,7 @@
       "label": "Are you aware of any public-order, security, public-health, or entry-ban issue that may affect admission to Spain?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.public_health_disease_flag",
@@ -280,7 +278,7 @@
       "label": "Do you have any disease with serious public-health implications under the International Health Regulations?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "study.student_work_intent",
@@ -291,8 +289,7 @@
       "choices": [
         "no_work",
         "work_30_hours_or_less_and_study_compatible",
-        "work_over_30_hours_or_not_study_compatible",
-        "not_sure"
+        "work_over_30_hours_or_not_study_compatible"
       ]
     },
     {

@@ -52,6 +52,10 @@ def _is_yes(value: Any) -> bool:
     return value == "yes" or value is True
 
 
+def _is_no(value: Any) -> bool:
+    return value == "no" or value is False
+
+
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     routing = payload.get("routing", {}) if isinstance(payload, dict) else {}
     applicant_type = _get_dotted(payload, "routing.applicant_type")
@@ -73,6 +77,9 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     if not _is_yes(_get_dotted(payload, "role.pensionado.pension_foreign_source_confirmed")):
         failed.append("foreign_pension_source_unconfirmed")
+
+    if not _is_no(_get_dotted(payload, "work.intends_to_work_in_costa_rica")):
+        failed.append("work_authorization_acknowledgement_missing")
 
     pension_duration = _get_dotted(payload, "role.pensionado.pension_duration_type")
     if pension_duration != "lifetime_or_indefinite":
@@ -119,10 +126,6 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         if not _is_yes(_get_dotted(payload, "documents.dependent_documents_available")):
             failed.append("dependent_documents_unavailable")
 
-    ccss_renewal_ready = _get_dotted(payload, "documents.ccss_renewal_ready")
-    if ccss_renewal_ready not in {"already_registered", "will_register_after_approval"}:
-        failed.append("ccss_renewal_not_ready")
-
     pension_receipt_evidence = _get_dotted(
         payload,
         "documents.pension_receipt_costa_rica_evidence_available",
@@ -130,14 +133,14 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     if pension_receipt_evidence not in {"can_document", "will_document_after_approval"}:
         failed.append("pension_receipt_costa_rica_evidence_unavailable")
 
-    if not _is_yes(_get_dotted(payload, "routing.no_work_authorization_acknowledged")):
-        failed.append("work_authorization_acknowledgement_missing")
-
-    if not _is_yes(_get_dotted(payload, "routing.temporary_residence_acknowledged")):
-        failed.append("temporary_residence_acknowledgement_missing")
-
-    if not _is_yes(_get_dotted(payload, "routing.renewal_every_two_years_acknowledged")):
-        failed.append("renewal_acknowledgement_missing")
+    # NOTE: documents.ccss_renewal_ready and routing.renewal_every_two_years_acknowledged
+    # were removed from the live eligibility flow (and from this function) because they
+    # are renewal-stage requirements per requirements_reference.md, not facts needed to
+    # determine INITIAL eligibility. routing.temporary_residence_acknowledged was removed
+    # entirely (not preserved) because it merely re-confirmed a fact already implied by
+    # selecting this pathway. See questions.json's "post_eligibility_checklist" block for
+    # the two preserved questions and clarifications.json for their (now dormant)
+    # requirement codes.
 
     if any(requirement in HARD_FAILURES for requirement in failed):
         status = "not_eligible"

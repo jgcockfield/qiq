@@ -289,19 +289,15 @@ def _evaluate_background_and_compliance(
     elif criminal_record != "no":
         failed.append("criminal_record_needs_review")
 
-    aima_acknowledged = _get_dotted(
-        payload,
-        "compliance.aima_residence_step_acknowledged",
-    )
-    if not _is_yes(aima_acknowledged):
-        failed.append("aima_residence_step_needs_review")
-
-    extra_documents_acknowledged = _get_dotted(
-        payload,
-        "consulate.discretion_extra_documents_acknowledged",
-    )
-    if not _is_yes(extra_documents_acknowledged):
-        failed.append("discretionary_extra_documents_needs_review")
+    # NOTE: compliance.aima_residence_step_acknowledged was removed from the live
+    # eligibility flow (and from this function) because requesting a residence
+    # title from AIMA is a post-approval step, not a fact needed to determine
+    # INITIAL visa eligibility. See questions.json's "post_eligibility_checklist"
+    # block and clarifications.json for the preserved question/requirement content.
+    #
+    # NOTE: consulate.discretion_extra_documents_acknowledged was removed entirely
+    # (not preserved) -- it was a pure consular-discretion disclaimer with no
+    # eligibility fact behind it.
 
     truthful_documents_acknowledged = _get_dotted(
         payload,

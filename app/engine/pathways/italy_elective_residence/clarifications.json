@@ -201,11 +201,6 @@
       "requirement": "renewal_acknowledgement_needs_review",
       "title": "Renewal Requirement Needs Review",
       "clarification": "The applicant's understanding of annual renewal requirements is unclear. The case should be reviewed to confirm the applicant can maintain income, housing, insurance, and related conditions."
-    },
-    {
-      "requirement": "consulate_discretion_extra_documents_needs_review",
-      "title": "Consular Discretion Needs Review",
-      "clarification": "Submitting all listed documents does not guarantee approval, and the consulate may request additional evidence. The applicant's understanding of this discretionary review should be confirmed."
     }
   ]
 }

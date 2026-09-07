@@ -39,10 +39,147 @@ def test_pathway_registry_aliases():
     assert resolve_pathway("costa_rica_dnv").canonical_id == "costa_rica_dnv"
     assert resolve_pathway("spain-dnv").canonical_id == "spain_dnv"
     assert resolve_pathway("spain_dnv").canonical_id == "spain_dnv"
+    assert resolve_pathway("spain-nlv").canonical_id == "spain_nlv"
+    assert resolve_pathway("spain_nlv").canonical_id == "spain_nlv"
+    assert resolve_pathway("spain-student-visa").canonical_id == "spain_student_visa"
+    assert resolve_pathway("spain_student_visa").canonical_id == "spain_student_visa"
+    assert (
+        resolve_pathway("italy-elective-residence").canonical_id
+        == "italy_elective_residence"
+    )
+    assert (
+        resolve_pathway("italy_elective_residence").canonical_id
+        == "italy_elective_residence"
+    )
+    assert resolve_pathway("portugal-d7").canonical_id == "portugal_d7"
+    assert resolve_pathway("portugal_d7").canonical_id == "portugal_d7"
+    assert resolve_pathway("portugal-dnv").canonical_id == "portugal_dnv"
+    assert resolve_pathway("portugal_dnv").canonical_id == "portugal_dnv"
+    assert resolve_pathway("portugal-digital-nomad").canonical_id == "portugal_dnv"
+    assert (
+        resolve_pathway("portugal-digital-nomad-visa").canonical_id
+        == "portugal_dnv"
+    )
+    assert resolve_pathway("portugal-remote-work").canonical_id == "portugal_dnv"
+    assert (
+        resolve_pathway("portugal-remote-work-visa").canonical_id
+        == "portugal_dnv"
+    )
+    assert (
+        resolve_pathway("portugal-golden-visa").canonical_id
+        == "portugal_golden_visa"
+    )
+    assert (
+        resolve_pathway("portugal_golden_visa").canonical_id
+        == "portugal_golden_visa"
+    )
+    assert resolve_pathway("portugal-ari").canonical_id == "portugal_golden_visa"
+    assert resolve_pathway("portugal_ari").canonical_id == "portugal_golden_visa"
+    assert (
+        resolve_pathway("portugal-investment-residence").canonical_id
+        == "portugal_golden_visa"
+    )
+    assert (
+        resolve_pathway("portugal-investment-residence-permit").canonical_id
+        == "portugal_golden_visa"
+    )
     assert resolve_pathway("costa-rica-pensionado").canonical_id == "costa_rica_pensionado"
     assert resolve_pathway("costa_rica_pensionado").canonical_id == "costa_rica_pensionado"
     assert resolve_pathway("spain-dnv").implemented is False
     assert resolve_pathway("spain-dnv").questions_file == "pathways/spain_dnv/questions.json"
+    assert resolve_pathway("spain-nlv").implemented is True
+    assert resolve_pathway("spain-nlv").questions_file == "pathways/spain_nlv/questions.json"
+    assert (
+        resolve_pathway("spain-nlv").rules_module
+        == "app.engine.pathways.spain_nlv.rules"
+    )
+    assert resolve_pathway("spain-nlv").output_file == "pathways/spain_nlv/output.json"
+    assert (
+        resolve_pathway("spain-nlv").clarifications_file
+        == "pathways/spain_nlv/clarifications.json"
+    )
+    assert resolve_pathway("spain-student-visa").implemented is True
+    assert (
+        resolve_pathway("spain-student-visa").questions_file
+        == "pathways/spain_student_visa/questions.json"
+    )
+    assert (
+        resolve_pathway("spain-student-visa").rules_module
+        == "app.engine.pathways.spain_student_visa.rules"
+    )
+    assert (
+        resolve_pathway("spain-student-visa").output_file
+        == "pathways/spain_student_visa/output.json"
+    )
+    assert (
+        resolve_pathway("spain-student-visa").clarifications_file
+        == "pathways/spain_student_visa/clarifications.json"
+    )
+    assert resolve_pathway("italy-elective-residence").implemented is True
+    assert (
+        resolve_pathway("italy-elective-residence").questions_file
+        == "pathways/italy_elective_residence/questions.json"
+    )
+    assert (
+        resolve_pathway("italy-elective-residence").rules_module
+        == "app.engine.pathways.italy_elective_residence.rules"
+    )
+    assert (
+        resolve_pathway("italy-elective-residence").output_file
+        == "pathways/italy_elective_residence/output.json"
+    )
+    assert (
+        resolve_pathway("italy-elective-residence").clarifications_file
+        == "pathways/italy_elective_residence/clarifications.json"
+    )
+    assert resolve_pathway("portugal-d7").implemented is True
+    assert (
+        resolve_pathway("portugal-d7").questions_file
+        == "pathways/portugal_d7/questions.json"
+    )
+    assert (
+        resolve_pathway("portugal-d7").rules_module
+        == "app.engine.pathways.portugal_d7.rules"
+    )
+    assert resolve_pathway("portugal-d7").output_file == "pathways/portugal_d7/output.json"
+    assert (
+        resolve_pathway("portugal-d7").clarifications_file
+        == "pathways/portugal_d7/clarifications.json"
+    )
+    assert resolve_pathway("portugal-dnv").implemented is True
+    assert (
+        resolve_pathway("portugal-dnv").questions_file
+        == "pathways/portugal_dnv/questions.json"
+    )
+    assert (
+        resolve_pathway("portugal-dnv").rules_module
+        == "app.engine.pathways.portugal_dnv.rules"
+    )
+    assert (
+        resolve_pathway("portugal-dnv").output_file
+        == "pathways/portugal_dnv/output.json"
+    )
+    assert (
+        resolve_pathway("portugal-dnv").clarifications_file
+        == "pathways/portugal_dnv/clarifications.json"
+    )
+    assert resolve_pathway("portugal-golden-visa").implemented is True
+    assert (
+        resolve_pathway("portugal-golden-visa").questions_file
+        == "pathways/portugal_golden_visa/questions.json"
+    )
+    assert (
+        resolve_pathway("portugal-golden-visa").rules_module
+        == "app.engine.pathways.portugal_golden_visa.rules"
+    )
+    assert (
+        resolve_pathway("portugal-golden-visa").output_file
+        == "pathways/portugal_golden_visa/output.json"
+    )
+    assert (
+        resolve_pathway("portugal-golden-visa").clarifications_file
+        == "pathways/portugal_golden_visa/clarifications.json"
+    )
     assert resolve_pathway("costa-rica-pensionado").implemented is True
     assert (
         resolve_pathway("costa-rica-pensionado").questions_file
@@ -78,7 +215,11 @@ def test_stage_one_spain_filters_pathway_choices():
     result = evaluate({"routing": {"country": "spain"}})
 
     assert result["next_field_key"] == "routing.pathway"
-    assert result["field"]["choices"] == ["spain_dnv"]
+    assert result["field"]["choices"] == [
+        "spain_dnv",
+        "spain_nlv",
+        "spain_student_visa",
+    ]
 
 
 def test_stage_one_costa_rica_filters_pathway_choices():
@@ -262,19 +403,20 @@ def _pensionado_payload(
     police_clearance_available="yes",
     criminal_record_flag="no",
     pension_receipt_evidence="will_document_after_approval",
+    intends_to_work_in_costa_rica="no",
 ):
     return {
         "routing": {
             "applicant_type": "individual",
             "passport_validity_months": "24",
             "criminal_record_flag": criminal_record_flag,
-            "no_work_authorization_acknowledged": "yes",
-            "temporary_residence_acknowledged": "yes",
-            "renewal_every_two_years_acknowledged": "yes",
         },
         "identity": {
             "nationality": "United States",
             "country_of_residence": "United States",
+        },
+        "work": {
+            "intends_to_work_in_costa_rica": intends_to_work_in_costa_rica,
         },
         "role": {
             "pensionado": {
@@ -363,6 +505,523 @@ def _spain_nlv_payload(
         ] = performs_labor_for_spanish_company
 
     return payload
+
+
+def _italy_elective_residence_payload(
+    *,
+    applicant_type="individual",
+    annual_passive_income_eur="50000",
+    available_assets_eur="250000",
+    intends_to_work_in_italy="no",
+    italy_lodging_status="registered_lease",
+    dependents_count=None,
+    family_documents_available="yes",
+):
+    payload = {
+        "routing": {
+            "applicant_type": applicant_type,
+            "consulate_jurisdiction": "new_york",
+            "stable_residence_intent": "stable_residence",
+            "health_insurance_status": "have_it",
+            "health_insurance_coverage_level": "meets_consular_coverage",
+            "passport_validity_months": "24",
+            "passport_issued_within_10_years": "yes",
+            "passport_blank_pages": "2",
+        },
+        "identity": {
+            "nationality": "United States",
+        },
+        "work": {
+            "intends_to_work_in_italy": intends_to_work_in_italy,
+        },
+        "financial": {
+            "annual_passive_income_eur": annual_passive_income_eur,
+            "available_assets_eur": available_assets_eur,
+            "income_source_types": ["pension"],
+            "income_evidence_types": ["bank_letters"],
+            "tax_returns_available": "two_years_complete_with_schedules",
+        },
+        "housing": {
+            "italy_lodging_status": italy_lodging_status,
+        },
+        "compliance": {
+            "permesso_8_day_acknowledged": "yes",
+            "annual_renewal_acknowledged": "yes",
+        },
+    }
+
+    if applicant_type == "family":
+        payload["routing"].update(
+            {
+                "dependents_count": "1" if dependents_count is None else dependents_count,
+                "dependent_relationships": "spouse",
+                "dependent_adult_children_living_with_parents": "no_adult_children",
+                "family_documents_available": family_documents_available,
+            }
+        )
+
+    return payload
+
+
+def _portugal_d7_payload(
+    *,
+    applicant_type="individual",
+    annual_passive_income_eur="20000",
+    application_country_matches_nationality="yes",
+    lawful_residence_where_applying=None,
+    passive_own_income_intent="yes",
+    portuguese_bank_availability="yes",
+    portugal_accommodation_12_months="lease_12_months_or_more",
+    police_clearance_available="yes",
+    criminal_record_flag="no",
+    dependents_count=None,
+    additional_adult_dependents_count=None,
+    child_or_dependent_non_minor_count=None,
+):
+    payload = {
+        "routing": {
+            "applicant_type": applicant_type,
+            "application_country_matches_nationality": application_country_matches_nationality,
+            "passive_own_income_intent": passive_own_income_intent,
+            "passport_validity_months": "12",
+            "health_travel_insurance_status": "have_it",
+            "police_clearance_available": police_clearance_available,
+            "criminal_record_flag": criminal_record_flag,
+        },
+        "identity": {
+            "nationality": "United States",
+        },
+        "financial": {
+            "annual_passive_income_eur": annual_passive_income_eur,
+            "income_source_types": ["pension"],
+            "income_evidence_types": ["bank_statements"],
+            "portuguese_bank_availability": portuguese_bank_availability,
+        },
+        "housing": {
+            "portugal_accommodation_12_months": portugal_accommodation_12_months,
+        },
+        "compliance": {
+            "truthful_documents_acknowledged": "yes",
+        },
+    }
+
+    if lawful_residence_where_applying is not None:
+        payload["routing"][
+            "lawful_residence_where_applying"
+        ] = lawful_residence_where_applying
+
+    if applicant_type == "family":
+        payload["routing"].update(
+            {
+                "dependents_count": (
+                    "2" if dependents_count is None else dependents_count
+                ),
+                "additional_adult_dependents_count": (
+                    "1"
+                    if additional_adult_dependents_count is None
+                    else additional_adult_dependents_count
+                ),
+                "child_or_dependent_non_minor_count": (
+                    "1"
+                    if child_or_dependent_non_minor_count is None
+                    else child_or_dependent_non_minor_count
+                ),
+                "dependent_relationships": "spouse, child",
+                "family_documents_available": "yes",
+            }
+        )
+
+    return payload
+
+
+def _portugal_dnv_payload(
+    *,
+    visa_route="residence_visa",
+    work_relationship="remote_employee",
+    average_monthly_income_last_3_months_eur="3680",
+    entities_outside_portugal="yes",
+    employee_contract_or_declaration_available="yes",
+    independent_service_or_client_proof_available="yes",
+    business_owner_company_service_documents_available="yes",
+    tax_residence_certificate_available="yes",
+    applicant_type="individual",
+    family_documents_available="yes",
+    family_stable_means_available="yes",
+):
+    payload = {
+        "routing": {
+            "visa_route": visa_route,
+            "work_relationship": work_relationship,
+            "applicant_type": applicant_type,
+            "application_country_matches_nationality": "yes",
+            "passport_validity_months": "12",
+            "health_travel_insurance_status": "have_it",
+            "police_clearance_available": "yes",
+            "criminal_record_flag": "no",
+            "removal_or_refusal_alert_flag": "no",
+        },
+        "identity": {
+            "nationality": "United States",
+        },
+        "work": {
+            "entities_outside_portugal": entities_outside_portugal,
+        },
+        "role": {
+            "employee": {
+                "contract_or_declaration_available": (
+                    employee_contract_or_declaration_available
+                ),
+            },
+            "independent": {
+                "service_or_client_proof_available": (
+                    independent_service_or_client_proof_available
+                ),
+            },
+            "business_owner": {
+                "company_service_documents_available": (
+                    business_owner_company_service_documents_available
+                ),
+            },
+        },
+        "financial": {
+            "average_monthly_income_last_3_months_eur": (
+                average_monthly_income_last_3_months_eur
+            ),
+            "income_evidence_types": ["bank_statements", "contracts"],
+        },
+        "documents": {
+            "tax_residence_certificate_available": tax_residence_certificate_available,
+        },
+        "housing": {
+            "settlement_statement_ready": "yes",
+        },
+        "compliance": {
+            "truthful_documents_acknowledged": "yes",
+        },
+    }
+
+    if applicant_type == "family":
+        payload["routing"].update(
+            {
+                "dependents_count": "2",
+                "dependent_relationships": "spouse, child",
+                "family_documents_available": family_documents_available,
+            }
+        )
+        payload["financial"][
+            "family_stable_means_available"
+        ] = family_stable_means_available
+
+    return payload
+
+
+def _portugal_golden_visa_payload(
+    *,
+    investment_route="job_creation",
+    third_country_national_status="third_country_national",
+    real_estate_only_basis="no",
+    jobs_created_count="10",
+    job_creation_evidence_available="yes",
+    scientific_research_amount_eur="500000",
+    scientific_research_confirmation_available="yes",
+    arts_cultural_heritage_amount_eur="250000",
+    arts_cultural_heritage_confirmation_available="yes",
+    fund_amount_eur="500000",
+    fund_non_real_estate_confirmed="yes",
+    fund_maturity_confirmed="yes",
+    fund_subscription_documents_available="yes",
+    company_capitalization_amount_eur="500000",
+    company_capitalization_job_plan="create_5_permanent_jobs",
+    company_documents_available="yes",
+    proof_of_funds_or_transfer_available="yes",
+    applicant_type="individual",
+    family_documents_available="yes",
+    valid_passport_available="yes",
+    criminal_record_certificate_available="yes_recent_translated_apostilled",
+    serious_criminal_conviction_flag="no",
+    entry_stay_ban_flag="no",
+    sii_ucfe_refusal_alert_flag="no",
+    portuguese_tax_clearance_status="debt_clearance_certificate",
+    social_security_clearance_status="debt_clearance_certificate",
+    foreign_tax_id_disclosure_available="yes",
+    investment_maintenance_declaration_available="yes",
+):
+    payload = {
+        "identity": {
+            "nationality": "United States",
+            "third_country_national_status": third_country_national_status,
+        },
+        "investment": {
+            "route": investment_route,
+            "real_estate_only_basis": real_estate_only_basis,
+            "proof_of_funds_or_transfer_available": proof_of_funds_or_transfer_available,
+            "job_creation": {
+                "jobs_created_count": jobs_created_count,
+                "evidence_available": job_creation_evidence_available,
+            },
+            "scientific_research": {
+                "amount_eur": scientific_research_amount_eur,
+                "institution_confirmation_available": (
+                    scientific_research_confirmation_available
+                ),
+            },
+            "arts_cultural_heritage": {
+                "amount_eur": arts_cultural_heritage_amount_eur,
+                "qualifying_entity_confirmation_available": (
+                    arts_cultural_heritage_confirmation_available
+                ),
+            },
+            "fund": {
+                "amount_eur": fund_amount_eur,
+                "non_real_estate_confirmed": fund_non_real_estate_confirmed,
+                "maturity_and_portuguese_company_investment_confirmed": (
+                    fund_maturity_confirmed
+                ),
+                "subscription_documents_available": (
+                    fund_subscription_documents_available
+                ),
+            },
+            "company_capitalization": {
+                "amount_eur": company_capitalization_amount_eur,
+                "jobs_requirement_plan": company_capitalization_job_plan,
+                "company_and_employment_documents_available": (
+                    company_documents_available
+                ),
+            },
+        },
+        "routing": {
+            "applicant_type": applicant_type,
+            "serious_criminal_conviction_flag": serious_criminal_conviction_flag,
+            "entry_stay_ban_flag": entry_stay_ban_flag,
+            "sii_ucfe_refusal_alert_flag": sii_ucfe_refusal_alert_flag,
+        },
+        "documents": {
+            "valid_passport_available": valid_passport_available,
+            "criminal_record_certificate_available": (
+                criminal_record_certificate_available
+            ),
+            "portuguese_tax_clearance_status": portuguese_tax_clearance_status,
+            "social_security_clearance_status": social_security_clearance_status,
+            "foreign_tax_id_disclosure_available": foreign_tax_id_disclosure_available,
+        },
+        "compliance": {
+            "investment_maintenance_declaration_available": (
+                investment_maintenance_declaration_available
+            ),
+        },
+    }
+
+    if applicant_type == "family":
+        payload["routing"].update(
+            {
+                "dependents_count": "2",
+                "dependent_relationships": "spouse, child",
+                "family_documents_available": family_documents_available,
+            }
+        )
+
+    return payload
+
+
+def _spain_student_payload(
+    *,
+    applicant_type="individual",
+    monthly_funds_eur="600",
+    dependents_count=None,
+    stay_over_6_months="yes",
+    background_check_available="yes",
+    criminal_record_flag="no",
+    study_category="higher_studies",
+    student_work_intent="no_work",
+):
+    payload = {
+        "routing": {
+            "applicant_type": applicant_type,
+            "irregular_presence_spain": "no",
+            "application_route": "consular_outside_spain",
+            "passport_validity_months": "24",
+            "health_insurance_status": "have_it",
+            "public_order_security_risk_flag": "no",
+            "public_health_disease_flag": "no",
+        },
+        "identity": {
+            "nationality": "United States",
+            "eu_eea_swiss_or_free_movement_status": "no",
+        },
+        "study": {
+            "category": study_category,
+            "accepted_by_authorized_institution": "yes",
+            "full_time_recognized_program": "yes",
+            "modality": "hybrid",
+            "in_person_requirement_met": "yes",
+            "program_duration_months": "12",
+            "stay_over_6_months": stay_over_6_months,
+            "application_timing_status": "at_least_2_months_before_start",
+            "enrollment_payment_status": "paid_or_proven",
+            "student_work_intent": student_work_intent,
+        },
+        "financial": {
+            "monthly_funds_eur": monthly_funds_eur,
+            "accommodation_prepaid_full_stay": "no",
+            "funds_evidence_types": ["bank_statements"],
+        },
+    }
+
+    if stay_over_6_months == "yes":
+        payload["identity"]["criminal_age_status"] = "yes"
+        payload["routing"]["background_check_available"] = background_check_available
+        payload["routing"]["criminal_record_flag"] = criminal_record_flag
+
+    if applicant_type == "family":
+        payload["routing"].update(
+            {
+                "dependents_count": "1" if dependents_count is None else dependents_count,
+                "dependent_relationships": "spouse, child",
+                "dependent_ages": "35, 8",
+                "minor_children_included": "yes",
+                "dependents_allowed_for_study_category": "yes",
+                "dependents_work_intent": "no_work",
+            }
+        )
+
+    return payload
+
+
+def test_spain_student_visa_aliases_load_first_question():
+    result_dash = evaluate({}, pathway="spain-student-visa")
+    result_underscore = evaluate({}, pathway="spain_student_visa")
+
+    assert result_dash == result_underscore
+    assert result_dash["next_field_key"] == "routing.applicant_type"
+    assert result_dash["field"]["input_type"] == "choice"
+    assert result_dash["field"]["choices"] == ["individual", "family"]
+
+
+def test_spain_student_visa_valid_individual_returns_eligible():
+    result = evaluate_eligibility(
+        _spain_student_payload(),
+        pathway="spain-student-visa",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["pathway"] == "spain_student_visa"
+    assert result["visa_type"] == "Spain Student Visa"
+
+
+def test_spain_student_visa_insufficient_funds_returns_not_eligible():
+    result = evaluate_eligibility(
+        _spain_student_payload(monthly_funds_eur="599"),
+        pathway="spain_student_visa",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["insufficient_financial_means"]
+
+
+def test_spain_student_visa_family_route_calculates_dependent_funds():
+    result = evaluate_eligibility(
+        _spain_student_payload(
+            applicant_type="family",
+            dependents_count="2",
+            monthly_funds_eur="1349",
+        ),
+        pathway="spain-student-visa",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["insufficient_financial_means"]
+    assert result["required_monthly_financial_means_eur"] == 1350
+
+
+def test_spain_student_visa_stay_over_6_months_triggers_background_logic():
+    result = evaluate_eligibility(
+        _spain_student_payload(background_check_available="no"),
+        pathway="spain-student-visa",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["background_check_needs_review"]
+
+
+def test_spain_student_visa_work_intent_can_return_needs_review():
+    result = evaluate_eligibility(
+        _spain_student_payload(
+            study_category="training",
+            student_work_intent="work_30_hours_or_less_and_study_compatible",
+        ),
+        pathway="spain-student-visa",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["student_work_authorization_needs_review"]
+
+
+def test_spain_student_visa_individual_question_sequence():
+    answers = {
+        "routing.applicant_type": "individual",
+        "identity.nationality": "United States",
+        "identity.eu_eea_swiss_or_free_movement_status": "no",
+        "routing.irregular_presence_spain": "no",
+        "routing.application_route": "consular_outside_spain",
+        "study.category": "higher_studies",
+        "study.accepted_by_authorized_institution": "yes",
+        "study.full_time_recognized_program": "yes",
+        "study.modality": "hybrid",
+        "study.in_person_requirement_met": "yes",
+        "study.program_duration_months": "12",
+        "study.stay_over_6_months": "yes",
+        "study.application_timing_status": "at_least_2_months_before_start",
+        "study.enrollment_payment_status": "paid_or_proven",
+        "financial.monthly_funds_eur": "600",
+        "financial.accommodation_prepaid_full_stay": "no",
+        "financial.funds_evidence_types": ["bank_statements"],
+        "routing.passport_validity_months": "24",
+        "routing.health_insurance_status": "have_it",
+        "identity.criminal_age_status": "yes",
+        "routing.background_check_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "routing.public_order_security_risk_flag": "no",
+        "routing.public_health_disease_flag": "no",
+        "study.student_work_intent": "no_work",
+    }
+    expected_order = list(answers.keys())
+
+    payload: dict = {}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="spain-student-visa")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-student-visa")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+
+
+def test_spain_student_visa_no_escape_choices_anywhere_in_schema():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_student_visa"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
 
 def test_spain_nlv_aliases_load_first_question():
@@ -780,6 +1439,1031 @@ def test_spain_nlv_no_escape_choices_anywhere_in_schema():
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
 
+def test_italy_elective_residence_aliases_load_first_question():
+    result_dash = evaluate({}, pathway="italy-elective-residence")
+    result_underscore = evaluate({}, pathway="italy_elective_residence")
+
+    assert result_dash == result_underscore
+    assert result_dash["next_field_key"] == "routing.applicant_type"
+    assert result_dash["field"]["input_type"] == "choice"
+    assert result_dash["field"]["choices"] == ["individual", "family"]
+
+
+def test_italy_elective_residence_valid_individual_returns_eligible():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(),
+        pathway="italy-elective-residence",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["pathway"] == "italy_elective_residence"
+    assert result["visa_type"] == "Italy Elective Residence Visa"
+
+
+def test_italy_elective_residence_work_intent_returns_not_eligible():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(intends_to_work_in_italy="yes"),
+        pathway="italy-elective-residence",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["no_work_in_italy_not_confirmed"]
+
+    passes = evaluate_eligibility(
+        _italy_elective_residence_payload(intends_to_work_in_italy="no"),
+        pathway="italy-elective-residence",
+    )
+    assert "no_work_in_italy_not_confirmed" not in passes["failed_requirements"]
+
+
+def test_italy_elective_residence_insufficient_income_assets_not_eligible():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            annual_passive_income_eur="30000",
+            available_assets_eur="0",
+        ),
+        pathway="italy_elective_residence",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert "insufficient_passive_income" in result["failed_requirements"]
+    assert "financial_assets_need_review" in result["failed_requirements"]
+
+
+def test_italy_elective_residence_missing_lodging_returns_not_eligible():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(italy_lodging_status="not_available"),
+        pathway="italy-elective-residence",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["qualifying_italian_lodging_unavailable"]
+
+
+def test_italy_elective_residence_family_route_can_return_needs_review():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            applicant_type="family",
+            annual_passive_income_eur="70000",
+            family_documents_available="no",
+        ),
+        pathway="italy-elective-residence",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["family_documents_needs_review"]
+    assert result["required_annual_passive_income_eur"] == 62000
+
+
+def test_italy_elective_residence_individual_question_sequence():
+    answers = {
+        "routing.applicant_type": "individual",
+        "identity.nationality": "United States",
+        "routing.consulate_jurisdiction": "new_york",
+        "work.intends_to_work_in_italy": "no",
+        "routing.stable_residence_intent": "stable_residence",
+        "financial.annual_passive_income_eur": "50000",
+        "financial.available_assets_eur": "250000",
+        "financial.income_source_types": ["pension"],
+        "financial.income_evidence_types": ["bank_letters"],
+        "financial.tax_returns_available": "two_years_complete_with_schedules",
+        "housing.italy_lodging_status": "registered_lease",
+        "routing.health_insurance_status": "have_it",
+        "routing.health_insurance_coverage_level": "meets_consular_coverage",
+        "routing.passport_validity_months": "24",
+        "routing.passport_issued_within_10_years": "yes",
+        "routing.passport_blank_pages": "2",
+        "compliance.permesso_8_day_acknowledged": "yes",
+        "compliance.annual_renewal_acknowledged": "yes",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="italy-elective-residence")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="italy-elective-residence")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "consulate.additional_documents_acknowledged" not in asked_keys
+
+
+def test_italy_elective_residence_consulate_discretion_removed():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "italy_elective_residence"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "consulate.additional_documents_acknowledged" not in live_keys
+
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+    import inspect
+
+    source = inspect.getsource(italy_er_rules.evaluate_eligibility)
+    assert '"consulate.additional_documents_acknowledged"' not in source
+
+    # A fully answered payload omitting the removed field entirely must still
+    # be able to reach "eligible".
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(), pathway="italy-elective-residence"
+    )
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_italy_elective_residence_permesso_and_renewal_untouched_pending_legal_review():
+    """Section 3 items: these two questions still carry HARD_FAILURES codes and
+    still offer 'not_sure' -- explicitly left unchanged pending a legal-review
+    decision, not touched by this Batch 1 cleanup."""
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "italy_elective_residence"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["compliance.permesso_8_day_acknowledged"]["choices"] == [
+        "yes",
+        "no",
+        "not_sure",
+    ]
+    assert fields_by_key["compliance.annual_renewal_acknowledged"]["choices"] == [
+        "yes",
+        "no",
+        "not_sure",
+    ]
+
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+
+    assert "permesso_acknowledgement_missing" in italy_er_rules.HARD_FAILURES
+    assert "renewal_acknowledgement_missing" in italy_er_rules.HARD_FAILURES
+
+
+def test_italy_elective_residence_no_escape_choices_outside_section_3_items():
+    """Zero escape choices anywhere EXCEPT the two Section-3 items explicitly
+    left untouched pending legal review."""
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "italy_elective_residence"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    allowed_exceptions = {
+        "compliance.permesso_8_day_acknowledged",
+        "compliance.annual_renewal_acknowledged",
+    }
+    for field in data["taxonomy_fields"]:
+        if field["key"] in allowed_exceptions:
+            continue
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
+def test_portugal_d7_aliases_load_first_question():
+    result_dash = evaluate({}, pathway="portugal-d7")
+    result_underscore = evaluate({}, pathway="portugal_d7")
+
+    assert result_dash == result_underscore
+    assert result_dash["next_field_key"] == "routing.applicant_type"
+    assert result_dash["field"]["input_type"] == "choice"
+    assert result_dash["field"]["choices"] == ["individual", "family"]
+
+
+def test_portugal_d7_valid_individual_returns_eligible():
+    result = evaluate_eligibility(_portugal_d7_payload(), pathway="portugal-d7")
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["pathway"] == "portugal_d7"
+    assert result["visa_type"] == "Portugal D7 Passive Income Visa"
+
+
+def test_portugal_d7_insufficient_income_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(annual_passive_income_eur="11039"),
+        pathway="portugal_d7",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["insufficient_passive_income"]
+
+
+def test_portugal_d7_active_employment_intent_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(passive_own_income_intent="no"),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["active_employment_or_non_passive_intent"]
+
+
+def test_portugal_d7_missing_portugal_income_availability_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(portuguese_bank_availability="no"),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["income_not_available_in_portugal"]
+
+
+def test_portugal_d7_missing_12_month_accommodation_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(portugal_accommodation_12_months="not_available"),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == [
+        "portugal_accommodation_12_months_unavailable"
+    ]
+
+
+def test_portugal_d7_family_route_applies_dependent_income_formula():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(
+            applicant_type="family",
+            annual_passive_income_eur="19871",
+        ),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["insufficient_passive_income"]
+    assert result["required_annual_passive_income_eur"] == 19872
+    assert result["dependent_income_formula"] == {
+        "main_applicant": "100%",
+        "additional_adult": "50%",
+        "child_or_dependent_non_minor": "30%",
+    }
+
+
+def test_portugal_d7_background_gaps_can_return_needs_review():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(
+            police_clearance_available="not_sure",
+            criminal_record_flag="yes",
+        ),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == [
+        "police_clearance_needs_review",
+        "criminal_record_needs_review",
+    ]
+
+
+def test_portugal_d7_individual_question_sequence():
+    answers = {
+        "routing.applicant_type": "individual",
+        "identity.nationality": "United States",
+        "routing.application_country_matches_nationality": "yes",
+        "routing.passive_own_income_intent": "yes",
+        "financial.annual_passive_income_eur": "20000",
+        "financial.income_source_types": ["pension"],
+        "financial.income_evidence_types": ["bank_statements"],
+        "financial.portuguese_bank_availability": "yes",
+        "housing.portugal_accommodation_12_months": "lease_12_months_or_more",
+        "routing.passport_validity_months": "12",
+        "routing.health_travel_insurance_status": "have_it",
+        "routing.police_clearance_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "compliance.truthful_documents_acknowledged": "yes",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="portugal-d7")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="portugal-d7")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "compliance.aima_residence_step_acknowledged" not in asked_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in asked_keys
+
+
+def test_portugal_d7_relocated_and_removed_questions():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_d7"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "compliance.aima_residence_step_acknowledged" not in live_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert "compliance.aima_residence_step_acknowledged" in checklist_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in checklist_keys
+
+    import app.engine.pathways.portugal_d7.rules as portugal_d7_rules
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_d7"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert '"compliance.aima_residence_step_acknowledged"' not in source_text
+    assert '"consulate.discretion_extra_documents_acknowledged"' not in source_text
+
+    result = evaluate_eligibility(_portugal_d7_payload(), pathway="portugal-d7")
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_portugal_d7_truthful_documents_untouched_pending_legal_review():
+    """Section 3 item: this question still carries a HARD_FAILURES code and
+    still offers 'not_sure' -- explicitly left unchanged pending a legal-review
+    decision, not touched by this Batch 1 cleanup."""
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_d7"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["compliance.truthful_documents_acknowledged"]["choices"] == [
+        "yes",
+        "no",
+        "not_sure",
+    ]
+
+    import app.engine.pathways.portugal_d7.rules as portugal_d7_rules
+
+    assert "false_statement_risk_not_acknowledged" in portugal_d7_rules.HARD_FAILURES
+
+
+def test_portugal_d7_no_escape_choices_outside_section_3_items():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_d7"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    allowed_exceptions = {"compliance.truthful_documents_acknowledged"}
+    for field in data["taxonomy_fields"]:
+        if field["key"] in allowed_exceptions:
+            continue
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
+def test_portugal_dnv_aliases_load_first_question():
+    result_dash = evaluate({}, pathway="portugal-dnv")
+    result_underscore = evaluate({}, pathway="portugal_dnv")
+
+    assert result_dash == result_underscore
+    assert result_dash["next_field_key"] == "routing.visa_route"
+    assert result_dash["field"]["input_type"] == "choice"
+    assert result_dash["field"]["choices"] == [
+        "residence_visa",
+        "temporary_stay_under_1_year",
+    ]
+
+
+def test_portugal_dnv_valid_remote_employee_returns_eligible():
+    result = evaluate_eligibility(_portugal_dnv_payload(), pathway="portugal-dnv")
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["pathway"] == "portugal_dnv"
+    assert result["work_type"] == "remote_employee"
+    assert result["minimum_average_monthly_income_eur"] == 3680
+
+
+def test_portugal_dnv_valid_independent_freelancer_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(work_relationship="freelancer_independent"),
+        pathway="portugal-digital-nomad",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["work_type"] == "freelancer_independent"
+
+
+def test_portugal_dnv_valid_business_owner_company_service_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(work_relationship="business_owner_company_service"),
+        pathway="portugal-remote-work-visa",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["work_type"] == "business_owner_company_service"
+
+
+def test_portugal_dnv_income_below_threshold_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(average_monthly_income_last_3_months_eur="3679"),
+        pathway="portugal-dnv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["income_below_minimum"]
+
+
+def test_portugal_dnv_non_foreign_remote_work_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(entities_outside_portugal="no"),
+        pathway="portugal-dnv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == [
+        "remote_work_not_for_entities_outside_portugal"
+    ]
+
+
+def test_portugal_dnv_missing_role_specific_work_proof_returns_expected_status():
+    missing_employee = evaluate_eligibility(
+        _portugal_dnv_payload(employee_contract_or_declaration_available="no"),
+        pathway="portugal-dnv",
+    )
+    unclear_independent = evaluate_eligibility(
+        _portugal_dnv_payload(
+            work_relationship="freelancer_independent",
+            independent_service_or_client_proof_available="not_sure",
+        ),
+        pathway="portugal-dnv",
+    )
+
+    assert missing_employee["eligibility_status"] == "not_eligible"
+    assert missing_employee["failed_requirements"] == [
+        "employee_contract_or_declaration_unavailable"
+    ]
+    assert unclear_independent["eligibility_status"] == "needs_review"
+    assert unclear_independent["failed_requirements"] == [
+        "independent_service_or_client_proof_needs_review"
+    ]
+
+
+def test_portugal_dnv_missing_tax_residence_certificate_returns_expected_status():
+    missing = evaluate_eligibility(
+        _portugal_dnv_payload(tax_residence_certificate_available="no"),
+        pathway="portugal-dnv",
+    )
+    unclear = evaluate_eligibility(
+        _portugal_dnv_payload(tax_residence_certificate_available="not_sure"),
+        pathway="portugal-dnv",
+    )
+
+    assert missing["eligibility_status"] == "not_eligible"
+    assert missing["failed_requirements"] == ["tax_residence_certificate_unavailable"]
+    assert unclear["eligibility_status"] == "needs_review"
+    assert unclear["failed_requirements"] == ["tax_residence_certificate_needs_review"]
+
+
+def test_portugal_dnv_temporary_stay_route_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(visa_route="temporary_stay_under_1_year"),
+        pathway="portugal-dnv",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+
+def test_portugal_dnv_individual_question_sequence():
+    answers = {
+        "routing.visa_route": "residence_visa",
+        "routing.work_relationship": "remote_employee",
+        "work.entities_outside_portugal": "yes",
+        "role.employee.contract_or_declaration_available": "yes",
+        "financial.average_monthly_income_last_3_months_eur": "3680",
+        "financial.income_evidence_types": ["bank_statements"],
+        "documents.tax_residence_certificate_available": "yes",
+        "routing.applicant_type": "individual",
+        "identity.nationality": "United States",
+        "routing.application_country_matches_nationality": "yes",
+        "routing.passport_validity_months": "12",
+        "routing.health_travel_insurance_status": "have_it",
+        "routing.police_clearance_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "routing.removal_or_refusal_alert_flag": "no",
+        "housing.settlement_statement_ready": "yes",
+        "compliance.truthful_documents_acknowledged": "yes",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="portugal-dnv")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="portugal-dnv")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "compliance.aima_residence_permit_acknowledged" not in asked_keys
+    assert "compliance.renewal_acknowledged" not in asked_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in asked_keys
+
+
+def test_portugal_dnv_relocated_questions_do_not_affect_eligibility():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "compliance.aima_residence_permit_acknowledged" not in live_keys
+    assert "compliance.renewal_acknowledged" not in live_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert "compliance.aima_residence_permit_acknowledged" in checklist_keys
+    assert "compliance.renewal_acknowledged" in checklist_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in checklist_keys
+
+    import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert '"compliance.aima_residence_permit_acknowledged"' not in source_text
+    assert '"compliance.renewal_acknowledged"' not in source_text
+    assert '"consulate.discretion_extra_documents_acknowledged"' not in source_text
+
+    # A payload without these fields at all is still fully evaluable and eligible.
+    result = evaluate_eligibility(_portugal_dnv_payload(), pathway="portugal-dnv")
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_portugal_dnv_truthful_documents_untouched_pending_legal_review():
+    """Section 3 item: still carries a HARD_FAILURES code and still offers
+    'not_sure' -- explicitly left unchanged pending legal review."""
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["compliance.truthful_documents_acknowledged"]["choices"] == [
+        "yes",
+        "no",
+        "not_sure",
+    ]
+
+    import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
+
+    assert "truthful_documents_not_acknowledged" in portugal_dnv_rules.HARD_FAILURES
+
+
+def test_portugal_dnv_no_escape_choices_outside_section_3_items():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    allowed_exceptions = {"compliance.truthful_documents_acknowledged"}
+    for field in data["taxonomy_fields"]:
+        if field["key"] in allowed_exceptions:
+            continue
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
+def test_portugal_dnv_family_route_can_return_needs_review():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(
+            applicant_type="family",
+            family_documents_available="no",
+            family_stable_means_available="not_sure",
+        ),
+        pathway="portugal-dnv",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == [
+        "family_documents_needs_review",
+        "family_stable_means_needs_review",
+    ]
+
+
+def test_portugal_golden_visa_aliases_load_first_question():
+    result_dash = evaluate({}, pathway="portugal-golden-visa")
+    result_underscore = evaluate({}, pathway="portugal_golden_visa")
+
+    assert result_dash == result_underscore
+    assert result_dash["next_field_key"] == "identity.nationality"
+    assert result_dash["field"]["input_type"] == "text"
+
+
+def test_portugal_golden_visa_non_third_country_national_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            third_country_national_status="portuguese_eu_eea_andorra_swiss"
+        ),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == [
+        "portuguese_eu_eea_andorra_swiss_national"
+    ]
+
+
+def test_portugal_golden_visa_real_estate_only_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(investment_route="real_estate_only"),
+        pathway="portugal-ari",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["real_estate_only_basis"]
+
+
+def test_portugal_golden_visa_valid_job_creation_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(investment_route="job_creation"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["investment_route"] == "job_creation"
+    assert result["pathway"] == "portugal_golden_visa"
+
+
+def test_portugal_golden_visa_valid_scientific_research_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(investment_route="scientific_research"),
+        pathway="portugal_ari",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["investment_route"] == "scientific_research"
+
+
+def test_portugal_golden_visa_valid_arts_cultural_heritage_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(investment_route="arts_cultural_heritage"),
+        pathway="portugal-investment-residence",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["investment_route"] == "arts_cultural_heritage"
+
+
+def test_portugal_golden_visa_valid_non_real_estate_fund_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund"
+        ),
+        pathway="portugal-investment-residence-permit",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["investment_route"] == "non_real_estate_investment_fund"
+
+
+def test_portugal_golden_visa_valid_company_capitalization_returns_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(investment_route="company_capitalization_jobs"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert result["investment_route"] == "company_capitalization_jobs"
+
+
+def test_portugal_golden_visa_below_route_threshold_returns_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="scientific_research",
+            scientific_research_amount_eur="499999",
+        ),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == [
+        "scientific_research_amount_below_minimum"
+    ]
+
+
+def test_portugal_golden_visa_missing_route_evidence_returns_expected_status():
+    missing = evaluate_eligibility(
+        _portugal_golden_visa_payload(job_creation_evidence_available="no"),
+        pathway="portugal-golden-visa",
+    )
+    unclear = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund",
+            fund_non_real_estate_confirmed="not_sure",
+        ),
+        pathway="portugal-golden-visa",
+    )
+
+    assert missing["eligibility_status"] == "not_eligible"
+    assert missing["failed_requirements"] == ["job_creation_evidence_unavailable"]
+    assert unclear["eligibility_status"] == "needs_review"
+    assert unclear["failed_requirements"] == ["fund_non_real_estate_status_needs_review"]
+
+
+def test_portugal_golden_visa_serious_criminal_conviction_not_eligible():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(serious_criminal_conviction_flag="yes"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["serious_criminal_conviction"]
+
+
+def test_portugal_golden_visa_entry_ban_or_refusal_alert_not_eligible():
+    entry_ban = evaluate_eligibility(
+        _portugal_golden_visa_payload(entry_stay_ban_flag="yes"),
+        pathway="portugal-golden-visa",
+    )
+    refusal_alert = evaluate_eligibility(
+        _portugal_golden_visa_payload(sii_ucfe_refusal_alert_flag="yes"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert entry_ban["eligibility_status"] == "not_eligible"
+    assert entry_ban["failed_requirements"] == ["entry_stay_ban"]
+    assert refusal_alert["eligibility_status"] == "not_eligible"
+    assert refusal_alert["failed_requirements"] == ["sii_ucfe_refusal_alert"]
+
+
+def test_portugal_golden_visa_tax_or_social_security_gaps_expected_status():
+    tax_debt = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            portuguese_tax_clearance_status="has_tax_debts"
+        ),
+        pathway="portugal-golden-visa",
+    )
+    social_unclear = evaluate_eligibility(
+        _portugal_golden_visa_payload(social_security_clearance_status="not_sure"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert tax_debt["eligibility_status"] == "not_eligible"
+    assert tax_debt["failed_requirements"] == ["portuguese_tax_debts"]
+    assert social_unclear["eligibility_status"] == "needs_review"
+    assert social_unclear["failed_requirements"] == [
+        "social_security_clearance_needs_review"
+    ]
+
+
+def test_portugal_golden_visa_family_route_can_return_needs_review():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            applicant_type="family",
+            family_documents_available="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == [
+        "family_documents_needs_review",
+    ]
+
+
+def test_portugal_golden_visa_individual_question_sequence():
+    answers = {
+        "identity.nationality": "United States",
+        "identity.third_country_national_status": "third_country_national",
+        "investment.route": "job_creation",
+        "investment.real_estate_only_basis": "no",
+        "investment.job_creation.jobs_created_count": "10",
+        "investment.job_creation.evidence_available": "yes",
+        "investment.proof_of_funds_or_transfer_available": "yes",
+        "routing.applicant_type": "individual",
+        "documents.valid_passport_available": "yes",
+        "documents.criminal_record_certificate_available": (
+            "yes_recent_translated_apostilled"
+        ),
+        "routing.serious_criminal_conviction_flag": "no",
+        "routing.entry_stay_ban_flag": "no",
+        "routing.sii_ucfe_refusal_alert_flag": "no",
+        "documents.portuguese_tax_clearance_status": "debt_clearance_certificate",
+        "documents.social_security_clearance_status": "debt_clearance_certificate",
+        "documents.foreign_tax_id_disclosure_available": "yes",
+        "compliance.investment_maintenance_declaration_available": "yes",
+    }
+    expected_order = list(answers.keys())
+
+    payload: dict = {}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="portugal-golden-visa")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="portugal-golden-visa")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "process.portal_ari_family_application_acknowledged" not in asked_keys
+    assert "compliance.minimum_stay_acknowledged" not in asked_keys
+    assert "process.portal_ari_acknowledged" not in asked_keys
+    assert "compliance.renewal_investment_maintenance_acknowledged" not in asked_keys
+    assert "compliance.permanent_residence_later_stage_acknowledged" not in asked_keys
+
+
+def test_portugal_golden_visa_relocated_and_removed_questions():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "process.portal_ari_family_application_acknowledged" not in live_keys
+    assert "compliance.minimum_stay_acknowledged" not in live_keys
+    assert "process.portal_ari_acknowledged" not in live_keys
+    assert "compliance.renewal_investment_maintenance_acknowledged" not in live_keys
+    assert "compliance.permanent_residence_later_stage_acknowledged" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert checklist_keys == {
+        "compliance.minimum_stay_acknowledged",
+        "compliance.renewal_investment_maintenance_acknowledged",
+    }
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    for removed_key in (
+        '"process.portal_ari_family_application_acknowledged"',
+        '"compliance.minimum_stay_acknowledged"',
+        '"process.portal_ari_acknowledged"',
+        '"compliance.renewal_investment_maintenance_acknowledged"',
+        '"compliance.permanent_residence_later_stage_acknowledged"',
+    ):
+        assert removed_key not in source_text
+
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(), pathway="portugal-golden-visa"
+    )
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_portugal_golden_visa_investment_routes_untouched_pending_legal_review():
+    """Section 3 items: the 5 investment-route evidence questions and the
+    investment-maintenance declaration still carry HARD_FAILURES codes --
+    only their escape choices were removed, not touched otherwise."""
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    for code in (
+        "job_creation_evidence_unavailable",
+        "scientific_research_institution_confirmation_unavailable",
+        "arts_cultural_heritage_qualifying_entity_unavailable",
+        "fund_subscription_documents_unavailable",
+        "company_capitalization_documents_unavailable",
+        "investment_maintenance_declaration_unavailable",
+    ):
+        assert code in portugal_golden_visa_rules.HARD_FAILURES
+
+
+def test_portugal_golden_visa_no_escape_choices_anywhere_in_schema():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
 def test_costa_rica_pensionado_aliases_load_first_question():
     result_dash = evaluate({}, pathway="costa-rica-pensionado")
     result_underscore = evaluate({}, pathway="costa_rica_pensionado")
@@ -806,15 +2490,15 @@ def test_costa_rica_pensionado_standard_order_after_applicant_type():
 
     payload["role"]["pensionado"]["pension_retirement_based"] = "yes"
     result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "routing.no_work_authorization_acknowledged"
+    assert result["next_field_key"] == "work.intends_to_work_in_costa_rica"
 
 
 def test_costa_rica_pensionado_uses_dnv_style_income_order():
     payload = {
         "routing": {
             "applicant_type": "individual",
-            "no_work_authorization_acknowledged": "yes",
         },
+        "work": {"intends_to_work_in_costa_rica": "no"},
         "role": {
             "pensionado": {
                 "retired_from_habitual_occupation": "yes",
@@ -838,8 +2522,8 @@ def test_costa_rica_pensionado_asks_dependents_before_identity_when_family():
     payload = {
         "routing": {
             "applicant_type": "family",
-            "no_work_authorization_acknowledged": "yes",
         },
+        "work": {"intends_to_work_in_costa_rica": "no"},
         "role": {
             "pensionado": {
                 "retired_from_habitual_occupation": "yes",
@@ -961,6 +2645,131 @@ def test_costa_rica_pensionado_new_review_reasons_use_clarifications():
 
     assert output["clarifications"][0]["requirement"] == "foreign_pension_source_unconfirmed"
     assert "issued from outside Costa Rica" in output["clarifications"][0]["clarification"]
+
+
+def test_costa_rica_pensionado_work_intent_polarity():
+    working = evaluate_eligibility(
+        _pensionado_payload(intends_to_work_in_costa_rica="yes"),
+        pathway="costa-rica-pensionado",
+    )
+    assert working["failed_requirements"] == ["work_authorization_acknowledgement_missing"]
+    assert working["eligibility_status"] == "needs_review"
+
+    not_working = evaluate_eligibility(
+        _pensionado_payload(intends_to_work_in_costa_rica="no"),
+        pathway="costa-rica-pensionado",
+    )
+    assert "work_authorization_acknowledgement_missing" not in not_working["failed_requirements"]
+    assert not_working["eligibility_status"] == "eligible"
+
+
+def test_costa_rica_pensionado_individual_question_sequence():
+    answers = {
+        "routing.applicant_type": "individual",
+        "role.pensionado.retired_from_habitual_occupation": "yes",
+        "role.pensionado.pension_source_type": "social_security",
+        "role.pensionado.pension_retirement_based": "yes",
+        "work.intends_to_work_in_costa_rica": "no",
+        "role.pensionado.pension_foreign_source_confirmed": "yes",
+        "role.pensionado.monthly_pension_usd": "1000",
+        "role.pensionado.pension_certificate_available": "yes",
+        "role.pensionado.pension_duration_type": "lifetime_or_indefinite",
+        "identity.nationality": "United States",
+        "identity.country_of_residence": "United States",
+        "routing.passport_validity_months": "24",
+        "documents.passport_copy_available": "yes",
+        "documents.police_clearance_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "documents.birth_certificate_available": "yes",
+        "documents.passport_photos_available": "yes",
+        "documents.filiacion_form_ready": "yes",
+        "documents.request_letter_ready": "yes",
+        "documents.government_fees_ready": "yes",
+        "documents.apostille_translation_ready": "yes",
+        "documents.pension_receipt_costa_rica_evidence_available": "can_document",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="costa-rica-pensionado")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="costa-rica-pensionado")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    # Relocated/removed questions must never appear in the live flow.
+    assert "documents.ccss_renewal_ready" not in asked_keys
+    assert "routing.temporary_residence_acknowledged" not in asked_keys
+    assert "routing.renewal_every_two_years_acknowledged" not in asked_keys
+
+
+def test_costa_rica_pensionado_relocated_questions_do_not_affect_eligibility():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "documents.ccss_renewal_ready" not in live_keys
+    assert "routing.temporary_residence_acknowledged" not in live_keys
+    assert "routing.renewal_every_two_years_acknowledged" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert "documents.ccss_renewal_ready" in checklist_keys
+    assert "routing.renewal_every_two_years_acknowledged" in checklist_keys
+    # temporary_residence_acknowledged was removed outright (not preserved).
+    assert "routing.temporary_residence_acknowledged" not in checklist_keys
+
+    import app.engine.pathways.costa_rica_pensionado.rules as pensionado_rules
+    import inspect
+
+    source = inspect.getsource(pensionado_rules.evaluate_eligibility)
+    assert '"documents.ccss_renewal_ready"' not in source
+    assert '"routing.temporary_residence_acknowledged"' not in source
+    assert '"routing.renewal_every_two_years_acknowledged"' not in source
+
+    # A fully answered payload omitting the relocated/removed fields entirely
+    # must still be able to reach "eligible" -- confirms they no longer gate
+    # current eligibility.
+    result = evaluate_eligibility(_pensionado_payload(), pathway="costa-rica-pensionado")
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_costa_rica_pensionado_no_escape_choices_anywhere_in_schema():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
 
 def test_spain_below_2800_returns_not_eligible():

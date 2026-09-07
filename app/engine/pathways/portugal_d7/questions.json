@@ -27,7 +27,7 @@
       "label": "Are you applying from your country of nationality?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.lawful_residence_where_applying",
@@ -35,7 +35,7 @@
       "label": "If applying outside your country of nationality, can you prove lawful residence there beyond the requested visa period?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.application_country_matches_nationality", "no"] }
     },
     {
@@ -45,7 +45,7 @@
       "description": "This pathway is a passive-income / own-income residence visa, not a digital nomad or active-employment visa.",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "financial.annual_passive_income_eur",
@@ -70,8 +70,7 @@
         "intellectual_property",
         "savings_or_bank_balance",
         "employment_or_active_work_income",
-        "other",
-        "not_sure"
+        "other"
       ]
     },
     {
@@ -96,7 +95,7 @@
       "label": "Can you show that your income or funds are available in Portugal, such as through a Portuguese bank account?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "will_open_or_transfer", "no", "not_sure"]
+      "choices": ["yes", "will_open_or_transfer", "no"]
     },
     {
       "key": "housing.portugal_accommodation_12_months",
@@ -109,8 +108,7 @@
         "property_deed",
         "other_qualifying_accommodation",
         "less_than_12_months",
-        "not_available",
-        "not_sure"
+        "not_available"
       ]
     },
     {
@@ -151,7 +149,7 @@
       "label": "Can you provide relationship documents for each included family member?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -164,7 +162,8 @@
     {
       "key": "routing.health_travel_insurance_status",
       "depends_on": ["routing.passport_validity_months"],
-      "label": "Do you have health or travel insurance covering medical expenses, urgent medical assistance, and possible repatriation, or will you obtain it?",
+      "label": "Do you have qualifying health or travel insurance, or will you obtain it?",
+      "description": "Coverage must include medical expenses, urgent medical assistance, and possible repatriation.",
       "input_type": "choice",
       "required": true,
       "choices": ["have_it", "will_obtain", "bilateral_exception_applies", "cannot_obtain"]
@@ -175,7 +174,7 @@
       "label": "Can you obtain the required criminal record certificate from your country of nationality or any country where you lived over 1 year?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "under_16_exempt", "no", "not_sure"]
+      "choices": ["yes", "under_16_exempt", "no"]
     },
     {
       "key": "routing.criminal_record_flag",
@@ -183,27 +182,11 @@
       "label": "Do you have any criminal convictions that may appear on the required certificate?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.aima_residence_step_acknowledged",
-      "depends_on": ["routing.criminal_record_flag"],
-      "label": "Do you understand that after D7 visa approval, you must request a residence title from AIMA during the residence stage?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "consulate.discretion_extra_documents_acknowledged",
-      "depends_on": ["compliance.aima_residence_step_acknowledged"],
-      "label": "Do you understand the consulate may request supplementary documents and that missing mandatory documents can lead to refusal?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "compliance.truthful_documents_acknowledged",
-      "depends_on": ["consulate.discretion_extra_documents_acknowledged"],
+      "depends_on": ["routing.criminal_record_flag"],
       "label": "Do you understand that false statements can cause refusal or annulment of a granted visa?",
       "input_type": "choice",
       "required": true,
@@ -216,5 +199,17 @@
       "input_type": "text",
       "required": false
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "This is a real Portugal D7 requirement sourced from requirements_reference.md, but it describes a post-approval residence step rather than a fact needed to determine INITIAL visa eligibility. It was removed from the live eligibility-screening flow and is preserved here for a future post-eligibility guidance surface. Its former requirement code still exists in clarifications.json for that purpose.",
+    "fields": [
+      {
+        "key": "compliance.aima_residence_step_acknowledged",
+        "label": "Do you understand that after D7 visa approval, you must request a residence title from AIMA during the residence stage?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "related_requirement": "aima_residence_step_needs_review"
+      }
+    ]
+  }
 }

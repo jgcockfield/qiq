@@ -180,17 +180,16 @@
     {
       "requirement": "aima_residence_permit_acknowledgement_needs_review",
       "title": "AIMA Residence Permit Step Needs Review",
-      "clarification": "For the residence visa route, the applicant must apply to AIMA for a residence permit after entry. The applicant's understanding of this post-entry step is missing or unclear."
+      "clarification": "For the residence visa route, the applicant must apply to AIMA for a residence permit after entry. The applicant's understanding of this post-entry step is missing or unclear.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.aima_residence_permit_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "renewal_acknowledgement_needs_review",
       "title": "Residence Renewal Requirement Needs Review",
-      "clarification": "For the residence visa route, the remote-work residence authorization is initially valid for 2 years and may be renewed for successive 3-year periods if requirements remain satisfied. The applicant's understanding of this renewal requirement is unclear."
-    },
-    {
-      "requirement": "discretionary_extra_documents_needs_review",
-      "title": "Discretionary Extra-Document Review",
-      "clarification": "Missing mandatory documents may lead to refusal, and the consulate may request supplementary documents. The applicant's understanding of this discretionary review is unclear."
+      "clarification": "For the residence visa route, the remote-work residence authorization is initially valid for 2 years and may be renewed for successive 3-year periods if requirements remain satisfied. The applicant's understanding of this renewal requirement is unclear.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.renewal_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "truthful_documents_not_acknowledged",
