@@ -281,16 +281,21 @@ def _spain_payload(
     health_insurance_status="will_obtain",
     applicant_type="individual",
     dependents_count=None,
-    service_agreements=None,
     employer_outside_spain="yes",
     foreign_employment_months="12",
     remote_work_approved="yes",
+    employer_company_operating_1_year="yes",
+    qualification_or_experience="qualifying_education",
     foreign_client_relationship="yes",
     foreign_client_relationship_months="12",
+    remote_work_capable="yes",
+    foreign_company_operating_1_year="yes",
     spanish_clients_flag="no",
     spanish_activity_percentage=None,
-    supporting_company_operating_1_year="yes",
-    business_owner_work_structure="salary_as_employee",
+    business_outside_spain="yes",
+    months_owned_operated="12",
+    remote_operation_capable="yes",
+    business_operating_1_year="yes",
 ):
     if income_evidence_types is None:
         income_evidence_types = {
@@ -328,20 +333,6 @@ def _spain_payload(
             "1" if dependents_count is None else dependents_count
         )
 
-    if work_relationship in ("employee", "contractor", "business_owner"):
-        payload["routing"]["supporting_company_operating_1_year"] = (
-            supporting_company_operating_1_year
-        )
-
-    if service_agreements is not None:
-        payload["role"]["contractor"] = {
-            "service_agreements_available": service_agreements,
-        }
-    elif work_relationship == "contractor":
-        payload["role"]["contractor"] = {
-            "service_agreements_available": "can_secure_service_agreements",
-        }
-
     role_payload = payload["role"].setdefault(work_relationship, {})
     role_payload.update(
         {
@@ -357,6 +348,8 @@ def _spain_payload(
                 "employer_outside_spain": employer_outside_spain,
                 "foreign_employment_months": foreign_employment_months,
                 "remote_work_approved": remote_work_approved,
+                "employer_company_operating_1_year": employer_company_operating_1_year,
+                "qualification_or_experience": qualification_or_experience,
             }
         )
 
@@ -365,6 +358,9 @@ def _spain_payload(
             {
                 "foreign_client_relationship": foreign_client_relationship,
                 "foreign_client_relationship_months": foreign_client_relationship_months,
+                "remote_work_capable": remote_work_capable,
+                "foreign_company_operating_1_year": foreign_company_operating_1_year,
+                "qualification_or_experience": qualification_or_experience,
                 "spanish_clients_flag": spanish_clients_flag,
             }
         )
@@ -372,25 +368,18 @@ def _spain_payload(
             role_payload["spanish_activity_percentage"] = spanish_activity_percentage
 
     if work_relationship == "business_owner":
-        role_payload["work_structure"] = business_owner_work_structure
-        if business_owner_work_structure == "salary_as_employee":
-            role_payload.update(
-                {
-                    "employer_outside_spain": employer_outside_spain,
-                    "foreign_employment_months": foreign_employment_months,
-                    "remote_work_approved": remote_work_approved,
-                }
-            )
-        elif business_owner_work_structure == "business_or_self_employment_income":
-            role_payload.update(
-                {
-                    "foreign_client_relationship": foreign_client_relationship,
-                    "foreign_client_relationship_months": foreign_client_relationship_months,
-                    "spanish_clients_flag": spanish_clients_flag,
-                }
-            )
-            if spanish_activity_percentage is not None:
-                role_payload["spanish_activity_percentage"] = spanish_activity_percentage
+        role_payload.update(
+            {
+                "business_outside_spain": business_outside_spain,
+                "months_owned_operated": months_owned_operated,
+                "remote_operation_capable": remote_operation_capable,
+                "business_operating_1_year": business_operating_1_year,
+                "qualification_or_experience": qualification_or_experience,
+                "spanish_clients_flag": spanish_clients_flag,
+            }
+        )
+        if spanish_activity_percentage is not None:
+            role_payload["spanish_activity_percentage"] = spanish_activity_percentage
 
     return payload
 
@@ -2772,14 +2761,69 @@ def test_costa_rica_pensionado_no_escape_choices_anywhere_in_schema():
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
 
-def test_spain_below_2800_returns_not_eligible():
+def test_spain_business_owner_below_2026_smi_threshold_returns_not_eligible():
+    """Business Owner now uses the same 2026 SMI-based formula as Employee
+    and Contractor."""
     result = evaluate_eligibility(
-        _spain_payload(monthly_income_eur="2799"),
+        _spain_payload(work_relationship="business_owner", monthly_income_eur="2441"),
         pathway="spain-dnv",
     )
 
     assert result["eligibility_status"] == "not_eligible"
-    assert result["failed_requirements"] == ["income_below_minimum"]
+    assert result["failed_requirements"] == ["business_owner_income_below_minimum"]
+
+
+def test_spain_business_owner_at_2026_smi_threshold_is_eligible():
+    result = evaluate_eligibility(
+        _spain_payload(work_relationship="business_owner", monthly_income_eur="2442"),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+
+def test_spain_employee_below_2026_smi_threshold_returns_not_eligible():
+    """200% of the 2026 SMI (EUR 1,221) = EUR 2,442/month for an individual
+    Employee applicant."""
+    result = evaluate_eligibility(
+        _spain_payload(monthly_income_eur="2441"),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["employee_income_below_minimum"]
+
+
+def test_spain_employee_at_2026_smi_threshold_is_eligible():
+    result = evaluate_eligibility(
+        _spain_payload(monthly_income_eur="2442"),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+
+def test_spain_contractor_below_2026_smi_threshold_returns_not_eligible():
+    """Contractor now uses the same 2026 SMI-based formula as Employee."""
+    result = evaluate_eligibility(
+        _spain_payload(work_relationship="contractor", monthly_income_eur="2441"),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["contractor_income_below_minimum"]
+
+
+def test_spain_contractor_at_2026_smi_threshold_is_eligible():
+    result = evaluate_eligibility(
+        _spain_payload(work_relationship="contractor", monthly_income_eur="2442"),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
 
 
 def test_spain_short_income_history_returns_needs_review():
@@ -2802,42 +2846,29 @@ def test_spain_incomplete_income_evidence_returns_needs_review():
     assert result["failed_requirements"] == ["employee_income_evidence_incomplete"]
 
 
-def test_spain_each_work_type_gets_only_its_role_income_fields():
-    cases = {
-        "employee": [
-            "role.employee.employer_outside_spain",
-            "role.employee.foreign_employment_months",
-            "role.employee.remote_work_approved",
-            "role.employee.monthly_income_eur",
-            "role.employee.income_evidence_types",
-            "role.employee.income_evidence_months",
-            "routing.supporting_company_operating_1_year",
-        ],
-        "contractor": [
-            "role.contractor.foreign_client_relationship",
-            "role.contractor.foreign_client_relationship_months",
-            "role.contractor.spanish_clients_flag",
-            "role.contractor.service_agreements_available",
-            "role.contractor.monthly_income_eur",
-            "role.contractor.income_evidence_types",
-            "role.contractor.income_evidence_months",
-            "routing.supporting_company_operating_1_year",
-        ],
-        "business_owner": [
-            "role.business_owner.work_structure",
-            "role.business_owner.employer_outside_spain",
-            "role.business_owner.foreign_employment_months",
-            "role.business_owner.remote_work_approved",
-            "role.business_owner.monthly_income_eur",
-            "role.business_owner.income_evidence_types",
-            "role.business_owner.income_evidence_months",
-            "routing.supporting_company_operating_1_year",
-        ],
-    }
+def test_spain_employee_gets_only_its_role_income_fields():
+    """Employee has its own dedicated applicant_type position (asked first,
+    before the Employee-specific block) and its own dedicated
+    employer-company-history/qualification questions -- it no longer uses
+    the shared routing.supporting_company_operating_1_year question at all."""
+    expected_keys = [
+        "routing.applicant_type",
+        "role.employee.employer_outside_spain",
+        "role.employee.foreign_employment_months",
+        "role.employee.remote_work_approved",
+        "role.employee.employer_company_operating_1_year",
+        "role.employee.qualification_or_experience",
+        "role.employee.monthly_income_eur",
+        "role.employee.income_evidence_types",
+        "role.employee.income_evidence_months",
+    ]
     answers = {
+        "routing.applicant_type": "individual",
         "role.employee.employer_outside_spain": "yes",
         "role.employee.foreign_employment_months": "12",
         "role.employee.remote_work_approved": "yes",
+        "role.employee.employer_company_operating_1_year": "yes",
+        "role.employee.qualification_or_experience": "qualifying_education",
         "role.employee.monthly_income_eur": "2800",
         "role.employee.income_evidence_types": [
             "bank_statements",
@@ -2845,23 +2876,107 @@ def test_spain_each_work_type_gets_only_its_role_income_fields():
             "pay_stubs",
         ],
         "role.employee.income_evidence_months": "12_or_more",
+    }
+
+    payload = {"routing": {"work_relationship": "employee"}, "role": {}}
+    asked_keys = []
+    for expected_key in expected_keys:
+        result = evaluate(payload, pathway="spain-dnv")
+        asked_keys.append(result["next_field_key"])
+        assert result["next_field_key"] == expected_key
+
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-dnv")
+    assert result["next_field_key"] == "identity.nationality"
+    assert "routing.supporting_company_operating_1_year" not in asked_keys
+    assert all("income." not in key for key in asked_keys)
+
+
+def test_spain_contractor_gets_only_its_role_income_fields():
+    """Contractor has its own dedicated applicant_type position (asked
+    first, before the Contractor-specific block), its own dedicated
+    remote-work/company-history/qualification questions, and no longer asks
+    the old service-agreements question at all."""
+    expected_keys = [
+        "routing.applicant_type",
+        "role.contractor.monthly_income_eur",
+        "role.contractor.foreign_client_relationship",
+        "role.contractor.foreign_client_relationship_months",
+        "role.contractor.remote_work_capable",
+        "role.contractor.foreign_company_operating_1_year",
+        "role.contractor.qualification_or_experience",
+        "role.contractor.spanish_clients_flag",
+        "role.contractor.income_evidence_types",
+        "role.contractor.income_evidence_months",
+    ]
+    answers = {
+        "routing.applicant_type": "individual",
+        "role.contractor.monthly_income_eur": "2800",
         "role.contractor.foreign_client_relationship": "yes",
         "role.contractor.foreign_client_relationship_months": "12",
+        "role.contractor.remote_work_capable": "yes",
+        "role.contractor.foreign_company_operating_1_year": "yes",
+        "role.contractor.qualification_or_experience": "qualifying_education",
         "role.contractor.spanish_clients_flag": "no",
-        "role.contractor.service_agreements_available": "can_secure_service_agreements",
-        "role.contractor.monthly_income_eur": "2800",
         "role.contractor.income_evidence_types": [
             "bank_statements",
             "service_agreements_or_contracts",
             "invoices",
         ],
         "role.contractor.income_evidence_months": "12_or_more",
-        "routing.supporting_company_operating_1_year": "yes",
-        "role.business_owner.work_structure": "salary_as_employee",
-        "role.business_owner.employer_outside_spain": "yes",
-        "role.business_owner.foreign_employment_months": "12",
-        "role.business_owner.remote_work_approved": "yes",
+    }
+
+    payload = {"routing": {"work_relationship": "contractor"}, "role": {}}
+    asked_keys = []
+    for expected_key in expected_keys:
+        result = evaluate(payload, pathway="spain-dnv")
+        asked_keys.append(result["next_field_key"])
+        assert result["next_field_key"] == expected_key
+
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-dnv")
+    assert result["next_field_key"] == "identity.nationality"
+    assert "role.contractor.service_agreements_available" not in asked_keys
+    assert "routing.supporting_company_operating_1_year" not in asked_keys
+    assert all("income." not in key for key in asked_keys)
+
+
+def test_spain_business_owner_gets_only_its_role_income_fields():
+    """Business Owner is ONE work type: no work_structure subrouting, its
+    own dedicated applicant_type position (asked first), and its own
+    dedicated business-location/duration/remote-operation/company-history/
+    qualification questions."""
+    expected_keys = [
+        "routing.applicant_type",
+        "role.business_owner.monthly_income_eur",
+        "role.business_owner.business_outside_spain",
+        "role.business_owner.months_owned_operated",
+        "role.business_owner.remote_operation_capable",
+        "role.business_owner.business_operating_1_year",
+        "role.business_owner.qualification_or_experience",
+        "role.business_owner.spanish_clients_flag",
+        "role.business_owner.income_evidence_types",
+        "role.business_owner.income_evidence_months",
+    ]
+    answers = {
+        "routing.applicant_type": "individual",
         "role.business_owner.monthly_income_eur": "2800",
+        "role.business_owner.business_outside_spain": "yes",
+        "role.business_owner.months_owned_operated": "12",
+        "role.business_owner.remote_operation_capable": "yes",
+        "role.business_owner.business_operating_1_year": "yes",
+        "role.business_owner.qualification_or_experience": "qualifying_education",
+        "role.business_owner.spanish_clients_flag": "no",
         "role.business_owner.income_evidence_types": [
             "bank_statements",
             "business_registration",
@@ -2870,24 +2985,24 @@ def test_spain_each_work_type_gets_only_its_role_income_fields():
         "role.business_owner.income_evidence_months": "12_or_more",
     }
 
-    for work_relationship, expected_keys in cases.items():
-        payload = {"routing": {"work_relationship": work_relationship}, "role": {}}
-
-        asked_keys = []
-        for expected_key in expected_keys:
-            result = evaluate(payload, pathway="spain-dnv")
-            asked_keys.append(result["next_field_key"])
-            assert result["next_field_key"] == expected_key
-
-            current = payload
-            parts = expected_key.split(".")
-            for part in parts[:-1]:
-                current = current.setdefault(part, {})
-            current[parts[-1]] = answers[expected_key]
-
+    payload = {"routing": {"work_relationship": "business_owner"}, "role": {}}
+    asked_keys = []
+    for expected_key in expected_keys:
         result = evaluate(payload, pathway="spain-dnv")
-        assert result["next_field_key"] == "routing.applicant_type"
-        assert all("income." not in key for key in asked_keys)
+        asked_keys.append(result["next_field_key"])
+        assert result["next_field_key"] == expected_key
+
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-dnv")
+    assert result["next_field_key"] == "identity.nationality"
+    assert "role.business_owner.work_structure" not in asked_keys
+    assert "routing.supporting_company_operating_1_year" not in asked_keys
+    assert all("income." not in key for key in asked_keys)
 
 
 def test_spain_valid_employee_contractor_and_business_owner_can_return_eligible():
@@ -2901,67 +3016,58 @@ def test_spain_valid_employee_contractor_and_business_owner_can_return_eligible(
         assert result["failed_requirements"] == []
 
 
-def test_spain_business_owner_salary_as_employee_reuses_employee_style_checks():
+def test_spain_business_owner_is_one_work_type_with_its_own_checks():
     # Passing case.
     result = evaluate_eligibility(
         _spain_payload(
             work_relationship="business_owner",
-            business_owner_work_structure="salary_as_employee",
-            employer_outside_spain="yes",
-            foreign_employment_months="12",
-            remote_work_approved="yes",
-            supporting_company_operating_1_year="yes",
+            business_outside_spain="yes",
+            months_owned_operated="12",
+            remote_operation_capable="yes",
+            business_operating_1_year="yes",
+            qualification_or_experience="qualifying_education",
         ),
         pathway="spain-dnv",
     )
     assert result["eligibility_status"] == "eligible"
     assert result["failed_requirements"] == []
 
-    # Employer/company based in Spain -> reuses the employee hard failure code.
+    # Business based in Spain -> Business-Owner-specific hard failure code.
     result = evaluate_eligibility(
-        _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="salary_as_employee",
-            employer_outside_spain="no",
-        ),
+        _spain_payload(work_relationship="business_owner", business_outside_spain="no"),
         pathway="spain-dnv",
     )
     assert result["eligibility_status"] == "not_eligible"
-    assert "employee_employer_located_in_spain" in result["failed_requirements"]
+    assert "business_owner_business_located_in_spain" in result["failed_requirements"]
 
-    # Relationship below 3 months.
+    # Ownership/operation duration below 3 months.
+    result = evaluate_eligibility(
+        _spain_payload(work_relationship="business_owner", months_owned_operated="2"),
+        pathway="spain-dnv",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert (
+        "business_owner_ownership_duration_below_minimum"
+        in result["failed_requirements"]
+    )
+
+    # Remote operation not possible.
     result = evaluate_eligibility(
         _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="salary_as_employee",
-            foreign_employment_months="2",
+            work_relationship="business_owner", remote_operation_capable="no"
         ),
         pathway="spain-dnv",
     )
     assert result["eligibility_status"] == "not_eligible"
     assert (
-        "employee_foreign_employment_duration_below_minimum"
+        "business_owner_remote_operation_not_possible"
         in result["failed_requirements"]
     )
 
-    # Remote work not approved.
+    # Business operating history below 1 year (shared helper, own dotted key).
     result = evaluate_eligibility(
         _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="salary_as_employee",
-            remote_work_approved="no",
-        ),
-        pathway="spain-dnv",
-    )
-    assert result["eligibility_status"] == "not_eligible"
-    assert "employee_remote_work_not_approved" in result["failed_requirements"]
-
-    # Supporting company operating history below 1 year.
-    result = evaluate_eligibility(
-        _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="salary_as_employee",
-            supporting_company_operating_1_year="no",
+            work_relationship="business_owner", business_operating_1_year="no"
         ),
         pathway="spain-dnv",
     )
@@ -2971,50 +3077,16 @@ def test_spain_business_owner_salary_as_employee_reuses_employee_style_checks():
         in result["failed_requirements"]
     )
 
-
-def test_spain_business_owner_self_employment_reuses_contractor_style_checks():
-    # Passing case.
+    # Qualification/experience: "neither" hard-fails.
     result = evaluate_eligibility(
         _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="business_or_self_employment_income",
-            foreign_client_relationship="yes",
-            foreign_client_relationship_months="12",
-            spanish_clients_flag="no",
-            supporting_company_operating_1_year="yes",
-        ),
-        pathway="spain-dnv",
-    )
-    assert result["eligibility_status"] == "eligible"
-    assert result["failed_requirements"] == []
-
-    # No qualifying foreign client/company relationship.
-    result = evaluate_eligibility(
-        _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="business_or_self_employment_income",
-            foreign_client_relationship="no",
+            work_relationship="business_owner", qualification_or_experience="neither"
         ),
         pathway="spain-dnv",
     )
     assert result["eligibility_status"] == "not_eligible"
     assert (
-        "contractor_foreign_client_relationship_missing"
-        in result["failed_requirements"]
-    )
-
-    # Relationship below 3 months.
-    result = evaluate_eligibility(
-        _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="business_or_self_employment_income",
-            foreign_client_relationship_months="2",
-        ),
-        pathway="spain-dnv",
-    )
-    assert result["eligibility_status"] == "not_eligible"
-    assert (
-        "contractor_foreign_client_duration_below_minimum"
+        "business_owner_qualification_or_experience_not_met"
         in result["failed_requirements"]
     )
 
@@ -3022,7 +3094,6 @@ def test_spain_business_owner_self_employment_reuses_contractor_style_checks():
     result = evaluate_eligibility(
         _spain_payload(
             work_relationship="business_owner",
-            business_owner_work_structure="business_or_self_employment_income",
             spanish_clients_flag="yes",
             spanish_activity_percentage="20",
         ),
@@ -3035,7 +3106,6 @@ def test_spain_business_owner_self_employment_reuses_contractor_style_checks():
     result = evaluate_eligibility(
         _spain_payload(
             work_relationship="business_owner",
-            business_owner_work_structure="business_or_self_employment_income",
             spanish_clients_flag="yes",
             spanish_activity_percentage="21",
         ),
@@ -3043,54 +3113,33 @@ def test_spain_business_owner_self_employment_reuses_contractor_style_checks():
     )
     assert result["eligibility_status"] == "not_eligible"
     assert (
-        "contractor_spanish_activity_above_threshold" in result["failed_requirements"]
-    )
-
-    # Supporting company operating history below 1 year.
-    result = evaluate_eligibility(
-        _spain_payload(
-            work_relationship="business_owner",
-            business_owner_work_structure="business_or_self_employment_income",
-            supporting_company_operating_1_year="no",
-        ),
-        pathway="spain-dnv",
-    )
-    assert result["eligibility_status"] == "not_eligible"
-    assert (
-        "supporting_company_operating_history_below_minimum"
+        "business_owner_spanish_activity_above_threshold"
         in result["failed_requirements"]
     )
 
 
-def test_spain_business_owner_missing_work_structure_returns_needs_review():
-    payload = _spain_payload(work_relationship="business_owner")
-    del payload["role"]["business_owner"]["work_structure"]
+def test_spain_business_owner_has_no_work_structure_subrouting():
+    """Business Owner is ONE work type -- there is no work_structure
+    question, and no Employee-style or Contractor-style sub-branch."""
+    payload = {"routing": {"work_relationship": "business_owner"}, "role": {}}
+    result = evaluate(payload, pathway="spain-dnv")
 
-    result = evaluate_eligibility(payload, pathway="spain-dnv")
+    assert result["next_field_key"] == "routing.applicant_type"
 
-    assert result["eligibility_status"] == "needs_review"
-    assert "business_owner_work_structure_needs_review" in result["failed_requirements"]
+    import app.engine.pathways.spain_dnv.rules as spain_dnv_rules
 
-
-def test_spain_business_owner_question_order_by_work_structure():
-    salary_payload = {"routing": {"work_relationship": "business_owner"}, "role": {}}
-    result = evaluate(salary_payload, pathway="spain-dnv")
-    assert result["next_field_key"] == "role.business_owner.work_structure"
-
-    salary_payload["role"]["business_owner"] = {"work_structure": "salary_as_employee"}
-    result = evaluate(salary_payload, pathway="spain-dnv")
-    assert result["next_field_key"] == "role.business_owner.employer_outside_spain"
-
-    self_employment_payload = {
-        "routing": {"work_relationship": "business_owner"},
-        "role": {
-            "business_owner": {
-                "work_structure": "business_or_self_employment_income",
-            }
-        },
-    }
-    result = evaluate(self_employment_payload, pathway="spain-dnv")
-    assert result["next_field_key"] == "role.business_owner.foreign_client_relationship"
+    assert "business_owner_work_structure_needs_review" not in spain_dnv_rules.HARD_FAILURES
+    source_text = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert '"role.business_owner.work_structure"' not in source_text
+    assert "salary_as_employee" not in source_text
+    assert "business_or_self_employment_income" not in source_text
 
 
 def test_spain_no_escape_choices_in_business_owner_questions():
@@ -3188,19 +3237,45 @@ def test_spain_valid_dnv_applicant_returns_eligible():
     assert result["visa_type"] == "Spain Digital Nomad Visa"
 
 
-def test_spain_contractor_without_service_agreements_returns_needs_review():
-    result = evaluate_eligibility(
-        _spain_payload(
-            work_relationship="contractor",
-            service_agreements="cannot_secure_service_agreements",
-        ),
-        pathway="spain-dnv",
-    )
+def test_spain_contractor_no_longer_has_service_agreements_field_or_dependency():
+    """The old vague 'ability to secure service agreements' question was
+    removed from the live Contractor structure (per the approved Contractor
+    review flow) -- it no longer appears in questions.json and no longer
+    affects eligibility."""
+    import json
+    from pathlib import Path
 
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == [
-        "contractor_service_agreements_unavailable"
-    ]
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "role.contractor.service_agreements_available" not in live_keys
+
+    import app.engine.pathways.spain_dnv.rules as spain_dnv_rules
+
+    assert "contractor_service_agreements_unavailable" not in spain_dnv_rules.HARD_FAILURES
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert '"role.contractor.service_agreements_available"' not in source_text
+
+    # A payload without this field at all is still fully evaluable and eligible.
+    result = evaluate_eligibility(
+        _spain_payload(work_relationship="contractor"), pathway="spain-dnv"
+    )
+    assert result["eligibility_status"] == "eligible"
 
 
 def test_spain_eligible_result_uses_spain_dnv_output():
@@ -3217,7 +3292,7 @@ def test_spain_needs_review_uses_email_output():
     eligibility = evaluate_eligibility(
         _spain_payload(
             work_relationship="contractor",
-            service_agreements="cannot_secure_service_agreements",
+            income_history="less_than_3",
         ),
         pathway="spain-dnv",
     )
@@ -3230,7 +3305,7 @@ def test_spain_needs_review_uses_email_output():
 
 def test_spain_not_eligible_uses_not_qualified_output():
     eligibility = evaluate_eligibility(
-        _spain_payload(monthly_income_eur="2799"),
+        _spain_payload(work_relationship="business_owner", monthly_income_eur="2441"),
         pathway="spain-dnv",
     )
     output = build_output(eligibility)
@@ -3249,29 +3324,43 @@ def test_costa_rica_output_still_uses_default_taxonomy():
     assert output["next_steps"]["action"]["label"] == "Book a consultation with Great Expatations"
 
 
-def test_spain_below_2800_includes_income_clarification():
+def test_spain_business_owner_below_smi_threshold_includes_income_clarification():
     eligibility = evaluate_eligibility(
-        _spain_payload(monthly_income_eur="2799"),
+        _spain_payload(work_relationship="business_owner", monthly_income_eur="2441"),
         pathway="spain-dnv",
     )
     output = build_output(eligibility)
 
-    assert output["clarifications"][0]["requirement"] == "income_below_minimum"
-    assert "EUR 2,800" in output["clarifications"][0]["clarification"]
+    assert output["clarifications"][0]["requirement"] == "business_owner_income_below_minimum"
+    assert "200%" in output["clarifications"][0]["clarification"]
 
 
-def test_spain_contractor_review_includes_service_agreement_clarification():
+def test_spain_employee_below_smi_threshold_includes_employee_income_clarification():
+    eligibility = evaluate_eligibility(
+        _spain_payload(monthly_income_eur="2441"),
+        pathway="spain-dnv",
+    )
+    output = build_output(eligibility)
+
+    assert output["clarifications"][0]["requirement"] == "employee_income_below_minimum"
+    assert "200%" in output["clarifications"][0]["clarification"]
+
+
+def test_spain_contractor_review_includes_qualification_clarification():
     eligibility = evaluate_eligibility(
         _spain_payload(
             work_relationship="contractor",
-            service_agreements="cannot_secure_service_agreements",
+            qualification_or_experience="neither",
         ),
         pathway="spain-dnv",
     )
     output = build_output(eligibility)
 
-    assert output["clarifications"][0]["requirement"] == "contractor_service_agreements_unavailable"
-    assert "business-to-business work relationships" in output["clarifications"][0]["clarification"]
+    assert (
+        output["clarifications"][0]["requirement"]
+        == "contractor_qualification_or_experience_not_met"
+    )
+    assert "professional experience" in output["clarifications"][0]["clarification"]
 
 
 def test_spain_manual_review_includes_manual_review_clarification():
@@ -3312,7 +3401,9 @@ def test_spain_aliases_load_first_question():
 
 
 def test_spain_no_longer_asks_service_interest_or_profession():
-    payload = {"routing": {"work_relationship": "employee"}}
+    payload = {
+        "routing": {"work_relationship": "employee", "applicant_type": "individual"}
+    }
     result = evaluate(payload, pathway="spain-dnv")
 
     assert result["next_field_key"] == "role.employee.employer_outside_spain"
@@ -3323,12 +3414,14 @@ def test_spain_no_longer_asks_service_interest_or_profession():
 def test_spain_numeric_income_question_has_no_band_choices():
     result = evaluate(
         {
-            "routing": {"work_relationship": "employee"},
+            "routing": {"work_relationship": "employee", "applicant_type": "individual"},
             "role": {
                 "employee": {
                     "employer_outside_spain": "yes",
                     "foreign_employment_months": "12",
                     "remote_work_approved": "yes",
+                    "employer_company_operating_1_year": "yes",
+                    "qualification_or_experience": "qualifying_education",
                 }
             },
         },
@@ -3359,3 +3452,110 @@ def test_spain_no_longer_asks_document_readiness_questions():
     assert "documents.civil_documents_available" not in result["missing_fields"]
     assert "documents.apostille_translation_ready" not in result["missing_fields"]
     assert "routing.renewal_compliance_acknowledged" not in result["missing_fields"]
+
+
+def test_spain_contractor_evidence_choices_and_duration_bands_render_exactly_as_approved():
+    import json
+    from pathlib import Path
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    evidence_field = fields_by_key["role.contractor.income_evidence_types"]
+    assert evidence_field["label"] == "Which documents can you provide as proof of your contractor income?"
+    assert evidence_field["choices"] == [
+        "bank_statements",
+        "service_agreements_or_contracts",
+        "invoices",
+        "other",
+    ]
+
+    duration_field = fields_by_key["role.contractor.income_evidence_months"]
+    assert duration_field["label"] == "For how many months can you prove this income with those documents?"
+    assert duration_field["choices"] == ["less_than_3", "3_to_5", "6_to_11", "12_or_more"]
+    assert duration_field["input_type"] == "choice"
+
+    qualification_field = fields_by_key["role.contractor.qualification_or_experience"]
+    assert qualification_field["choices"] == [
+        "qualifying_education",
+        "3_or_more_years_of_relevant_professional_experience",
+        "neither",
+    ]
+
+
+def test_spain_business_owner_evidence_choices_and_duration_bands_render_exactly_as_approved():
+    import json
+    from pathlib import Path
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    income_field = fields_by_key["role.business_owner.monthly_income_eur"]
+    assert income_field["label"] == "What is your average gross monthly income from your business in EUR before tax?"
+    assert income_field["input_type"] == "number"
+
+    evidence_field = fields_by_key["role.business_owner.income_evidence_types"]
+    assert evidence_field["label"] == "Which documents can you provide as proof of your business income?"
+    assert evidence_field["choices"] == [
+        "bank_statements",
+        "business_registration",
+        "tax_returns_or_financial_statements",
+        "profit_loss_statements",
+        "other",
+    ]
+
+    duration_field = fields_by_key["role.business_owner.income_evidence_months"]
+    assert duration_field["label"] == "For how many months can you prove this income with those documents?"
+    assert duration_field["choices"] == ["less_than_3", "3_to_5", "6_to_11", "12_or_more"]
+    assert duration_field["input_type"] == "choice"
+
+    qualification_field = fields_by_key["role.business_owner.qualification_or_experience"]
+    assert qualification_field["choices"] == [
+        "qualifying_education",
+        "3_or_more_years_of_relevant_professional_experience",
+        "neither",
+    ]
+
+    percentage_field = fields_by_key["role.business_owner.spanish_activity_percentage"]
+    assert (
+        percentage_field["label"]
+        == "What percentage of your total professional work will be for clients or companies based in Spain?"
+    )
+    assert "business" not in percentage_field["label"].lower()
+
+
+def test_spain_no_escape_choices_anywhere_in_schema():
+    import json
+    from pathlib import Path
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+    forbidden = {"not_sure", "not_ready", "unknown"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"

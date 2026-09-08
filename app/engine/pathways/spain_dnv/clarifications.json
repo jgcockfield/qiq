@@ -3,9 +3,19 @@
   "visa_type": "Spain Digital Nomad Visa",
   "clarifications": [
     {
-      "requirement": "income_below_minimum",
-      "title": "Income Below Spain DNV Threshold",
-      "clarification": "Spain DNV screening requires gross monthly income of at least EUR 2,800. Based on the amount provided, the application does not currently appear to meet that financial threshold."
+      "requirement": "employee_income_below_minimum",
+      "title": "Employee Income Below Spain DNV Threshold",
+      "clarification": "Spain DNV screening for employees compares gross monthly salary to a threshold based on 200% of Spain's monthly minimum wage (SMI), plus additional amounts for each included dependent. Based on the amount and family size provided, the application does not currently appear to meet that financial threshold."
+    },
+    {
+      "requirement": "employee_qualification_or_experience_not_met",
+      "title": "Qualification Or Experience Requirement Not Met",
+      "clarification": "Spain's Digital Nomad Visa requires employee applicants to hold a qualifying university, vocational-training, or business-school qualification, or to have at least 3 years of relevant professional experience. Based on the information provided, this pathway does not appear to match your situation."
+    },
+    {
+      "requirement": "employee_qualification_or_experience_needs_review",
+      "title": "Qualification Or Experience Needs Review",
+      "clarification": "Whether the applicant holds a qualifying education credential or the required professional experience is missing or unclear. The case should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "income_amount_missing_or_unrecognized",
@@ -18,14 +28,84 @@
       "clarification": "The work relationship is missing or not recognized. The case should be reviewed before eligibility is confirmed because evidence requirements depend on whether the applicant is an employee, contractor, or business owner."
     },
     {
-      "requirement": "contractor_service_agreements_unavailable",
-      "title": "Service Agreement Review Needed",
-      "clarification": "Self-employed applicants may need to show business-to-business work relationships through service agreements, contracts, or similar documentation. If those agreements cannot be secured, the case should be reviewed before eligibility is confirmed."
+      "requirement": "contractor_income_below_minimum",
+      "title": "Contractor Income Below Spain DNV Threshold",
+      "clarification": "Spain DNV screening for contractors compares gross monthly income to a threshold based on 200% of Spain's monthly minimum wage (SMI), plus additional amounts for each included dependent. Based on the amount and family size provided, the application does not currently appear to meet that financial threshold."
     },
     {
-      "requirement": "business_owner_work_structure_needs_review",
-      "title": "Business Owner Work Structure Needs Review",
-      "clarification": "Spain's Digital Nomad Visa evaluates business owners as either a salaried employee of their business or a self-employed professional, depending on how they're paid. Whether this applicant is paid a salary or earns business/self-employment income is missing or unclear. The case should be reviewed before eligibility is confirmed."
+      "requirement": "contractor_remote_work_not_possible",
+      "title": "Remote Work Not Possible",
+      "clarification": "Spain's Digital Nomad Visa requires that the applicant's professional work can be performed remotely from Spain. Based on the information provided, this does not appear to be the case."
+    },
+    {
+      "requirement": "contractor_remote_work_needs_review",
+      "title": "Remote Work Capability Needs Review",
+      "clarification": "Whether the applicant's professional work can be performed remotely from Spain is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "contractor_qualification_or_experience_not_met",
+      "title": "Qualification Or Experience Requirement Not Met",
+      "clarification": "Spain's Digital Nomad Visa requires contractor applicants to hold a qualifying university, vocational-training, or business-school qualification, or to have at least 3 years of relevant professional experience. Based on the information provided, this pathway does not appear to match your situation."
+    },
+    {
+      "requirement": "contractor_qualification_or_experience_needs_review",
+      "title": "Qualification Or Experience Needs Review",
+      "clarification": "Whether the applicant holds a qualifying education credential or the required professional experience is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "business_owner_income_below_minimum",
+      "title": "Business Owner Income Below Spain DNV Threshold",
+      "clarification": "Spain DNV screening for business owners compares average gross monthly income from the business to a threshold based on 200% of Spain's monthly minimum wage (SMI), plus additional amounts for each included dependent. Based on the amount and family size provided, the application does not currently appear to meet that financial threshold."
+    },
+    {
+      "requirement": "business_owner_business_located_in_spain",
+      "title": "Business Must Be Outside Spain",
+      "clarification": "Spain's Digital Nomad Visa requires the business relied on for this application to be based outside Spain. Based on the information provided, the business does not appear to meet this requirement."
+    },
+    {
+      "requirement": "business_owner_business_location_needs_review",
+      "title": "Business Location Needs Review",
+      "clarification": "Whether the business relied on for this application is located outside Spain is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "business_owner_ownership_duration_below_minimum",
+      "title": "Business Ownership Too Recent",
+      "clarification": "Spain's Digital Nomad Visa requires the applicant to have owned or operated the business relied on for this application for at least 3 months. The provided duration is below that minimum."
+    },
+    {
+      "requirement": "business_owner_ownership_duration_needs_review",
+      "title": "Business Ownership Duration Needs Review",
+      "clarification": "The length of time the applicant has owned or operated the business is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "business_owner_remote_operation_not_possible",
+      "title": "Remote Business Operation Not Possible",
+      "clarification": "Spain's Digital Nomad Visa requires that the applicant's business can be operated remotely from Spain. Based on the information provided, this does not appear to be the case."
+    },
+    {
+      "requirement": "business_owner_remote_operation_needs_review",
+      "title": "Remote Business Operation Needs Review",
+      "clarification": "Whether the applicant's business can be operated remotely from Spain is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "business_owner_qualification_or_experience_not_met",
+      "title": "Qualification Or Experience Requirement Not Met",
+      "clarification": "Spain's Digital Nomad Visa requires business-owner applicants to hold a qualifying university, vocational-training, or business-school qualification, or to have at least 3 years of relevant professional experience. Based on the information provided, this pathway does not appear to match your situation."
+    },
+    {
+      "requirement": "business_owner_qualification_or_experience_needs_review",
+      "title": "Qualification Or Experience Needs Review",
+      "clarification": "Whether the applicant holds a qualifying education credential or the required professional experience is missing or unclear. The case should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "business_owner_spanish_activity_above_threshold",
+      "title": "Spanish Professional Activity Too High",
+      "clarification": "Spain permits business-owner applicants to perform up to 20% of their total professional activity for Spain-based clients or companies. Based on the percentage provided, the application exceeds that limit."
+    },
+    {
+      "requirement": "business_owner_spanish_activity_needs_review",
+      "title": "Spanish Professional Activity Needs Review",
+      "clarification": "Whether any Spain-based professional activity is included, and what percentage it represents, is missing or unclear. The case should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "employee_employer_located_in_spain",

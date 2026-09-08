@@ -16,8 +16,17 @@
       "choices": ["business_owner", "contractor", "employee"]
     },
     {
-      "key": "role.employee.employer_outside_spain",
+      "key": "routing.applicant_type",
       "depends_on": ["routing.work_relationship"],
+      "label": "Are you applying as an individual or with family dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["individual", "family"],
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
+    },
+    {
+      "key": "role.employee.employer_outside_spain",
+      "depends_on": ["routing.applicant_type"],
       "label": "Is your employer based outside Spain?",
       "description": "Spain's Digital Nomad Visa requires employees to work for a company located outside Spain.",
       "input_type": "choice",
@@ -37,17 +46,41 @@
     {
       "key": "role.employee.remote_work_approved",
       "depends_on": ["role.employee.foreign_employment_months"],
-      "label": "Can you perform your job remotely from Spain with your employer's approval?",
+      "label": "Has your employer authorized you to work remotely from Spain?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.work_relationship", "employee"] }
     },
     {
-      "key": "role.employee.monthly_income_eur",
+      "key": "role.employee.employer_company_operating_1_year",
       "depends_on": ["role.employee.remote_work_approved"],
+      "label": "Has your employer's company been operating for at least 1 year?",
+      "description": "Spain's Digital Nomad Visa requires the employer relied on for this application to show real and continuous activity for at least 1 year.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
+    },
+    {
+      "key": "role.employee.qualification_or_experience",
+      "depends_on": ["role.employee.employer_company_operating_1_year"],
+      "label": "Do you have a qualifying university, vocational-training, or business-school qualification, or at least 3 years of relevant professional experience?",
+      "description": "Verified requirement under Ley 14/2013, Art. 74 bis.2.",
+      "input_type": "choice",
+      "required": true,
+      "choices": [
+        "qualifying_education",
+        "3_or_more_years_of_relevant_professional_experience",
+        "neither"
+      ],
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
+    },
+    {
+      "key": "role.employee.monthly_income_eur",
+      "depends_on": ["role.employee.qualification_or_experience"],
       "label": "What is your gross monthly salary in EUR before tax?",
-      "description": "Spain DNV screening uses a minimum income threshold of EUR 2,800 per month.",
+      "description": "Spain DNV screening compares this to a threshold based on 200% of Spain's 2026 monthly minimum wage (SMI), plus additional amounts for each included dependent.",
       "input_type": "number",
       "required": true,
       "applies_when": { "equals": ["routing.work_relationship", "employee"] }
@@ -76,8 +109,34 @@
       "applies_when": { "equals": ["routing.work_relationship", "employee"] }
     },
     {
-      "key": "role.contractor.foreign_client_relationship",
+      "key": "routing.dependents_count",
+      "depends_on": ["role.employee.income_evidence_months"],
+      "label": "How many dependents are included in your application?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.work_relationship", "employee"] }
+    },
+    {
+      "key": "routing.applicant_type",
       "depends_on": ["routing.work_relationship"],
+      "label": "Are you applying as an individual or with family dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["individual", "family"],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.monthly_income_eur",
+      "depends_on": ["routing.applicant_type"],
+      "label": "What is your gross monthly freelance or contractor income in EUR before tax?",
+      "description": "Spain DNV screening compares this to a threshold based on 200% of Spain's 2026 monthly minimum wage (SMI), plus additional amounts for each included dependent.",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.foreign_client_relationship",
+      "depends_on": ["role.contractor.monthly_income_eur"],
       "label": "Do you currently provide professional services to at least one client or company based outside Spain?",
       "description": "Spain's Digital Nomad Visa requires self-employed applicants to have a professional relationship with at least one company located outside Spain.",
       "input_type": "choice",
@@ -95,8 +154,41 @@
       "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
     },
     {
-      "key": "role.contractor.spanish_clients_flag",
+      "key": "role.contractor.remote_work_capable",
       "depends_on": ["role.contractor.foreign_client_relationship_months"],
+      "label": "Can you perform your professional work remotely from Spain?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.foreign_company_operating_1_year",
+      "depends_on": ["role.contractor.remote_work_capable"],
+      "label": "Has the foreign client or company you are relying on for this application been operating for at least 1 year?",
+      "description": "Spain's Digital Nomad Visa requires the foreign client or company relied on for this application to show real and continuous activity for at least 1 year.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.qualification_or_experience",
+      "depends_on": ["role.contractor.foreign_company_operating_1_year"],
+      "label": "Do you have a qualifying university, vocational-training, or business-school qualification, or at least 3 years of relevant professional experience?",
+      "description": "Verified requirement under Ley 14/2013, Art. 74 bis.2.",
+      "input_type": "choice",
+      "required": true,
+      "choices": [
+        "qualifying_education",
+        "3_or_more_years_of_relevant_professional_experience",
+        "neither"
+      ],
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "role.contractor.spanish_clients_flag",
+      "depends_on": ["role.contractor.qualification_or_experience"],
       "label": "Will any of your professional work be for clients or companies based in Spain?",
       "input_type": "choice",
       "required": true,
@@ -113,27 +205,9 @@
       "applies_when": { "equals": ["role.contractor.spanish_clients_flag", "yes"] }
     },
     {
-      "key": "role.contractor.service_agreements_available",
-      "depends_on": ["role.contractor.spanish_clients_flag"],
-      "label": "As a self-employed professional, do you collaborate with other businesses and have the ability to secure service agreements or contracts when needed?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["can_secure_service_agreements", "cannot_secure_service_agreements"],
-      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
-    },
-    {
-      "key": "role.contractor.monthly_income_eur",
-      "depends_on": ["role.contractor.service_agreements_available"],
-      "label": "What is your gross monthly freelance or contractor income in EUR before tax?",
-      "description": "Spain DNV screening uses a minimum income threshold of EUR 2,800 per month.",
-      "input_type": "number",
-      "required": true,
-      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
-    },
-    {
       "key": "role.contractor.income_evidence_types",
-      "depends_on": ["role.contractor.monthly_income_eur"],
-      "label": "Which contractor documents can you provide as proof of income?",
+      "depends_on": ["role.contractor.spanish_clients_flag"],
+      "label": "Which documents can you provide as proof of your contractor income?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
@@ -147,104 +221,112 @@
     {
       "key": "role.contractor.income_evidence_months",
       "depends_on": ["role.contractor.income_evidence_types"],
-      "label": "For how many months can you prove this contractor income with those documents?",
+      "label": "For how many months can you prove this income with those documents?",
       "input_type": "choice",
       "required": true,
       "choices": ["less_than_3", "3_to_5", "6_to_11", "12_or_more"],
       "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
     },
     {
-      "key": "role.business_owner.work_structure",
+      "key": "routing.dependents_count",
+      "depends_on": ["role.contractor.income_evidence_months"],
+      "label": "How many dependents are included in your application?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.work_relationship", "contractor"] }
+    },
+    {
+      "key": "routing.applicant_type",
       "depends_on": ["routing.work_relationship"],
-      "label": "How do you earn income from your business?",
-      "description": "Spain's Digital Nomad Visa applies different requirements depending on how you're paid.",
+      "label": "Are you applying as an individual or with family dependents?",
       "input_type": "choice",
       "required": true,
-      "choices": ["salary_as_employee", "business_or_self_employment_income"],
+      "choices": ["individual", "family"],
       "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
-      "key": "role.business_owner.employer_outside_spain",
-      "depends_on": ["role.business_owner.work_structure"],
-      "label": "Is the business that pays your salary based outside Spain?",
-      "description": "Spain's Digital Nomad Visa requires employees to work for a company located outside Spain.",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["role.business_owner.work_structure", "salary_as_employee"] }
-    },
-    {
-      "key": "role.business_owner.foreign_employment_months",
-      "depends_on": ["role.business_owner.employer_outside_spain"],
-      "label": "How many months have you received this salary from the business?",
-      "description": "This employment relationship must have existed for at least 3 months.",
+      "key": "role.business_owner.monthly_income_eur",
+      "depends_on": ["routing.applicant_type"],
+      "label": "What is your average gross monthly income from your business in EUR before tax?",
+      "description": "Spain DNV screening compares this to a threshold based on 200% of Spain's 2026 monthly minimum wage (SMI), plus additional amounts for each included dependent.",
       "input_type": "number",
       "required": true,
-      "applies_when": { "equals": ["role.business_owner.work_structure", "salary_as_employee"] }
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
-      "key": "role.business_owner.remote_work_approved",
-      "depends_on": ["role.business_owner.foreign_employment_months"],
-      "label": "Can you perform this role remotely from Spain with the business's approval?",
+      "key": "role.business_owner.business_outside_spain",
+      "depends_on": ["role.business_owner.monthly_income_eur"],
+      "label": "Is the business you rely on for this application based outside Spain?",
+      "description": "Spain's Digital Nomad Visa requires the business relied on for this application to be based outside Spain.",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
-      "applies_when": { "equals": ["role.business_owner.work_structure", "salary_as_employee"] }
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
-      "key": "role.business_owner.foreign_client_relationship",
-      "depends_on": ["role.business_owner.work_structure"],
-      "label": "Does your business currently provide professional services to at least one client or company based outside Spain?",
-      "description": "Spain's Digital Nomad Visa requires self-employed applicants to have a professional relationship with at least one company located outside Spain.",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["role.business_owner.work_structure", "business_or_self_employment_income"] }
-    },
-    {
-      "key": "role.business_owner.foreign_client_relationship_months",
-      "depends_on": ["role.business_owner.foreign_client_relationship"],
-      "label": "How many months has your business worked with the foreign client or company you will use for this application?",
-      "description": "This professional relationship must have existed for at least 3 months.",
+      "key": "role.business_owner.months_owned_operated",
+      "depends_on": ["role.business_owner.business_outside_spain"],
+      "label": "How many months have you owned or operated this business?",
+      "description": "This business relationship must have existed for at least 3 months.",
       "input_type": "number",
       "required": true,
-      "applies_when": { "equals": ["role.business_owner.work_structure", "business_or_self_employment_income"] }
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
+    },
+    {
+      "key": "role.business_owner.remote_operation_capable",
+      "depends_on": ["role.business_owner.months_owned_operated"],
+      "label": "Can you operate your business remotely from Spain?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
+    },
+    {
+      "key": "role.business_owner.business_operating_1_year",
+      "depends_on": ["role.business_owner.remote_operation_capable"],
+      "label": "Has your business been operating for at least 1 year?",
+      "description": "Spain's Digital Nomad Visa requires the business relied on for this application to show real and continuous activity for at least 1 year.",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
+    },
+    {
+      "key": "role.business_owner.qualification_or_experience",
+      "depends_on": ["role.business_owner.business_operating_1_year"],
+      "label": "Do you have a qualifying university, vocational-training, or business-school qualification, or at least 3 years of relevant professional experience?",
+      "description": "Verified requirement under Ley 14/2013, Art. 74 bis.2.",
+      "input_type": "choice",
+      "required": true,
+      "choices": [
+        "qualifying_education",
+        "3_or_more_years_of_relevant_professional_experience",
+        "neither"
+      ],
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
       "key": "role.business_owner.spanish_clients_flag",
-      "depends_on": ["role.business_owner.foreign_client_relationship_months"],
-      "label": "Will any of your business's professional work be for clients or companies based in Spain?",
+      "depends_on": ["role.business_owner.qualification_or_experience"],
+      "label": "Will any of your professional work be for clients or companies based in Spain?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
-      "applies_when": { "equals": ["role.business_owner.work_structure", "business_or_self_employment_income"] }
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
       "key": "role.business_owner.spanish_activity_percentage",
       "depends_on": ["role.business_owner.spanish_clients_flag"],
-      "label": "What percentage of your business's total professional work will be for clients or companies based in Spain?",
+      "label": "What percentage of your total professional work will be for clients or companies based in Spain?",
       "description": "Enter a number between 0 and 100. Spain allows up to 20% of your professional activity to be for Spain-based clients or companies.",
       "input_type": "number",
       "required": true,
       "applies_when": { "equals": ["role.business_owner.spanish_clients_flag", "yes"] }
     },
     {
-      "key": "role.business_owner.monthly_income_eur",
-      "depends_on": [
-        "role.business_owner.remote_work_approved",
-        "role.business_owner.spanish_clients_flag",
-        "role.business_owner.spanish_activity_percentage"
-      ],
-      "label": "What is your average gross monthly business-owner income in EUR before tax?",
-      "description": "Spain DNV screening uses a minimum income threshold of EUR 2,800 per month.",
-      "input_type": "number",
-      "required": true,
-      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
-    },
-    {
       "key": "role.business_owner.income_evidence_types",
-      "depends_on": ["role.business_owner.monthly_income_eur"],
-      "label": "Which business-owner documents can you provide as proof of business income?",
+      "depends_on": ["role.business_owner.spanish_clients_flag"],
+      "label": "Which documents can you provide as proof of your business income?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
@@ -259,41 +341,19 @@
     {
       "key": "role.business_owner.income_evidence_months",
       "depends_on": ["role.business_owner.income_evidence_types"],
-      "label": "For how many months can you prove this business income with those documents?",
+      "label": "For how many months can you prove this income with those documents?",
       "input_type": "choice",
       "required": true,
       "choices": ["less_than_3", "3_to_5", "6_to_11", "12_or_more"],
       "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
-      "key": "routing.supporting_company_operating_1_year",
-      "depends_on": [
-        "role.employee.income_evidence_months",
-        "role.contractor.income_evidence_months",
-        "role.business_owner.income_evidence_months"
-      ],
-      "label": "Has the company you are relying on for this application been operating for at least 1 year?",
-      "description": "This is your employer if you're an employee, or the foreign client/company you named if you're self-employed.",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"]
-    },
-    {
-      "key": "routing.applicant_type",
-      "depends_on": ["routing.supporting_company_operating_1_year"],
-      "label": "Are you applying as an individual or with family dependents?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["individual", "family"]
-    },
-    {
       "key": "routing.dependents_count",
-      "depends_on": ["routing.applicant_type"],
+      "depends_on": ["role.business_owner.income_evidence_months"],
       "label": "How many dependents are included in your application?",
-      "input_type": "choice",
+      "input_type": "number",
       "required": true,
-      "choices": ["1", "2", "3", "4_or_more"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+      "applies_when": { "equals": ["routing.work_relationship", "business_owner"] }
     },
     {
       "key": "routing.dependent_relationships",
