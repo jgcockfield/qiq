@@ -41,6 +41,15 @@ def _as_values(value: Any) -> List[Any]:
     return [value]
 
 
+def _as_number(value: Any) -> float | None:
+    if isinstance(value, str):
+        value = value.replace(",", "").strip()
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _applies_when_true(payload: Dict[str, Any], spec: Dict[str, Any]) -> bool:
     condition = spec.get("applies_when")
     if not isinstance(condition, dict) or not condition:
@@ -61,6 +70,29 @@ def _applies_when_true(payload: Dict[str, Any], spec: Dict[str, Any]) -> bool:
     if "not_contains" in condition:
         key, expected = condition["not_contains"]
         return expected not in _as_values(_get_dotted(payload, key))
+
+    # Generic numeric comparisons. Each takes [dotted_key, threshold]. If the
+    # current value isn't a parseable number, the condition is not satisfied
+    # (the conditional field stays hidden) rather than guessing.
+    if "less_than" in condition:
+        key, threshold = condition["less_than"]
+        value = _as_number(_get_dotted(payload, key))
+        return value is not None and value < threshold
+
+    if "less_than_or_equal" in condition:
+        key, threshold = condition["less_than_or_equal"]
+        value = _as_number(_get_dotted(payload, key))
+        return value is not None and value <= threshold
+
+    if "greater_than" in condition:
+        key, threshold = condition["greater_than"]
+        value = _as_number(_get_dotted(payload, key))
+        return value is not None and value > threshold
+
+    if "greater_than_or_equal" in condition:
+        key, threshold = condition["greater_than_or_equal"]
+        value = _as_number(_get_dotted(payload, key))
+        return value is not None and value >= threshold
 
     return True
 

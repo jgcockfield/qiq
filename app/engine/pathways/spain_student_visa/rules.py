@@ -37,9 +37,27 @@ VALID_FUNDS_EVIDENCE_TYPES = {
     "grant",
 }
 
+MINIMUM_APPLICATION_TIMING_DAYS = 60
+
+# NOTE: MoveWise review item -- "criminal age in the relevant jurisdiction" has
+# no defined numeric threshold anywhere in this pathway's rules or
+# requirements_reference.md (age of criminal responsibility is inherently
+# jurisdiction-dependent, not a single Spain-wide number). The approved
+# canonical flow collects identity.age as a fact, but this screening does not
+# yet use it to gate the background-check questions -- see the
+# stay_over_6_months derivation and background-check block below, which gate
+# on study duration only. Do not add an age threshold here without legal input.
+#
+# NOTE: MoveWise review item -- study.student_work_intent was simplified from
+# a 3-state legal test (no work / compatible part-time work / incompatible or
+# over-30-hours work) down to the approved Yes/No question. A bare "yes" can
+# no longer be resolved to the old hard-fail-vs-needs-review distinction
+# without guessing which of the two prior categories applies, so "yes" is
+# treated as needs_review (soft), not an automatic hard failure. See the
+# student_work_intent block below.
 HARD_FAILURES = {
     "eu_eea_swiss_or_free_movement_status",
-    "irregular_presence_in_spain",
+    "eu_family_member_route",
     "in_spain_filing_without_lawful_status",
     "study_admission_unavailable",
     "study_program_not_full_time_or_recognized",
@@ -55,7 +73,6 @@ HARD_FAILURES = {
     "health_insurance_unavailable",
     "public_order_security_risk",
     "serious_public_health_disease",
-    "student_work_not_compatible",
 }
 
 
@@ -134,37 +151,38 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     if applicant_type not in {"individual", "family"}:
         failed.append("applicant_type_missing")
 
-    failed.extend(
-        _review_or_hard_for_yes_no(
-            _get_dotted(payload, "identity.eu_eea_swiss_or_free_movement_status"),
-            hard_when_yes="eu_eea_swiss_or_free_movement_status",
-            review_key="eu_eea_swiss_or_free_movement_status_needs_review",
-        )
+    eu_eea_swiss_status = _get_dotted(
+        payload, "identity.eu_eea_swiss_or_free_movement_status"
     )
-
-    irregular_presence = _get_dotted(payload, "routing.irregular_presence_spain")
-    if _is_yes(irregular_presence):
-        failed.append("irregular_presence_in_spain")
-    elif not _is_no(irregular_presence):
-        failed.append("irregular_presence_needs_review")
+    if _is_yes(eu_eea_swiss_status):
+        failed.append("eu_eea_swiss_or_free_movement_status")
+    elif not _is_no(eu_eea_swiss_status):
+        failed.append("eu_eea_swiss_or_free_movement_status_needs_review")
+    else:
+        # Only reachable (and only asked in the live flow) once
+        # eu_eea_swiss_status is confirmed "no" -- see questions.json's
+        # applies_when.
+        eu_family_member_route = _get_dotted(payload, "identity.eu_family_member_route")
+        if _is_yes(eu_family_member_route):
+            failed.append("eu_family_member_route")
+        elif not _is_no(eu_family_member_route):
+            failed.append("eu_family_member_route_needs_review")
 
     application_route = _get_dotted(payload, "routing.application_route")
-    if application_route == "in_spain":
+    if application_route == "from_within_spain":
         lawful_status = _get_dotted(payload, "routing.lawful_status_in_spain")
         if _is_no(lawful_status):
             failed.append("in_spain_filing_without_lawful_status")
         elif not _is_yes(lawful_status):
             failed.append("in_spain_filing_lawful_status_needs_review")
-    elif application_route == "not_sure" or application_route is None:
-        failed.append("application_route_needs_review")
-    elif application_route != "consular_outside_spain":
+    elif application_route != "from_outside_spain":
         failed.append("application_route_needs_review")
 
     study_category = _get_dotted(payload, "study.category")
     if study_category not in VALID_STUDY_CATEGORIES:
         failed.append("study_category_needs_review")
 
-    if application_route == "in_spain" and study_category != "higher_studies":
+    if application_route == "from_within_spain" and study_category != "higher_studies":
         failed.append("in_spain_filing_route_needs_review")
 
     admission = _get_dotted(payload, "study.accepted_by_authorized_institution")
@@ -185,11 +203,15 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     elif modality not in {"in_person", "hybrid"}:
         failed.append("study_modality_needs_review")
 
-    in_person_requirement = _get_dotted(payload, "study.in_person_requirement_met")
-    if _is_no(in_person_requirement):
-        failed.append("in_person_requirement_not_met")
-    elif not _is_yes(in_person_requirement):
-        failed.append("in_person_requirement_needs_review")
+    # study.in_person_requirement_met only applies (and is only asked) when
+    # modality != "in_person" -- see questions.json's applies_when. An
+    # in-person program has no separate in-person requirement to satisfy.
+    if modality != "in_person":
+        in_person_requirement = _get_dotted(payload, "study.in_person_requirement_met")
+        if _is_no(in_person_requirement):
+            failed.append("in_person_requirement_not_met")
+        elif not _is_yes(in_person_requirement):
+            failed.append("in_person_requirement_needs_review")
 
     program_duration_months = _as_float(
         _get_dotted(payload, "study.program_duration_months")
@@ -199,17 +221,28 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     elif program_duration_months <= MINIMUM_STUDY_STAY_MONTHS:
         failed.append("study_stay_not_over_90_days")
 
-    stay_over_6_months = _get_dotted(payload, "study.stay_over_6_months")
-    if stay_over_6_months == "not_sure" or stay_over_6_months is None:
-        failed.append("stay_over_6_months_needs_review")
+    # Stay-over-6-months is now derived directly from program_duration_months
+    # rather than a separate self-reported question -- see questions.json's
+    # background-check applies_when, which uses the same derived condition.
+    stay_over_6_months = (
+        program_duration_months is not None and program_duration_months > 6
+    )
 
-    timing_status = _get_dotted(payload, "study.application_timing_status")
-    if timing_status == "less_than_2_months_no_justification":
-        failed.append("application_timing_too_late")
-    elif timing_status in {"less_than_2_months_with_justification", "not_sure"}:
+    timing_days = _as_float(_get_dotted(payload, "study.application_timing_days"))
+    if timing_days is None:
         failed.append("application_timing_needs_review")
-    elif timing_status != "at_least_2_months_before_start":
-        failed.append("application_timing_needs_review")
+    elif timing_days >= MINIMUM_APPLICATION_TIMING_DAYS:
+        pass
+    else:
+        justification_available = _get_dotted(
+            payload, "study.application_timing_justification_available"
+        )
+        if _is_yes(justification_available):
+            failed.append("application_timing_needs_review")
+        elif _is_no(justification_available):
+            failed.append("application_timing_too_late")
+        else:
+            failed.append("application_timing_needs_review")
 
     enrollment_status = _get_dotted(payload, "study.enrollment_payment_status")
     if enrollment_status == "not_available":
@@ -232,26 +265,16 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         if not _get_dotted(payload, "routing.dependent_ages"):
             failed.append("dependent_ages_missing")
 
-        minor_children = _get_dotted(payload, "routing.minor_children_included")
-        if minor_children == "not_sure" or minor_children is None:
-            failed.append("minor_children_needs_review")
-
-        dependents_allowed = _get_dotted(
-            payload,
-            "routing.dependents_allowed_for_study_category",
-        )
-        if _is_no(dependents_allowed):
-            failed.append("dependents_not_allowed_for_study_category")
-        elif not _is_yes(dependents_allowed):
-            failed.append("dependents_allowed_for_study_category_needs_review")
-
+        # Whether dependents are allowed is now derived directly from
+        # study.category (the reference-defined rule) rather than a separate
+        # applicant self-assessment. Same hard-failure code as before.
         if study_category not in DEPENDENT_ELIGIBLE_STUDY_CATEGORIES:
-            failed.append("dependents_study_category_needs_review")
+            failed.append("dependents_not_allowed_for_study_category")
 
         dependents_work = _get_dotted(payload, "routing.dependents_work_intent")
-        if dependents_work == "intend_to_work":
+        if _is_yes(dependents_work):
             failed.append("dependents_work_not_allowed")
-        elif dependents_work != "no_work":
+        elif not _is_no(dependents_work):
             failed.append("dependents_work_intent_needs_review")
 
     monthly_funds = _as_float(_get_dotted(payload, "financial.monthly_funds_eur"))
@@ -282,27 +305,25 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         failed.append("passport_validity_below_minimum")
 
     health_insurance_status = _get_dotted(payload, "routing.health_insurance_status")
-    if health_insurance_status == "cannot_obtain":
+    if _is_no(health_insurance_status):
         failed.append("health_insurance_unavailable")
     elif health_insurance_status != "have_it":
         failed.append("health_insurance_needs_review")
 
-    if stay_over_6_months == "yes":
-        criminal_age = _get_dotted(payload, "identity.criminal_age_status")
-        if criminal_age == "not_sure" or criminal_age is None:
-            failed.append("criminal_age_status_needs_review")
+    # identity.age is collected per the approved canonical flow but is not
+    # yet used here -- see the MoveWise review note above HARD_FAILURES.
+    # Background-check questions are gated on study duration alone.
+    if stay_over_6_months:
+        background_check_available = _get_dotted(
+            payload,
+            "routing.background_check_available",
+        )
+        if background_check_available != "yes":
+            failed.append("background_check_needs_review")
 
-        if criminal_age in {"yes", "not_sure", None}:
-            background_check_available = _get_dotted(
-                payload,
-                "routing.background_check_available",
-            )
-            if background_check_available != "yes":
-                failed.append("background_check_needs_review")
-
-            criminal_record = _get_dotted(payload, "routing.criminal_record_flag")
-            if criminal_record != "no":
-                failed.append("criminal_record_needs_review")
+        criminal_record = _get_dotted(payload, "routing.criminal_record_flag")
+        if criminal_record != "no":
+            failed.append("criminal_record_needs_review")
 
     public_order_risk = _get_dotted(
         payload,
@@ -322,13 +343,13 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     elif public_health_disease != "no":
         failed.append("public_health_needs_review")
 
+    # Simplified from a 3-state legal test to the approved Yes/No question --
+    # see the MoveWise review note above HARD_FAILURES. "Yes" is routed to
+    # manual review rather than an invented hard-fail/pass split.
     student_work_intent = _get_dotted(payload, "study.student_work_intent")
-    if student_work_intent == "work_over_30_hours_or_not_study_compatible":
-        failed.append("student_work_not_compatible")
-    elif student_work_intent == "work_30_hours_or_less_and_study_compatible":
-        if study_category != "higher_studies":
-            failed.append("student_work_authorization_needs_review")
-    elif student_work_intent != "no_work":
+    if _is_yes(student_work_intent):
+        failed.append("student_work_intent_needs_review")
+    elif not _is_no(student_work_intent):
         failed.append("student_work_intent_needs_review")
 
     if any(requirement in HARD_FAILURES for requirement in failed):

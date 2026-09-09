@@ -26,9 +26,6 @@
       "dependents_not_allowed_for_study_category": {
         "text": "Based on the study category provided, your family dependents may not be eligible to accompany you under the student-family stay route."
       },
-      "student_work_not_compatible": {
-        "text": "Based on the work plans provided, the intended student work does not appear compatible with Spain's student-work limits."
-      },
       "passport_validity_below_minimum": {
         "text": "Based on the passport validity provided, you do not currently appear to meet the Spain Student Visa / Study Stay 1-year passport-validity requirement."
       },
@@ -96,7 +93,7 @@
           "type": "email_followup"
         }
       },
-      "student_work_authorization_needs_review": {
+      "student_work_intent_needs_review": {
         "enabled": true,
         "text": [
           "Your student-work plans need manual review.",
@@ -104,17 +101,6 @@
         ],
         "action": {
           "label": "Wait for student-work review",
-          "type": "email_followup"
-        }
-      },
-      "dependents_allowed_for_study_category_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your family-dependent route needs manual review.",
-          "The team should verify whether your study category allows dependents and whether the dependent funds and documentation can support the case."
-        ],
-        "action": {
-          "label": "Wait for dependent-route review",
           "type": "email_followup"
         }
       }

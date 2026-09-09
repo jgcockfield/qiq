@@ -817,17 +817,19 @@ def _spain_student_payload(
     applicant_type="individual",
     monthly_funds_eur="600",
     dependents_count=None,
-    stay_over_6_months="yes",
+    program_duration_months="12",
     background_check_available="yes",
     criminal_record_flag="no",
     study_category="higher_studies",
-    student_work_intent="no_work",
+    student_work_intent="no",
+    application_timing_days="90",
+    application_timing_justification_available=None,
+    dependents_work_intent="no",
 ):
     payload = {
         "routing": {
             "applicant_type": applicant_type,
-            "irregular_presence_spain": "no",
-            "application_route": "consular_outside_spain",
+            "application_route": "from_outside_spain",
             "passport_validity_months": "24",
             "health_insurance_status": "have_it",
             "public_order_security_risk_flag": "no",
@@ -836,6 +838,8 @@ def _spain_student_payload(
         "identity": {
             "nationality": "United States",
             "eu_eea_swiss_or_free_movement_status": "no",
+            "eu_family_member_route": "no",
+            "age": "25",
         },
         "study": {
             "category": study_category,
@@ -843,9 +847,8 @@ def _spain_student_payload(
             "full_time_recognized_program": "yes",
             "modality": "hybrid",
             "in_person_requirement_met": "yes",
-            "program_duration_months": "12",
-            "stay_over_6_months": stay_over_6_months,
-            "application_timing_status": "at_least_2_months_before_start",
+            "program_duration_months": program_duration_months,
+            "application_timing_days": application_timing_days,
             "enrollment_payment_status": "paid_or_proven",
             "student_work_intent": student_work_intent,
         },
@@ -856,8 +859,17 @@ def _spain_student_payload(
         },
     }
 
-    if stay_over_6_months == "yes":
-        payload["identity"]["criminal_age_status"] = "yes"
+    if application_timing_justification_available is not None:
+        payload["study"][
+            "application_timing_justification_available"
+        ] = application_timing_justification_available
+
+    try:
+        stay_over_6_months = float(program_duration_months) > 6
+    except (TypeError, ValueError):
+        stay_over_6_months = False
+
+    if stay_over_6_months:
         payload["routing"]["background_check_available"] = background_check_available
         payload["routing"]["criminal_record_flag"] = criminal_record_flag
 
@@ -867,9 +879,7 @@ def _spain_student_payload(
                 "dependents_count": "1" if dependents_count is None else dependents_count,
                 "dependent_relationships": "spouse, child",
                 "dependent_ages": "35, 8",
-                "minor_children_included": "yes",
-                "dependents_allowed_for_study_category": "yes",
-                "dependents_work_intent": "no_work",
+                "dependents_work_intent": dependents_work_intent,
             }
         )
 
@@ -933,46 +943,70 @@ def test_spain_student_visa_stay_over_6_months_triggers_background_logic():
     assert result["failed_requirements"] == ["background_check_needs_review"]
 
 
-def test_spain_student_visa_work_intent_can_return_needs_review():
+def test_spain_student_visa_stay_6_months_or_less_skips_background_questions():
+    """Stay-over-6-months is now derived from program_duration_months --
+    there is no separate self-reported question, and durations of exactly
+    6 months or less never trigger the background-check gate."""
     result = evaluate_eligibility(
         _spain_student_payload(
-            study_category="training",
-            student_work_intent="work_30_hours_or_less_and_study_compatible",
+            program_duration_months="6", background_check_available="no"
         ),
         pathway="spain-student-visa",
     )
 
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+
+def test_spain_student_visa_work_intent_can_return_needs_review():
+    """study.student_work_intent was simplified to Yes/No -- any intent to
+    work routes to manual review rather than an automatic hard fail/pass,
+    since the old 3-state legal distinction can no longer be derived from a
+    bare "yes"."""
+    result = evaluate_eligibility(
+        _spain_student_payload(student_work_intent="yes"),
+        pathway="spain-student-visa",
+    )
+
     assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["student_work_authorization_needs_review"]
+    assert result["failed_requirements"] == ["student_work_intent_needs_review"]
+
+    result = evaluate_eligibility(
+        _spain_student_payload(student_work_intent="no"),
+        pathway="spain-student-visa",
+    )
+    assert "student_work_intent_needs_review" not in result["failed_requirements"]
 
 
 def test_spain_student_visa_individual_question_sequence():
+    """Exact canonical order for an individual applicant: EU citizen (no
+    family-member-route branch since eu_eea_swiss=yes skips it), from
+    outside Spain (no lawful-status branch), in-person modality (no
+    in-person-requirement branch), timing >=60 days (no justification
+    branch), duration >6 months (background questions shown)."""
     answers = {
         "routing.applicant_type": "individual",
         "identity.nationality": "United States",
-        "identity.eu_eea_swiss_or_free_movement_status": "no",
-        "routing.irregular_presence_spain": "no",
-        "routing.application_route": "consular_outside_spain",
+        "identity.eu_eea_swiss_or_free_movement_status": "yes",
+        "routing.application_route": "from_outside_spain",
         "study.category": "higher_studies",
         "study.accepted_by_authorized_institution": "yes",
         "study.full_time_recognized_program": "yes",
-        "study.modality": "hybrid",
-        "study.in_person_requirement_met": "yes",
+        "study.modality": "in_person",
         "study.program_duration_months": "12",
-        "study.stay_over_6_months": "yes",
-        "study.application_timing_status": "at_least_2_months_before_start",
+        "study.application_timing_days": "90",
         "study.enrollment_payment_status": "paid_or_proven",
         "financial.monthly_funds_eur": "600",
         "financial.accommodation_prepaid_full_stay": "no",
         "financial.funds_evidence_types": ["bank_statements"],
         "routing.passport_validity_months": "24",
         "routing.health_insurance_status": "have_it",
-        "identity.criminal_age_status": "yes",
+        "identity.age": "25",
         "routing.background_check_available": "yes",
         "routing.criminal_record_flag": "no",
         "routing.public_order_security_risk_flag": "no",
         "routing.public_health_disease_flag": "no",
-        "study.student_work_intent": "no_work",
+        "study.student_work_intent": "no",
     }
     expected_order = list(answers.keys())
 
@@ -991,6 +1025,251 @@ def test_spain_student_visa_individual_question_sequence():
     result = evaluate(payload, pathway="spain-student-visa")
     assert result["next_field_key"] is None
     assert asked_keys == expected_order
+    # Legacy questions must never appear in the live flow.
+    assert "routing.irregular_presence_spain" not in asked_keys
+    assert "study.stay_over_6_months" not in asked_keys
+    assert "study.application_timing_status" not in asked_keys
+    assert "identity.criminal_age_status" not in asked_keys
+    assert "routing.minor_children_included" not in asked_keys
+    assert "routing.dependents_allowed_for_study_category" not in asked_keys
+
+
+def test_spain_student_visa_eu_family_member_route_branch():
+    result = evaluate(
+        {
+            "routing": {"applicant_type": "individual"},
+            "identity": {
+                "nationality": "United States",
+                "eu_eea_swiss_or_free_movement_status": "no",
+            },
+        },
+        pathway="spain-student-visa",
+    )
+    assert result["next_field_key"] == "identity.eu_family_member_route"
+
+    eu_citizen = evaluate(
+        {
+            "routing": {"applicant_type": "individual"},
+            "identity": {
+                "nationality": "United States",
+                "eu_eea_swiss_or_free_movement_status": "yes",
+            },
+        },
+        pathway="spain-student-visa",
+    )
+    assert eu_citizen["next_field_key"] != "identity.eu_family_member_route"
+
+
+def test_spain_student_visa_from_within_spain_shows_lawful_status():
+    payload = {
+        "routing": {"applicant_type": "individual", "application_route": "from_within_spain"},
+        "identity": {
+            "nationality": "United States",
+            "eu_eea_swiss_or_free_movement_status": "no",
+            "eu_family_member_route": "no",
+        },
+    }
+    result = evaluate(payload, pathway="spain-student-visa")
+    assert result["next_field_key"] == "routing.lawful_status_in_spain"
+
+    payload["routing"]["application_route"] = "from_outside_spain"
+    result = evaluate(payload, pathway="spain-student-visa")
+    assert result["next_field_key"] != "routing.lawful_status_in_spain"
+
+
+def test_spain_student_visa_in_person_skips_attendance_condition_question():
+    base = {
+        "routing": {"applicant_type": "individual", "application_route": "from_outside_spain"},
+        "identity": {
+            "nationality": "United States",
+            "eu_eea_swiss_or_free_movement_status": "yes",
+        },
+        "study": {
+            "category": "higher_studies",
+            "accepted_by_authorized_institution": "yes",
+            "full_time_recognized_program": "yes",
+        },
+    }
+
+    in_person_payload = {**base, "study": {**base["study"], "modality": "in_person"}}
+    result = evaluate(in_person_payload, pathway="spain-student-visa")
+    assert result["next_field_key"] != "study.in_person_requirement_met"
+
+    for modality in ("hybrid", "online"):
+        payload = {**base, "study": {**base["study"], "modality": modality}}
+        result = evaluate(payload, pathway="spain-student-visa")
+        assert result["next_field_key"] == "study.in_person_requirement_met"
+
+
+def test_spain_student_visa_application_timing_justification_conditional():
+    def evaluate_up_to_timing(days):
+        payload = {
+            "routing": {
+                "applicant_type": "individual",
+                "application_route": "from_outside_spain",
+            },
+            "identity": {
+                "nationality": "United States",
+                "eu_eea_swiss_or_free_movement_status": "yes",
+            },
+            "study": {
+                "category": "higher_studies",
+                "accepted_by_authorized_institution": "yes",
+                "full_time_recognized_program": "yes",
+                "modality": "in_person",
+                "program_duration_months": "12",
+                "application_timing_days": days,
+            },
+        }
+        return evaluate(payload, pathway="spain-student-visa")
+
+    below_60 = evaluate_up_to_timing("59")
+    assert below_60["next_field_key"] == "study.application_timing_justification_available"
+
+    at_60 = evaluate_up_to_timing("60")
+    assert at_60["next_field_key"] != "study.application_timing_justification_available"
+
+    above_60 = evaluate_up_to_timing("61")
+    assert above_60["next_field_key"] != "study.application_timing_justification_available"
+
+
+def test_spain_student_visa_family_question_sequence():
+    answers = {
+        "routing.applicant_type": "family",
+        "identity.nationality": "United States",
+        "identity.eu_eea_swiss_or_free_movement_status": "yes",
+        "routing.application_route": "from_outside_spain",
+        "study.category": "higher_studies",
+        "study.accepted_by_authorized_institution": "yes",
+        "study.full_time_recognized_program": "yes",
+        "study.modality": "in_person",
+        "study.program_duration_months": "12",
+        "study.application_timing_days": "90",
+        "study.enrollment_payment_status": "paid_or_proven",
+        "financial.monthly_funds_eur": "1050",
+        "financial.accommodation_prepaid_full_stay": "no",
+        "financial.funds_evidence_types": ["bank_statements"],
+        "routing.dependents_count": "1",
+        "routing.dependent_relationships": "spouse",
+        "routing.dependent_ages": "35",
+        "routing.dependents_work_intent": "no",
+        "routing.passport_validity_months": "24",
+        "routing.health_insurance_status": "have_it",
+        "identity.age": "30",
+        "routing.background_check_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "routing.public_order_security_risk_flag": "no",
+        "routing.public_health_disease_flag": "no",
+        "study.student_work_intent": "no",
+    }
+    expected_order = list(answers.keys())
+
+    payload: dict = {}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="spain-student-visa")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="spain-student-visa")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "routing.minor_children_included" not in asked_keys
+    assert "routing.dependents_allowed_for_study_category" not in asked_keys
+
+
+def test_spain_student_visa_dependents_allowed_derived_from_study_category():
+    """The old self-assessed "is your study category eligible to include
+    dependents?" question is gone -- eligibility is derived purely from
+    study.category, matching DEPENDENT_ELIGIBLE_STUDY_CATEGORIES."""
+    eligible_category = evaluate_eligibility(
+        _spain_student_payload(
+            applicant_type="family",
+            study_category="higher_studies",
+            monthly_funds_eur="1050",
+        ),
+        pathway="spain-student-visa",
+    )
+    assert "dependents_not_allowed_for_study_category" not in eligible_category[
+        "failed_requirements"
+    ]
+
+    ineligible_category = evaluate_eligibility(
+        _spain_student_payload(
+            applicant_type="family",
+            study_category="training",
+            monthly_funds_eur="1050",
+        ),
+        pathway="spain-student-visa",
+    )
+    assert (
+        "dependents_not_allowed_for_study_category"
+        in ineligible_category["failed_requirements"]
+    )
+
+    import app.engine.pathways.spain_student_visa.rules as spain_student_visa_rules
+
+    assert (
+        "dependents_not_allowed_for_study_category"
+        in spain_student_visa_rules.HARD_FAILURES
+    )
+
+
+def test_spain_student_visa_exact_choices_match_approved_canonical_flow():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_student_visa"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["study.category"]["choices"] == [
+        "higher_studies",
+        "post_compulsory_secondary",
+        "student_mobility",
+        "specialized_health_training",
+        "volunteering",
+        "training",
+        "other",
+    ]
+    assert fields_by_key["study.enrollment_payment_status"]["choices"] == [
+        "paid_or_proven",
+        "responsible_declaration_available",
+        "not_available",
+    ]
+    assert fields_by_key["financial.funds_evidence_types"]["choices"] == [
+        "bank_statements",
+        "scholarship",
+        "family_support",
+        "grant",
+        "other",
+    ]
+    assert fields_by_key["routing.health_insurance_status"]["choices"] == [
+        "have_it",
+        "will_obtain",
+        "no",
+    ]
+    assert fields_by_key["study.program_duration_months"]["input_type"] == "number"
+    assert fields_by_key["study.application_timing_days"]["input_type"] == "number"
+    assert fields_by_key["identity.age"]["input_type"] == "number"
+    assert fields_by_key["identity.age"]["label"] == "What is your age?"
+    assert "identity.criminal_age_status" not in fields_by_key
+    assert "study.stay_over_6_months" not in fields_by_key
+    assert "study.application_timing_status" not in fields_by_key
+    assert "routing.irregular_presence_spain" not in fields_by_key
+    assert "routing.minor_children_included" not in fields_by_key
+    assert "routing.dependents_allowed_for_study_category" not in fields_by_key
 
 
 def test_spain_student_visa_no_escape_choices_anywhere_in_schema():
@@ -1011,6 +1290,68 @@ def test_spain_student_visa_no_escape_choices_anywhere_in_schema():
         choices = field.get("choices") or []
         overlap = forbidden.intersection(choices)
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+
+def test_generic_applies_when_numeric_comparison_operators():
+    """Generic numeric applies_when operators added to support Spain Student
+    Visa's approved application-timing/duration conditions. Not
+    pathway-specific -- lives in evaluator.py's _applies_when_true()."""
+    from app.engine.evaluator import _applies_when_true
+
+    less_than_spec = {"applies_when": {"less_than": ["a.value", 60]}}
+    assert _applies_when_true({"a": {"value": "59"}}, less_than_spec) is True
+    assert _applies_when_true({"a": {"value": "60"}}, less_than_spec) is False
+    assert _applies_when_true({"a": {"value": "not-a-number"}}, less_than_spec) is False
+    assert _applies_when_true({"a": {}}, less_than_spec) is False
+
+    less_than_or_equal_spec = {"applies_when": {"less_than_or_equal": ["a.value", 60]}}
+    assert _applies_when_true({"a": {"value": "60"}}, less_than_or_equal_spec) is True
+    assert _applies_when_true({"a": {"value": "61"}}, less_than_or_equal_spec) is False
+
+    greater_than_spec = {"applies_when": {"greater_than": ["a.value", 6]}}
+    assert _applies_when_true({"a": {"value": "7"}}, greater_than_spec) is True
+    assert _applies_when_true({"a": {"value": "6"}}, greater_than_spec) is False
+
+    greater_than_or_equal_spec = {
+        "applies_when": {"greater_than_or_equal": ["a.value", 6]}
+    }
+    assert _applies_when_true({"a": {"value": "6"}}, greater_than_or_equal_spec) is True
+    assert _applies_when_true({"a": {"value": "5"}}, greater_than_or_equal_spec) is False
+
+
+def test_generic_applies_when_existing_operators_still_work():
+    """Confirms adding the numeric operators did not disturb the existing
+    equals/not_equals/contains/not_contains operators used by every other
+    pathway."""
+    from app.engine.evaluator import _applies_when_true
+
+    equals_spec = {"applies_when": {"equals": ["a.value", "family"]}}
+    assert _applies_when_true({"a": {"value": "family"}}, equals_spec) is True
+    assert _applies_when_true({"a": {"value": "individual"}}, equals_spec) is False
+
+    not_equals_spec = {"applies_when": {"not_equals": ["a.value", "employee"]}}
+    assert _applies_when_true({"a": {"value": "contractor"}}, not_equals_spec) is True
+    assert _applies_when_true({"a": {"value": "employee"}}, not_equals_spec) is False
+
+    contains_spec = {"applies_when": {"contains": ["a.value", "bank_statements"]}}
+    assert (
+        _applies_when_true({"a": {"value": ["bank_statements", "other"]}}, contains_spec)
+        is True
+    )
+    assert _applies_when_true({"a": {"value": ["other"]}}, contains_spec) is False
+
+    not_contains_spec = {"applies_when": {"not_contains": ["a.value", "other"]}}
+    assert (
+        _applies_when_true({"a": {"value": ["bank_statements"]}}, not_contains_spec)
+        is True
+    )
+    assert (
+        _applies_when_true({"a": {"value": ["bank_statements", "other"]}}, not_contains_spec)
+        is False
+    )
+
+    no_condition_spec = {}
+    assert _applies_when_true({}, no_condition_spec) is True
 
 
 def test_spain_nlv_aliases_load_first_question():

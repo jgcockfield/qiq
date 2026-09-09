@@ -18,14 +18,14 @@
       "clarification": "The applicant's EU, EEA, Swiss, or free-movement status is unclear. The case should be reviewed before Spain Student Visa eligibility is confirmed."
     },
     {
-      "requirement": "irregular_presence_in_spain",
-      "title": "Irregular Presence in Spain",
-      "clarification": "The reference requirement states that the applicant must not be irregularly present in Spain. Current irregular presence is a disqualifying factor for this screening."
+      "requirement": "eu_family_member_route",
+      "title": "EU Family-Member Residence Route",
+      "clarification": "Spain Student Visa screening is not for applicants residing in Spain under EU family-member residence rules (as the spouse, child, or parent of an EU, EEA, or Swiss citizen). If that route applies, this pathway does not appear to be the right category."
     },
     {
-      "requirement": "irregular_presence_needs_review",
-      "title": "Immigration Status Needs Review",
-      "clarification": "The applicant's current Spain immigration status is unclear. The case should be reviewed to confirm they are not irregularly present in Spain."
+      "requirement": "eu_family_member_route_needs_review",
+      "title": "EU Family-Member Route Needs Review",
+      "clarification": "Whether the applicant is applying under EU family-member residence rules is unclear. The case should be reviewed before Spain Student Visa eligibility is confirmed."
     },
     {
       "requirement": "application_route_needs_review",
@@ -103,14 +103,9 @@
       "clarification": "This pathway is for study stays over 90 days. A stay of 90 days or less does not appear to match the long-duration Spain Student Visa route."
     },
     {
-      "requirement": "stay_over_6_months_needs_review",
-      "title": "Stay Length Needs Review",
-      "clarification": "It is unclear whether the stay exceeds 6 months. This matters because longer stays may trigger criminal-record and TIE requirements."
-    },
-    {
       "requirement": "application_timing_too_late",
       "title": "Application Timing Too Late",
-      "clarification": "The reference states that the application must be submitted at least 2 months before studies begin, unless a justified exception applies. Filing late without justification does not appear to meet this timing requirement."
+      "clarification": "The reference states that the application must be submitted at least 60 days before studies begin, unless a justified exception applies. Filing late without justification does not appear to meet this timing requirement."
     },
     {
       "requirement": "application_timing_needs_review",
@@ -168,24 +163,9 @@
       "clarification": "When dependents are included, the application should identify each dependent's age. Dependent age may affect document review and family-route analysis."
     },
     {
-      "requirement": "minor_children_needs_review",
-      "title": "Minor Children Need Review",
-      "clarification": "It is unclear whether any included dependents are minor children. The case should be reviewed because minor-child status can affect family documentation and stay requirements."
-    },
-    {
       "requirement": "dependents_not_allowed_for_study_category",
       "title": "Dependents Not Allowed for Study Category",
       "clarification": "The reference notes that family dependents may accompany only for higher studies or specialized health training. If the selected study category does not allow dependents, the family route does not appear to qualify."
-    },
-    {
-      "requirement": "dependents_allowed_for_study_category_needs_review",
-      "title": "Dependent Route Needs Review",
-      "clarification": "It is unclear whether the selected study category allows family dependents. The case should be reviewed before family eligibility is confirmed."
-    },
-    {
-      "requirement": "dependents_study_category_needs_review",
-      "title": "Dependent Study Category Needs Review",
-      "clarification": "Family dependents are generally tied to higher studies or specialized health training. The selected study category should be reviewed to confirm whether dependents can be included."
     },
     {
       "requirement": "dependents_work_not_allowed",
@@ -218,14 +198,9 @@
       "clarification": "The applicant does not currently have qualifying Spain-authorized health insurance or the status is unclear. The case should be reviewed to confirm whether qualifying coverage can be obtained."
     },
     {
-      "requirement": "criminal_age_status_needs_review",
-      "title": "Criminal Age Status Needs Review",
-      "clarification": "For stays over 6 months, criminal-record requirements depend on whether the applicant is of criminal age. The case should be reviewed to confirm whether this requirement applies."
-    },
-    {
       "requirement": "background_check_needs_review",
       "title": "Criminal Record Certificates Need Review",
-      "clarification": "For stays over 6 months, applicants of criminal age may need criminal record certificates from the country of origin or residence covering the prior 5 years. If those certificates are unavailable or uncertain, the case needs review."
+      "clarification": "For stays over 6 months, the applicant may need criminal record certificates from the country of origin or residence covering the prior 5 years. If those certificates are unavailable or uncertain, the case needs review."
     },
     {
       "requirement": "criminal_record_needs_review",
@@ -253,19 +228,9 @@
       "clarification": "The public-health answer is unclear. The case should be reviewed to confirm whether the applicant can satisfy the Spain Student Visa medical requirement."
     },
     {
-      "requirement": "student_work_not_compatible",
-      "title": "Student Work Not Compatible",
-      "clarification": "Student work must remain compatible with studies and cannot exceed 30 hours per week. Work over that limit or incompatible with studies does not appear to satisfy the student-work rule."
-    },
-    {
-      "requirement": "student_work_authorization_needs_review",
-      "title": "Student Work Authorization Needs Review",
-      "clarification": "Higher-study authorization may automatically allow work, while other categories may require additional authorization. The case should be reviewed before confirming work eligibility."
-    },
-    {
       "requirement": "student_work_intent_needs_review",
       "title": "Student Work Intent Needs Review",
-      "clarification": "The applicant's work plans while studying are unclear. The case should be reviewed for study compatibility, category authorization, and the 30-hour weekly limit."
+      "clarification": "The applicant indicated an intent to work while studying, or the answer is unclear. The case should be reviewed for study-category work authorization, study compatibility, and any applicable weekly-hours limit."
     },
     {
       "requirement": "needs_manual_review",

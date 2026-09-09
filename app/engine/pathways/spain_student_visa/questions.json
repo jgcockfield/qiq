@@ -24,35 +24,36 @@
     {
       "key": "identity.eu_eea_swiss_or_free_movement_status",
       "depends_on": ["identity.nationality"],
-      "label": "Are you an EU, EEA, or Swiss citizen, or covered by EU free-movement rules?",
+      "label": "Are you a citizen of an EU, EEA, or Swiss country?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
     },
     {
-      "key": "routing.irregular_presence_spain",
+      "key": "identity.eu_family_member_route",
       "depends_on": ["identity.eu_eea_swiss_or_free_movement_status"],
-      "label": "Are you currently irregularly present in Spain?",
+      "label": "Are you applying in Spain under EU family-member residence rules?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no"]
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["identity.eu_eea_swiss_or_free_movement_status", "no"] }
     },
     {
       "key": "routing.application_route",
-      "depends_on": ["routing.irregular_presence_spain"],
-      "label": "Where do you expect to file the Spain Student Visa or study-stay application?",
+      "depends_on": ["identity.eu_family_member_route"],
+      "label": "Where will you submit your student visa or residence application?",
       "input_type": "choice",
       "required": true,
-      "choices": ["consular_outside_spain", "in_spain"]
+      "choices": ["from_outside_spain", "from_within_spain"]
     },
     {
       "key": "routing.lawful_status_in_spain",
       "depends_on": ["routing.application_route"],
-      "label": "If filing from Spain, are you legally present in Spain now?",
+      "label": "Are you currently in Spain with valid legal immigration status?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.application_route", "in_spain"] }
+      "applies_when": { "equals": ["routing.application_route", "from_within_spain"] }
     },
     {
       "key": "study.category",
@@ -73,7 +74,7 @@
     {
       "key": "study.accepted_by_authorized_institution",
       "depends_on": ["study.category"],
-      "label": "Have you been accepted by an authorized or recognized institution, center, or program in Spain?",
+      "label": "Have you been accepted by an authorized educational institution in Spain?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -81,7 +82,7 @@
     {
       "key": "study.full_time_recognized_program",
       "depends_on": ["study.accepted_by_authorized_institution"],
-      "label": "Is the program full-time and recognized for the study category you selected?",
+      "label": "Is your program a recognized full-time course of study?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -89,7 +90,7 @@
     {
       "key": "study.modality",
       "depends_on": ["study.full_time_recognized_program"],
-      "label": "What is the study modality for the program?",
+      "label": "How will you attend the program?",
       "input_type": "choice",
       "required": true,
       "choices": ["in_person", "hybrid", "online"]
@@ -97,42 +98,39 @@
     {
       "key": "study.in_person_requirement_met",
       "depends_on": ["study.modality"],
-      "label": "Does the program meet Spain's in-person or hybrid attendance requirement for your study category?",
+      "label": "Does your program meet Spain's required in-person attendance conditions?",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no"]
+      "choices": ["yes", "no"],
+      "applies_when": { "not_equals": ["study.modality", "in_person"] }
     },
     {
       "key": "study.program_duration_months",
-      "depends_on": ["study.in_person_requirement_met"],
-      "label": "How many months is your official study program or stay in Spain?",
+      "depends_on": ["study.modality"],
+      "label": "How many months will your program last?",
       "input_type": "number",
       "required": true
     },
     {
-      "key": "study.stay_over_6_months",
+      "key": "study.application_timing_days",
       "depends_on": ["study.program_duration_months"],
-      "label": "Will your stay in Spain be longer than 6 months?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"]
+      "label": "How many days before your program begins do you plan to submit your application?",
+      "input_type": "number",
+      "required": true
     },
     {
-      "key": "study.application_timing_status",
-      "depends_on": ["study.stay_over_6_months"],
-      "label": "Will the application be filed at least 2 months before the study start date?",
+      "key": "study.application_timing_justification_available",
+      "depends_on": ["study.application_timing_days"],
+      "label": "Do you have a justified reason for submitting your application less than 60 days before the program begins?",
       "input_type": "choice",
       "required": true,
-      "choices": [
-        "at_least_2_months_before_start",
-        "less_than_2_months_with_justification",
-        "less_than_2_months_no_justification"
-      ]
+      "choices": ["yes", "no"],
+      "applies_when": { "less_than": ["study.application_timing_days", 60] }
     },
     {
       "key": "study.enrollment_payment_status",
-      "depends_on": ["study.application_timing_status"],
-      "label": "Can you prove admission and enrollment or registration payment for the program?",
+      "depends_on": ["study.application_timing_days"],
+      "label": "Have you completed the required enrollment or tuition-payment step for your program?",
       "input_type": "choice",
       "required": true,
       "choices": [
@@ -144,7 +142,7 @@
     {
       "key": "financial.monthly_funds_eur",
       "depends_on": ["study.enrollment_payment_status"],
-      "label": "What monthly amount in EUR can you show for living costs during your stay, excluding study costs?",
+      "label": "What is the total monthly amount in EUR available to support you during your stay in Spain?",
       "description": "Spain Student Visa screening uses the official IPREM-based financial requirement for the main applicant and any dependents.",
       "input_type": "number",
       "required": true
@@ -152,7 +150,7 @@
     {
       "key": "financial.accommodation_prepaid_full_stay",
       "depends_on": ["financial.monthly_funds_eur"],
-      "label": "Is accommodation prepaid for the full stay?",
+      "label": "Have you prepaid accommodation for your full stay in Spain?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -160,7 +158,7 @@
     {
       "key": "financial.funds_evidence_types",
       "depends_on": ["financial.accommodation_prepaid_full_stay"],
-      "label": "Which documents can you provide as proof of funds for the stay?",
+      "label": "Which documents can you provide as evidence of your financial means?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
@@ -196,30 +194,12 @@
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
-      "key": "routing.minor_children_included",
-      "depends_on": ["routing.dependent_ages"],
-      "label": "Are any included dependents minor children?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
-      "key": "routing.dependents_allowed_for_study_category",
-      "depends_on": ["routing.dependent_relationships"],
-      "label": "Is your study category eligible to include family dependents?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
       "key": "routing.dependents_work_intent",
-      "depends_on": ["routing.dependents_allowed_for_study_category"],
-      "label": "Will any included family member work in Spain under the student-family stay?",
+      "depends_on": ["routing.dependent_ages"],
+      "label": "Do any of your dependents plan to work while living in Spain?",
       "input_type": "choice",
       "required": true,
-      "choices": ["no_work", "intend_to_work"],
+      "choices": ["yes", "no"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -232,42 +212,40 @@
     {
       "key": "routing.health_insurance_status",
       "depends_on": ["routing.passport_validity_months"],
-      "label": "Do you have qualifying health insurance with an insurer authorized to operate in Spain, or will you obtain it?",
+      "label": "Do you have qualifying health insurance for Spain, or will you obtain it?",
       "input_type": "choice",
       "required": true,
-      "choices": ["have_it", "will_obtain", "cannot_obtain"]
+      "choices": ["have_it", "will_obtain", "no"]
     },
     {
-      "key": "identity.criminal_age_status",
-      "depends_on": ["study.stay_over_6_months"],
-      "label": "If the stay is longer than 6 months, are you of criminal age in the relevant jurisdiction?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["study.stay_over_6_months", "yes"] }
+      "key": "identity.age",
+      "depends_on": ["routing.health_insurance_status"],
+      "label": "What is your age?",
+      "input_type": "number",
+      "required": true
     },
     {
       "key": "routing.background_check_available",
-      "depends_on": ["identity.criminal_age_status"],
-      "label": "Can you obtain criminal record certificates for your country of origin and countries of residence during the previous 5 years?",
+      "depends_on": ["identity.age"],
+      "label": "Can you obtain the required criminal background certificate or police clearance?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
-      "applies_when": { "equals": ["study.stay_over_6_months", "yes"] }
+      "applies_when": { "greater_than": ["study.program_duration_months", 6] }
     },
     {
       "key": "routing.criminal_record_flag",
       "depends_on": ["routing.background_check_available"],
-      "label": "Do you have any criminal convictions that may appear on those background checks?",
+      "label": "Do you have any criminal convictions that may appear on a background check?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
-      "applies_when": { "equals": ["study.stay_over_6_months", "yes"] }
+      "applies_when": { "greater_than": ["study.program_duration_months", 6] }
     },
     {
       "key": "routing.public_order_security_risk_flag",
       "depends_on": ["routing.criminal_record_flag"],
-      "label": "Are you aware of any public-order, security, public-health, or entry-ban issue that may affect admission to Spain?",
+      "label": "Have you ever been refused entry to Spain or another Schengen country, been deported, or been flagged as a public-order or security risk?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -286,11 +264,7 @@
       "label": "Do you plan to work while studying in Spain?",
       "input_type": "choice",
       "required": true,
-      "choices": [
-        "no_work",
-        "work_30_hours_or_less_and_study_compatible",
-        "work_over_30_hours_or_not_study_compatible"
-      ]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.additional_information",
