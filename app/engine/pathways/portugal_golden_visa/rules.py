@@ -38,54 +38,53 @@ VALID_SOCIAL_SECURITY_CLEARANCE_STATUSES = {
     "not_registered_with_portuguese_social_security",
 }
 
-VALID_FOREIGN_TAX_ID_STATUSES = {
-    "yes",
-    "proof_none_exists",
-}
-
-# NOTE: routing.family_documents_available and routing.additional_information
-# were removed from the live eligibility flow (and from this module) per Phase
-# A of the approved Portugal Golden Visa cleanup (questions_golden_visa.md).
-# family_documents_available's only eligibility consequence
-# (family_documents_needs_review) was never a hard failure, so removing it
-# loses no substantive eligibility behavior. additional_information had no
-# eligibility effect at all (required: false, never evaluated).
+# NOTE: Phase B (final canonical-parity cleanup) removed the following
+# document-readiness / application-process live questions and all
+# eligibility consequences tied solely to them, per the approved
+# questions_golden_visa.md:
+#   investment.real_estate_only_basis (redundant cross-check of the same
+#     real_estate_only_basis fact already captured by investment.route)
+#   investment.job_creation.evidence_available
+#   investment.fund.subscription_documents_available
+#   investment.company_capitalization.company_and_employment_documents_available
+#   investment.proof_of_funds_or_transfer_available
+#   documents.criminal_record_certificate_available
+#   documents.foreign_tax_id_disclosure_available
+#   compliance.investment_maintenance_declaration_available
+# The scientific-research and arts/cultural-heritage "confirmation available"
+# document-readiness questions were replaced (not merely removed) by factual
+# qualifying-institution / qualifying-entity questions:
+#   investment.scientific_research.institution_confirmation_available
+#     -> investment.scientific_research.institution_qualifies
+#   investment.arts_cultural_heritage.qualifying_entity_confirmation_available
+#     -> investment.arts_cultural_heritage.entity_qualifies
+# documents.valid_passport_available was reworded to a factual question and
+# its severity was downgraded from a hard failure to needs_review, since not
+# currently holding a passport in hand does not establish that a qualifying
+# passport cannot be obtained.
+# routing.family_documents_available and routing.additional_information were
+# already removed in Phase A and remain removed.
 #
-# The following fields remain live with UNCHANGED behavior pending MoveWise
-# legal/product review, per Phase A scope: investment.real_estate_only_basis,
-# investment.job_creation.evidence_available,
-# investment.scientific_research.institution_confirmation_available,
-# investment.arts_cultural_heritage.qualifying_entity_confirmation_available,
-# investment.fund.subscription_documents_available,
-# investment.company_capitalization.company_and_employment_documents_available,
-# investment.proof_of_funds_or_transfer_available,
-# documents.valid_passport_available,
-# documents.criminal_record_certificate_available,
-# documents.foreign_tax_id_disclosure_available,
-# compliance.investment_maintenance_declaration_available.
+# See the MoveWise Review Notes in the Phase B final report for the open
+# legal/product questions this removal raises. The inert post-eligibility
+# fields (compliance.minimum_stay_acknowledged,
+# compliance.renewal_investment_maintenance_acknowledged) are unaffected.
 HARD_FAILURES = {
     "arts_cultural_heritage_amount_below_minimum",
-    "arts_cultural_heritage_qualifying_entity_unavailable",
+    "arts_cultural_heritage_entity_not_qualifying",
     "company_capitalization_amount_below_minimum",
-    "company_capitalization_documents_unavailable",
     "company_capitalization_job_requirement_not_met",
     "entry_stay_ban",
-    "foreign_tax_id_disclosure_unavailable",
     "fund_amount_below_minimum",
     "fund_maturity_below_minimum",
     "fund_not_non_real_estate",
     "fund_portuguese_company_investment_below_minimum",
-    "fund_subscription_documents_unavailable",
-    "investment_maintenance_declaration_unavailable",
-    "investment_proof_or_transfer_unavailable",
     "job_creation_below_minimum",
-    "job_creation_evidence_unavailable",
-    "passport_unavailable",
     "portuguese_eu_eea_andorra_swiss_national",
     "portuguese_tax_debts",
     "real_estate_only_basis",
     "scientific_research_amount_below_minimum",
-    "scientific_research_institution_confirmation_unavailable",
+    "scientific_research_institution_not_qualifying",
     "serious_criminal_conviction",
     "sii_ucfe_refusal_alert",
     "social_security_debts",
@@ -166,14 +165,6 @@ def _evaluate_job_creation_route(payload: Dict[str, Any], failed: List[str]) -> 
     elif jobs_created < MINIMUM_JOB_CREATION_COUNT:
         failed.append("job_creation_below_minimum")
 
-    _evaluate_yes_no_requirement(
-        payload,
-        failed,
-        "investment.job_creation.evidence_available",
-        unavailable_key="job_creation_evidence_unavailable",
-        review_key="job_creation_evidence_needs_review",
-    )
-
 
 def _evaluate_scientific_research_route(
     payload: Dict[str, Any],
@@ -185,13 +176,14 @@ def _evaluate_scientific_research_route(
     elif amount < MINIMUM_RESEARCH_INVESTMENT_EUR:
         failed.append("scientific_research_amount_below_minimum")
 
-    _evaluate_yes_no_requirement(
+    institution_qualifies = _get_dotted(
         payload,
-        failed,
-        "investment.scientific_research.institution_confirmation_available",
-        unavailable_key="scientific_research_institution_confirmation_unavailable",
-        review_key="scientific_research_institution_confirmation_needs_review",
+        "investment.scientific_research.institution_qualifies",
     )
+    if _is_no(institution_qualifies):
+        failed.append("scientific_research_institution_not_qualifying")
+    elif not _is_yes(institution_qualifies):
+        failed.append("scientific_research_institution_qualification_needs_review")
 
 
 def _evaluate_arts_cultural_heritage_route(
@@ -206,13 +198,14 @@ def _evaluate_arts_cultural_heritage_route(
     elif amount < MINIMUM_ARTS_CULTURAL_HERITAGE_INVESTMENT_EUR:
         failed.append("arts_cultural_heritage_amount_below_minimum")
 
-    _evaluate_yes_no_requirement(
+    entity_qualifies = _get_dotted(
         payload,
-        failed,
-        "investment.arts_cultural_heritage.qualifying_entity_confirmation_available",
-        unavailable_key="arts_cultural_heritage_qualifying_entity_unavailable",
-        review_key="arts_cultural_heritage_qualifying_entity_needs_review",
+        "investment.arts_cultural_heritage.entity_qualifies",
     )
+    if _is_no(entity_qualifies):
+        failed.append("arts_cultural_heritage_entity_not_qualifying")
+    elif not _is_yes(entity_qualifies):
+        failed.append("arts_cultural_heritage_entity_qualification_needs_review")
 
 
 def _evaluate_fund_route(payload: Dict[str, Any], failed: List[str]) -> None:
@@ -243,13 +236,6 @@ def _evaluate_fund_route(payload: Dict[str, Any], failed: List[str]) -> None:
         unavailable_key="fund_portuguese_company_investment_below_minimum",
         review_key="fund_portuguese_company_investment_needs_review",
     )
-    _evaluate_yes_no_requirement(
-        payload,
-        failed,
-        "investment.fund.subscription_documents_available",
-        unavailable_key="fund_subscription_documents_unavailable",
-        review_key="fund_subscription_documents_needs_review",
-    )
 
 
 def _evaluate_company_capitalization_route(
@@ -273,14 +259,6 @@ def _evaluate_company_capitalization_route(
     elif job_plan not in VALID_COMPANY_CAPITALIZATION_JOB_PLANS:
         failed.append("company_capitalization_job_requirement_needs_review")
 
-    _evaluate_yes_no_requirement(
-        payload,
-        failed,
-        "investment.company_capitalization.company_and_employment_documents_available",
-        unavailable_key="company_capitalization_documents_unavailable",
-        review_key="company_capitalization_documents_needs_review",
-    )
-
 
 def _evaluate_investment_route(
     payload: Dict[str, Any],
@@ -298,12 +276,6 @@ def _evaluate_investment_route(
         failed.append("investment_route_missing_or_unrecognized")
         return None
 
-    real_estate_only = _get_dotted(payload, "investment.real_estate_only_basis")
-    if _is_yes(real_estate_only):
-        failed.append("real_estate_only_basis")
-    elif not _is_no(real_estate_only):
-        failed.append("real_estate_only_basis_needs_review")
-
     if investment_route == "job_creation":
         _evaluate_job_creation_route(payload, failed)
     elif investment_route == "scientific_research":
@@ -314,14 +286,6 @@ def _evaluate_investment_route(
         _evaluate_fund_route(payload, failed)
     elif investment_route == "company_capitalization_jobs":
         _evaluate_company_capitalization_route(payload, failed)
-
-    _evaluate_yes_no_requirement(
-        payload,
-        failed,
-        "investment.proof_of_funds_or_transfer_available",
-        unavailable_key="investment_proof_or_transfer_unavailable",
-        review_key="investment_proof_or_transfer_needs_review",
-    )
 
     return investment_route
 
@@ -342,40 +306,17 @@ def _evaluate_applicant_route(payload: Dict[str, Any], failed: List[str]) -> Non
     if not _get_dotted(payload, "routing.dependent_relationships"):
         failed.append("dependent_relationships_missing")
 
-    # NOTE: routing.family_documents_available was removed from the live
-    # eligibility flow (and from this function) per Phase A of the approved
-    # Portugal Golden Visa cleanup -- its only consequence
-    # (family_documents_needs_review) was never a hard failure.
-    #
-    # NOTE: process.portal_ari_family_application_acknowledged was removed
-    # from the live eligibility flow (and from this function) because it
-    # describes a portal/process step, not a fact needed to determine INITIAL
-    # eligibility. See questions.json's "post_eligibility_checklist" block and
-    # clarifications.json for the preserved question/requirement content.
-
 
 def _evaluate_documents_and_disqualifiers(
     payload: Dict[str, Any],
     failed: List[str],
 ) -> None:
-    _evaluate_yes_no_requirement(
-        payload,
-        failed,
-        "documents.valid_passport_available",
-        unavailable_key="passport_unavailable",
-        review_key="passport_needs_review",
-    )
-
-    criminal_certificate = _get_dotted(
-        payload,
-        "documents.criminal_record_certificate_available",
-    )
-    if criminal_certificate == "no":
-        failed.append("criminal_record_certificate_unavailable")
-    elif criminal_certificate == "available_but_needs_translation_or_apostille":
-        failed.append("criminal_record_certificate_needs_translation_or_apostille")
-    elif criminal_certificate != "yes_recent_translated_apostilled":
-        failed.append("criminal_record_certificate_needs_review")
+    # A "No" (or missing/unclear) valid-passport answer is a correctable
+    # readiness gap, not proof that a qualifying passport cannot be obtained,
+    # so it is needs_review only -- never a hard failure.
+    passport_available = _get_dotted(payload, "documents.valid_passport_available")
+    if not _is_yes(passport_available):
+        failed.append("passport_needs_review")
 
     serious_conviction = _get_dotted(
         payload,
@@ -402,7 +343,7 @@ def _evaluate_documents_and_disqualifiers(
         failed.append("sii_ucfe_refusal_alert_needs_review")
 
 
-def _evaluate_tax_social_security_and_ids(
+def _evaluate_tax_and_social_security(
     payload: Dict[str, Any],
     failed: List[str],
 ) -> None:
@@ -424,38 +365,6 @@ def _evaluate_tax_social_security_and_ids(
     elif social_security_clearance not in VALID_SOCIAL_SECURITY_CLEARANCE_STATUSES:
         failed.append("social_security_clearance_needs_review")
 
-    foreign_tax_id = _get_dotted(
-        payload,
-        "documents.foreign_tax_id_disclosure_available",
-    )
-    if _is_no(foreign_tax_id):
-        failed.append("foreign_tax_id_disclosure_unavailable")
-    elif foreign_tax_id not in VALID_FOREIGN_TAX_ID_STATUSES:
-        failed.append("foreign_tax_id_disclosure_needs_review")
-
-
-def _evaluate_compliance(payload: Dict[str, Any], failed: List[str]) -> None:
-    _evaluate_yes_no_requirement(
-        payload,
-        failed,
-        "compliance.investment_maintenance_declaration_available",
-        unavailable_key="investment_maintenance_declaration_unavailable",
-        review_key="investment_maintenance_declaration_needs_review",
-    )
-
-    # NOTE: compliance.minimum_stay_acknowledged and
-    # compliance.renewal_investment_maintenance_acknowledged were removed from
-    # the live eligibility flow (and from this function) because they describe
-    # post-approval / renewal-stage steps, not facts needed to determine INITIAL
-    # eligibility. They are preserved in questions.json's
-    # "post_eligibility_checklist" block and in clarifications.json.
-    #
-    # NOTE: process.portal_ari_acknowledged and
-    # compliance.permanent_residence_later_stage_acknowledged were removed
-    # entirely (not preserved) -- the former is a pure portal-process
-    # disclaimer, and the latter describes a separate, later-stage application
-    # (permanent residence) with no ARI-eligibility relevance.
-
 
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     routing = payload.get("routing", {}) if isinstance(payload, dict) else {}
@@ -465,8 +374,7 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     investment_route = _evaluate_investment_route(payload, failed, routing)
     _evaluate_applicant_route(payload, failed)
     _evaluate_documents_and_disqualifiers(payload, failed)
-    _evaluate_tax_social_security_and_ids(payload, failed)
-    _evaluate_compliance(payload, failed)
+    _evaluate_tax_and_social_security(payload, failed)
 
     if any(requirement in HARD_FAILURES for requirement in failed):
         status = "not_eligible"
