@@ -15,6 +15,7 @@ MINIMUM_AVERAGE_MONTHLY_INCOME_EUR = (
     MINIMUM_MONTHLY_WAGE_EUR_2026 * REMOTE_WORK_INCOME_MULTIPLIER
 )
 MINIMUM_PASSPORT_VALIDITY_MONTHS = 3
+MINIMUM_BACKGROUND_CHECK_AGE = 16
 
 VALID_VISA_ROUTES = {
     "residence_visa",
@@ -40,26 +41,34 @@ VALID_INSURANCE_STATUSES = {
     "bilateral_exception_applies",
 }
 
-VALID_POLICE_CLEARANCE_STATUSES = {
-    "yes",
-    "under_16_exempt",
-}
-
+# NOTE: routing.family_documents_available, housing.settlement_statement_ready,
+# and compliance.truthful_documents_acknowledged were removed from the live
+# eligibility flow (and from this module) per the approved canonical Markdown
+# (questions_dnv.md). Their former requirement codes (family_documents_needs_review,
+# settlement_statement_unavailable, settlement_statement_needs_review,
+# truthful_documents_not_acknowledged, truthful_documents_needs_review) are no
+# longer emitted anywhere. See clarifications.json/output.json for what was
+# cleaned up alongside them, and the MoveWise Review Notes for the open
+# legal/product questions this raises.
+#
+# The three role-specific document-availability checks
+# (employee_contract_or_declaration_unavailable,
+# independent_service_or_client_proof_unavailable,
+# business_owner_company_service_documents_unavailable) and the tax-residence
+# certificate check (tax_residence_certificate_unavailable) and the family
+# stable-means check (family_stable_means_unavailable) were downgraded from
+# hard failures to needs_review -- a "No" to a document-availability /
+# self-assessment question does not cleanly establish that the underlying
+# substantive relationship or financial capacity does not exist. See the
+# MoveWise Review Notes.
 HARD_FAILURES = {
-    "business_owner_company_service_documents_unavailable",
-    "employee_contract_or_declaration_unavailable",
-    "family_stable_means_unavailable",
     "health_travel_insurance_unavailable",
     "income_below_minimum",
-    "independent_service_or_client_proof_unavailable",
     "lawful_residence_where_applying_unavailable",
     "passport_validity_below_minimum",
     "police_clearance_unavailable",
     "remote_work_not_for_entities_outside_portugal",
     "removal_or_refusal_alert",
-    "settlement_statement_unavailable",
-    "tax_residence_certificate_unavailable",
-    "truthful_documents_not_acknowledged",
 }
 
 
@@ -150,9 +159,7 @@ def _evaluate_work_route(
             payload,
             "role.employee.contract_or_declaration_available",
         )
-        if _is_no(contract_or_declaration):
-            failed.append("employee_contract_or_declaration_unavailable")
-        elif not _is_yes(contract_or_declaration):
+        if not _is_yes(contract_or_declaration):
             failed.append("employee_contract_or_declaration_needs_review")
 
     if work_relationship == "freelancer_independent":
@@ -160,9 +167,7 @@ def _evaluate_work_route(
             payload,
             "role.independent.service_or_client_proof_available",
         )
-        if _is_no(service_or_client_proof):
-            failed.append("independent_service_or_client_proof_unavailable")
-        elif not _is_yes(service_or_client_proof):
+        if not _is_yes(service_or_client_proof):
             failed.append("independent_service_or_client_proof_needs_review")
 
     if work_relationship == "business_owner_company_service":
@@ -170,9 +175,7 @@ def _evaluate_work_route(
             payload,
             "role.business_owner.company_service_documents_available",
         )
-        if _is_no(company_service_documents):
-            failed.append("business_owner_company_service_documents_unavailable")
-        elif not _is_yes(company_service_documents):
+        if not _is_yes(company_service_documents):
             failed.append("business_owner_company_service_documents_needs_review")
 
     return work_relationship
@@ -200,9 +203,7 @@ def _evaluate_financials(payload: Dict[str, Any], failed: List[str]) -> None:
         payload,
         "documents.tax_residence_certificate_available",
     )
-    if _is_no(tax_residence_certificate):
-        failed.append("tax_residence_certificate_unavailable")
-    elif not _is_yes(tax_residence_certificate):
+    if not _is_yes(tax_residence_certificate):
         failed.append("tax_residence_certificate_needs_review")
 
 
@@ -228,17 +229,11 @@ def _evaluate_applicant_route(
     if not _get_dotted(payload, "routing.dependent_relationships"):
         failed.append("dependent_relationships_missing")
 
-    family_documents = _get_dotted(payload, "routing.family_documents_available")
-    if not _is_yes(family_documents):
-        failed.append("family_documents_needs_review")
-
     family_stable_means = _get_dotted(
         payload,
         "financial.family_stable_means_available",
     )
-    if _is_no(family_stable_means):
-        failed.append("family_stable_means_unavailable")
-    elif not _is_yes(family_stable_means):
+    if not _is_yes(family_stable_means):
         failed.append("family_stable_means_needs_review")
 
 
@@ -261,7 +256,7 @@ def _evaluate_lawful_status(payload: Dict[str, Any], failed: List[str]) -> None:
         failed.append("application_country_needs_review")
 
 
-def _evaluate_documents_background_and_housing(
+def _evaluate_documents_and_insurance(
     payload: Dict[str, Any],
     failed: List[str],
 ) -> None:
@@ -277,10 +272,27 @@ def _evaluate_documents_background_and_housing(
     elif insurance_status not in VALID_INSURANCE_STATUSES:
         failed.append("health_travel_insurance_needs_review")
 
+
+def _evaluate_background(
+    payload: Dict[str, Any],
+    failed: List[str],
+) -> None:
+    # Portugal DNV's criminal-record-certificate requirement does not apply
+    # under age 16 (the live flow's former "under_16_exempt" choice). The
+    # background questions are only asked (see questions.json's applies_when)
+    # when identity.age >= 16, so a missing answer here for an applicant
+    # under 16 must NOT be treated as needs_review -- it's the same pass
+    # state the old exemption choice produced. If age itself can't be
+    # parsed, fall through and evaluate normally rather than silently
+    # exempting an applicant of unknown age.
+    age = _as_int(_get_dotted(payload, "identity.age"))
+    if age is not None and age < MINIMUM_BACKGROUND_CHECK_AGE:
+        return
+
     police_clearance = _get_dotted(payload, "routing.police_clearance_available")
-    if police_clearance == "no":
+    if _is_no(police_clearance):
         failed.append("police_clearance_unavailable")
-    elif police_clearance not in VALID_POLICE_CLEARANCE_STATUSES:
+    elif not _is_yes(police_clearance):
         failed.append("police_clearance_needs_review")
 
     criminal_record = _get_dotted(payload, "routing.criminal_record_flag")
@@ -289,6 +301,11 @@ def _evaluate_documents_background_and_housing(
     elif criminal_record != "no":
         failed.append("criminal_record_needs_review")
 
+
+def _evaluate_removal_or_refusal_alert(
+    payload: Dict[str, Any],
+    failed: List[str],
+) -> None:
     removal_or_refusal_alert = _get_dotted(
         payload,
         "routing.removal_or_refusal_alert_flag",
@@ -297,38 +314,6 @@ def _evaluate_documents_background_and_housing(
         failed.append("removal_or_refusal_alert")
     elif removal_or_refusal_alert != "no":
         failed.append("removal_or_refusal_alert_needs_review")
-
-    settlement_statement = _get_dotted(payload, "housing.settlement_statement_ready")
-    if _is_no(settlement_statement):
-        failed.append("settlement_statement_unavailable")
-    elif not _is_yes(settlement_statement):
-        failed.append("settlement_statement_needs_review")
-
-
-def _evaluate_compliance(
-    payload: Dict[str, Any],
-    failed: List[str],
-    visa_route: str | None,
-) -> None:
-    # NOTE: compliance.aima_residence_permit_acknowledged and
-    # compliance.renewal_acknowledged were removed from the live eligibility flow
-    # (and from this function) because they describe post-entry / renewal-stage
-    # compliance steps, not facts needed to determine INITIAL visa eligibility.
-    # See questions.json's "post_eligibility_checklist" block and
-    # clarifications.json for the preserved question/requirement content.
-    #
-    # NOTE: consulate.discretion_extra_documents_acknowledged was removed entirely
-    # (not preserved) -- it was a pure consular-discretion disclaimer with no
-    # eligibility fact behind it.
-
-    truthful_documents_acknowledged = _get_dotted(
-        payload,
-        "compliance.truthful_documents_acknowledged",
-    )
-    if _is_no(truthful_documents_acknowledged):
-        failed.append("truthful_documents_not_acknowledged")
-    elif not _is_yes(truthful_documents_acknowledged):
-        failed.append("truthful_documents_needs_review")
 
 
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -340,8 +325,9 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     _evaluate_financials(payload, failed)
     _evaluate_applicant_route(payload, failed, routing)
     _evaluate_lawful_status(payload, failed)
-    _evaluate_documents_background_and_housing(payload, failed)
-    _evaluate_compliance(payload, failed, visa_route)
+    _evaluate_documents_and_insurance(payload, failed)
+    _evaluate_background(payload, failed)
+    _evaluate_removal_or_refusal_alert(payload, failed)
 
     if any(requirement in HARD_FAILURES for requirement in failed):
         status = "not_eligible"

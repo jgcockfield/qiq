@@ -632,8 +632,13 @@ def _portugal_dnv_payload(
     business_owner_company_service_documents_available="yes",
     tax_residence_certificate_available="yes",
     applicant_type="individual",
-    family_documents_available="yes",
     family_stable_means_available="yes",
+    health_travel_insurance_status="have_it",
+    age="30",
+    police_clearance_available="yes",
+    criminal_record_flag="no",
+    removal_or_refusal_alert_flag="no",
+    passport_validity_months="12",
 ):
     payload = {
         "routing": {
@@ -641,14 +646,15 @@ def _portugal_dnv_payload(
             "work_relationship": work_relationship,
             "applicant_type": applicant_type,
             "application_country_matches_nationality": "yes",
-            "passport_validity_months": "12",
-            "health_travel_insurance_status": "have_it",
-            "police_clearance_available": "yes",
-            "criminal_record_flag": "no",
-            "removal_or_refusal_alert_flag": "no",
+            "passport_validity_months": passport_validity_months,
+            "health_travel_insurance_status": health_travel_insurance_status,
+            "police_clearance_available": police_clearance_available,
+            "criminal_record_flag": criminal_record_flag,
+            "removal_or_refusal_alert_flag": removal_or_refusal_alert_flag,
         },
         "identity": {
             "nationality": "United States",
+            "age": age,
         },
         "work": {
             "entities_outside_portugal": entities_outside_portugal,
@@ -679,12 +685,6 @@ def _portugal_dnv_payload(
         "documents": {
             "tax_residence_certificate_available": tax_residence_certificate_available,
         },
-        "housing": {
-            "settlement_statement_ready": "yes",
-        },
-        "compliance": {
-            "truthful_documents_acknowledged": "yes",
-        },
     }
 
     if applicant_type == "family":
@@ -692,7 +692,6 @@ def _portugal_dnv_payload(
             {
                 "dependents_count": "2",
                 "dependent_relationships": "spouse, child",
-                "family_documents_available": family_documents_available,
             }
         )
         payload["financial"][
@@ -2565,6 +2564,27 @@ def test_portugal_dnv_valid_business_owner_company_service_returns_eligible():
     assert result["work_type"] == "business_owner_company_service"
 
 
+def test_portugal_dnv_work_relationship_exact_choices():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["routing.work_relationship"]["choices"] == [
+        "remote_employee",
+        "freelancer_independent",
+        "business_owner_company_service",
+    ]
+
+
 def test_portugal_dnv_income_below_threshold_returns_not_eligible():
     result = evaluate_eligibility(
         _portugal_dnv_payload(average_monthly_income_last_3_months_eur="3679"),
@@ -2573,6 +2593,30 @@ def test_portugal_dnv_income_below_threshold_returns_not_eligible():
 
     assert result["eligibility_status"] == "not_eligible"
     assert result["failed_requirements"] == ["income_below_minimum"]
+
+
+def test_portugal_dnv_income_evidence_exact_choices():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["financial.income_evidence_types"]["choices"] == [
+        "payslips",
+        "invoices",
+        "contracts",
+        "bank_statements",
+        "income_proof",
+        "other",
+    ]
 
 
 def test_portugal_dnv_non_foreign_remote_work_returns_not_eligible():
@@ -2587,43 +2631,84 @@ def test_portugal_dnv_non_foreign_remote_work_returns_not_eligible():
     ]
 
 
-def test_portugal_dnv_missing_role_specific_work_proof_returns_expected_status():
-    missing_employee = evaluate_eligibility(
+def test_portugal_dnv_role_specific_proof_no_is_needs_review_not_hard_fail():
+    """Role-specific document-availability 'No' answers were downgraded from
+    hard failures to needs_review -- a missing document does not cleanly
+    establish that the underlying relationship does not exist."""
+    employee_no = evaluate_eligibility(
         _portugal_dnv_payload(employee_contract_or_declaration_available="no"),
         pathway="portugal-dnv",
     )
-    unclear_independent = evaluate_eligibility(
+    assert employee_no["eligibility_status"] == "needs_review"
+    assert employee_no["failed_requirements"] == [
+        "employee_contract_or_declaration_needs_review"
+    ]
+
+    independent_no = evaluate_eligibility(
         _portugal_dnv_payload(
             work_relationship="freelancer_independent",
-            independent_service_or_client_proof_available="not_sure",
+            independent_service_or_client_proof_available="no",
         ),
         pathway="portugal-dnv",
     )
-
-    assert missing_employee["eligibility_status"] == "not_eligible"
-    assert missing_employee["failed_requirements"] == [
-        "employee_contract_or_declaration_unavailable"
-    ]
-    assert unclear_independent["eligibility_status"] == "needs_review"
-    assert unclear_independent["failed_requirements"] == [
+    assert independent_no["eligibility_status"] == "needs_review"
+    assert independent_no["failed_requirements"] == [
         "independent_service_or_client_proof_needs_review"
     ]
 
+    business_owner_no = evaluate_eligibility(
+        _portugal_dnv_payload(
+            work_relationship="business_owner_company_service",
+            business_owner_company_service_documents_available="no",
+        ),
+        pathway="portugal-dnv",
+    )
+    assert business_owner_no["eligibility_status"] == "needs_review"
+    assert business_owner_no["failed_requirements"] == [
+        "business_owner_company_service_documents_needs_review"
+    ]
 
-def test_portugal_dnv_missing_tax_residence_certificate_returns_expected_status():
-    missing = evaluate_eligibility(
+    import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
+
+    assert (
+        "employee_contract_or_declaration_unavailable"
+        not in portugal_dnv_rules.HARD_FAILURES
+    )
+    assert (
+        "independent_service_or_client_proof_unavailable"
+        not in portugal_dnv_rules.HARD_FAILURES
+    )
+    assert (
+        "business_owner_company_service_documents_unavailable"
+        not in portugal_dnv_rules.HARD_FAILURES
+    )
+
+
+def test_portugal_dnv_tax_residence_certificate_no_is_needs_review_not_hard_fail():
+    result = evaluate_eligibility(
         _portugal_dnv_payload(tax_residence_certificate_available="no"),
         pathway="portugal-dnv",
     )
-    unclear = evaluate_eligibility(
-        _portugal_dnv_payload(tax_residence_certificate_available="not_sure"),
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["tax_residence_certificate_needs_review"]
+
+    import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
+
+    assert (
+        "tax_residence_certificate_unavailable"
+        not in portugal_dnv_rules.HARD_FAILURES
+    )
+
+
+def test_portugal_dnv_tax_residence_certificate_yes_passes():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(tax_residence_certificate_available="yes"),
         pathway="portugal-dnv",
     )
 
-    assert missing["eligibility_status"] == "not_eligible"
-    assert missing["failed_requirements"] == ["tax_residence_certificate_unavailable"]
-    assert unclear["eligibility_status"] == "needs_review"
-    assert unclear["failed_requirements"] == ["tax_residence_certificate_needs_review"]
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
 
 
 def test_portugal_dnv_temporary_stay_route_returns_eligible():
@@ -2636,25 +2721,45 @@ def test_portugal_dnv_temporary_stay_route_returns_eligible():
     assert result["failed_requirements"] == []
 
 
+def test_portugal_dnv_applicant_type_is_third_question():
+    result_1 = evaluate({"routing": {}}, pathway="portugal-dnv")
+    assert result_1["next_field_key"] == "routing.visa_route"
+
+    result_2 = evaluate(
+        {"routing": {"visa_route": "residence_visa"}}, pathway="portugal-dnv"
+    )
+    assert result_2["next_field_key"] == "routing.work_relationship"
+
+    result_3 = evaluate(
+        {
+            "routing": {
+                "visa_route": "residence_visa",
+                "work_relationship": "remote_employee",
+            }
+        },
+        pathway="portugal-dnv",
+    )
+    assert result_3["next_field_key"] == "routing.applicant_type"
+
+
 def test_portugal_dnv_individual_question_sequence():
     answers = {
         "routing.visa_route": "residence_visa",
         "routing.work_relationship": "remote_employee",
+        "routing.applicant_type": "individual",
         "work.entities_outside_portugal": "yes",
         "role.employee.contract_or_declaration_available": "yes",
         "financial.average_monthly_income_last_3_months_eur": "3680",
         "financial.income_evidence_types": ["bank_statements"],
         "documents.tax_residence_certificate_available": "yes",
-        "routing.applicant_type": "individual",
         "identity.nationality": "United States",
         "routing.application_country_matches_nationality": "yes",
         "routing.passport_validity_months": "12",
         "routing.health_travel_insurance_status": "have_it",
+        "identity.age": "30",
         "routing.police_clearance_available": "yes",
         "routing.criminal_record_flag": "no",
         "routing.removal_or_refusal_alert_flag": "no",
-        "housing.settlement_statement_ready": "yes",
-        "compliance.truthful_documents_acknowledged": "yes",
     }
     expected_order = list(answers.keys())
 
@@ -2676,6 +2781,52 @@ def test_portugal_dnv_individual_question_sequence():
     assert "compliance.aima_residence_permit_acknowledged" not in asked_keys
     assert "compliance.renewal_acknowledged" not in asked_keys
     assert "consulate.discretion_extra_documents_acknowledged" not in asked_keys
+    assert "housing.settlement_statement_ready" not in asked_keys
+    assert "compliance.truthful_documents_acknowledged" not in asked_keys
+    assert "routing.family_documents_available" not in asked_keys
+    assert "routing.additional_information" not in asked_keys
+
+
+def test_portugal_dnv_family_question_sequence_includes_dependent_questions():
+    answers = {
+        "routing.visa_route": "residence_visa",
+        "routing.work_relationship": "remote_employee",
+        "routing.applicant_type": "family",
+        "work.entities_outside_portugal": "yes",
+        "role.employee.contract_or_declaration_available": "yes",
+        "financial.average_monthly_income_last_3_months_eur": "3680",
+        "financial.income_evidence_types": ["bank_statements"],
+        "documents.tax_residence_certificate_available": "yes",
+        "routing.dependents_count": "2",
+        "routing.dependent_relationships": "spouse, child",
+        "financial.family_stable_means_available": "yes",
+        "identity.nationality": "United States",
+        "routing.application_country_matches_nationality": "yes",
+        "routing.passport_validity_months": "12",
+        "routing.health_travel_insurance_status": "have_it",
+        "identity.age": "30",
+        "routing.police_clearance_available": "yes",
+        "routing.criminal_record_flag": "no",
+        "routing.removal_or_refusal_alert_flag": "no",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="portugal-dnv")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="portugal-dnv")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+    assert "routing.family_documents_available" not in asked_keys
 
 
 def test_portugal_dnv_relocated_questions_do_not_affect_eligibility():
@@ -2722,9 +2873,7 @@ def test_portugal_dnv_relocated_questions_do_not_affect_eligibility():
     assert result["eligibility_status"] == "eligible"
 
 
-def test_portugal_dnv_truthful_documents_untouched_pending_legal_review():
-    """Section 3 item: still carries a HARD_FAILURES code and still offers
-    'not_sure' -- explicitly left unchanged pending legal review."""
+def test_portugal_dnv_removed_questions_are_absent():
     questions_path = (
         Path(__file__).resolve().parents[1]
         / "app"
@@ -2736,20 +2885,40 @@ def test_portugal_dnv_truthful_documents_untouched_pending_legal_review():
     import json
 
     data = json.loads(questions_path.read_text(encoding="utf-8"))
-    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
 
-    assert fields_by_key["compliance.truthful_documents_acknowledged"]["choices"] == [
-        "yes",
-        "no",
-        "not_sure",
-    ]
+    # Removed entirely per the approved canonical flow (questions_dnv.md):
+    assert "routing.family_documents_available" not in live_keys
+    assert "housing.settlement_statement_ready" not in live_keys
+    assert "compliance.truthful_documents_acknowledged" not in live_keys
+    assert "routing.additional_information" not in live_keys
 
     import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
 
-    assert "truthful_documents_not_acknowledged" in portugal_dnv_rules.HARD_FAILURES
+    assert "settlement_statement_unavailable" not in portugal_dnv_rules.HARD_FAILURES
+    assert (
+        "truthful_documents_not_acknowledged"
+        not in portugal_dnv_rules.HARD_FAILURES
+    )
+    assert "family_stable_means_unavailable" not in portugal_dnv_rules.HARD_FAILURES
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert '"family_documents_available"' not in source_text
+    assert '"settlement_statement_ready"' not in source_text
+    assert '"truthful_documents_acknowledged"' not in source_text
+
+    result = evaluate_eligibility(_portugal_dnv_payload(), pathway="portugal-dnv")
+    assert result["eligibility_status"] == "eligible"
 
 
-def test_portugal_dnv_no_escape_choices_outside_section_3_items():
+def test_portugal_dnv_no_escape_choices():
     import json
 
     questions_path = (
@@ -2763,30 +2932,242 @@ def test_portugal_dnv_no_escape_choices_outside_section_3_items():
     data = json.loads(questions_path.read_text(encoding="utf-8"))
 
     forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
-    allowed_exceptions = {"compliance.truthful_documents_acknowledged"}
     for field in data["taxonomy_fields"]:
-        if field["key"] in allowed_exceptions:
-            continue
         choices = field.get("choices") or []
         overlap = forbidden.intersection(choices)
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
+    # under_16_exempt was replaced by the identity.age applies_when gate.
+    all_choices = {
+        choice
+        for field in data["taxonomy_fields"]
+        for choice in (field.get("choices") or [])
+    }
+    assert "under_16_exempt" not in all_choices
 
-def test_portugal_dnv_family_route_can_return_needs_review():
-    result = evaluate_eligibility(
+
+def test_portugal_dnv_family_stable_means_severity():
+    passes = evaluate_eligibility(
         _portugal_dnv_payload(
-            applicant_type="family",
-            family_documents_available="no",
-            family_stable_means_available="not_sure",
+            applicant_type="family", family_stable_means_available="yes"
         ),
+        pathway="portugal-dnv",
+    )
+    assert passes["eligibility_status"] == "eligible"
+
+    needs_review = evaluate_eligibility(
+        _portugal_dnv_payload(
+            applicant_type="family", family_stable_means_available="no"
+        ),
+        pathway="portugal-dnv",
+    )
+    assert needs_review["eligibility_status"] == "needs_review"
+    assert needs_review["failed_requirements"] == ["family_stable_means_needs_review"]
+
+    import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
+
+    assert "family_stable_means_unavailable" not in portugal_dnv_rules.HARD_FAILURES
+
+
+def test_portugal_dnv_no_family_numeric_formula_added():
+    """Portugal DNV has no numeric family-income formula (unlike Portugal
+    D7) -- the income threshold must not change with dependent counts."""
+    individual = evaluate_eligibility(
+        _portugal_dnv_payload(applicant_type="individual"),
+        pathway="portugal-dnv",
+    )
+    family = evaluate_eligibility(
+        _portugal_dnv_payload(applicant_type="family"),
+        pathway="portugal-dnv",
+    )
+
+    assert (
+        individual["minimum_average_monthly_income_eur"]
+        == family["minimum_average_monthly_income_eur"]
+        == 3680
+    )
+    assert "required_annual_passive_income_eur" not in family
+    assert "dependent_income_formula" not in family
+
+
+def test_portugal_dnv_lawful_residence_no_remains_hard_fail():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(),
+        pathway="portugal-dnv",
+    )
+    assert result["eligibility_status"] == "eligible"
+
+    payload = _portugal_dnv_payload()
+    payload["routing"]["application_country_matches_nationality"] = "no"
+    payload["routing"]["lawful_residence_where_applying"] = "no"
+    not_eligible = evaluate_eligibility(payload, pathway="portugal-dnv")
+
+    assert not_eligible["eligibility_status"] == "not_eligible"
+    assert not_eligible["failed_requirements"] == [
+        "lawful_residence_where_applying_unavailable"
+    ]
+
+
+def test_portugal_dnv_passport_threshold_unchanged():
+    below_minimum = evaluate_eligibility(
+        _portugal_dnv_payload(passport_validity_months="2"),
+        pathway="portugal-dnv",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert below_minimum["failed_requirements"] == ["passport_validity_below_minimum"]
+
+    at_minimum = evaluate_eligibility(
+        _portugal_dnv_payload(passport_validity_months="3"),
+        pathway="portugal-dnv",
+    )
+    assert at_minimum["eligibility_status"] == "eligible"
+
+
+def test_portugal_dnv_insurance_severity_matrix():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["routing.health_travel_insurance_status"]["choices"] == [
+        "have_it",
+        "will_obtain",
+        "bilateral_exception_applies",
+        "cannot_obtain",
+    ]
+
+    have_it = evaluate_eligibility(
+        _portugal_dnv_payload(health_travel_insurance_status="have_it"),
+        pathway="portugal-dnv",
+    )
+    assert have_it["eligibility_status"] == "eligible"
+
+    bilateral = evaluate_eligibility(
+        _portugal_dnv_payload(health_travel_insurance_status="bilateral_exception_applies"),
+        pathway="portugal-dnv",
+    )
+    assert bilateral["eligibility_status"] == "eligible"
+
+    will_obtain = evaluate_eligibility(
+        _portugal_dnv_payload(health_travel_insurance_status="will_obtain"),
+        pathway="portugal-dnv",
+    )
+    assert will_obtain["eligibility_status"] == "needs_review"
+    assert will_obtain["failed_requirements"] == ["health_travel_insurance_needs_review"]
+
+    cannot_obtain = evaluate_eligibility(
+        _portugal_dnv_payload(health_travel_insurance_status="cannot_obtain"),
+        pathway="portugal-dnv",
+    )
+    assert cannot_obtain["eligibility_status"] == "not_eligible"
+    assert cannot_obtain["failed_requirements"] == ["health_travel_insurance_unavailable"]
+
+
+def test_portugal_dnv_age_15_skips_background_questions_without_review():
+    payload = _portugal_dnv_payload(age="15")
+    payload["routing"].pop("police_clearance_available", None)
+    payload["routing"].pop("criminal_record_flag", None)
+    result = evaluate_eligibility(payload, pathway="portugal-dnv")
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert "police_clearance_needs_review" not in result["failed_requirements"]
+    assert "police_clearance_unavailable" not in result["failed_requirements"]
+    assert "criminal_record_needs_review" not in result["failed_requirements"]
+
+
+def test_portugal_dnv_age_16_shows_background_questions():
+    payload = _portugal_dnv_payload(age="16")
+    payload["routing"].pop("police_clearance_available", None)
+    payload["routing"].pop("criminal_record_flag", None)
+    result = evaluate_eligibility(payload, pathway="portugal-dnv")
+
+    assert result["eligibility_status"] == "needs_review"
+    assert "police_clearance_needs_review" in result["failed_requirements"]
+    assert "criminal_record_needs_review" in result["failed_requirements"]
+
+    live_result = evaluate(
+        {
+            "routing": {
+                "visa_route": "residence_visa",
+                "work_relationship": "remote_employee",
+                "applicant_type": "individual",
+                "application_country_matches_nationality": "yes",
+                "passport_validity_months": "12",
+                "health_travel_insurance_status": "have_it",
+            },
+            "identity": {"nationality": "United States", "age": "16"},
+            "work": {"entities_outside_portugal": "yes"},
+            "role": {"employee": {"contract_or_declaration_available": "yes"}},
+            "financial": {
+                "average_monthly_income_last_3_months_eur": "3680",
+                "income_evidence_types": ["bank_statements"],
+            },
+            "documents": {"tax_residence_certificate_available": "yes"},
+        },
+        pathway="portugal-dnv",
+    )
+    assert live_result["next_field_key"] == "routing.police_clearance_available"
+
+
+def test_portugal_dnv_police_clearance_no_at_age_16_plus_remains_hard_fail():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(age="16", police_clearance_available="no"),
+        pathway="portugal-dnv",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["police_clearance_unavailable"]
+
+
+def test_portugal_dnv_criminal_record_yes_remains_needs_review():
+    result = evaluate_eligibility(
+        _portugal_dnv_payload(age="30", criminal_record_flag="yes"),
         pathway="portugal-dnv",
     )
 
     assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == [
-        "family_documents_needs_review",
-        "family_stable_means_needs_review",
-    ]
+    assert result["failed_requirements"] == ["criminal_record_needs_review"]
+
+    import app.engine.pathways.portugal_dnv.rules as portugal_dnv_rules
+
+    assert "criminal_record_needs_review" not in portugal_dnv_rules.HARD_FAILURES
+
+
+def test_portugal_dnv_removal_or_refusal_alert_severity():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_dnv"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert "SII/UCFE" in fields_by_key["routing.removal_or_refusal_alert_flag"]["label"]
+
+    no_alert = evaluate_eligibility(
+        _portugal_dnv_payload(removal_or_refusal_alert_flag="no"),
+        pathway="portugal-dnv",
+    )
+    assert no_alert["eligibility_status"] == "eligible"
+
+    yes_alert = evaluate_eligibility(
+        _portugal_dnv_payload(removal_or_refusal_alert_flag="yes"),
+        pathway="portugal-dnv",
+    )
+    assert yes_alert["eligibility_status"] == "not_eligible"
+    assert yes_alert["failed_requirements"] == ["removal_or_refusal_alert"]
 
 
 def test_portugal_golden_visa_aliases_load_first_question():
