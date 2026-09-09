@@ -157,9 +157,9 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
             payload,
             "routing.minor_children_schooling_status",
         )
-        if schooling == "cannot_enroll":
+        if _is_no(schooling):
             failed.append("minor_children_schooling_issue")
-        elif schooling not in {"no_minor_children", "can_enroll"}:
+        elif schooling not in {"yes", "not_applicable"}:
             failed.append("minor_children_schooling_needs_review")
 
     monthly_financial_means = _as_float(
@@ -198,7 +198,7 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         failed.append("passport_validity_below_minimum")
 
     health_insurance_status = _get_dotted(payload, "routing.health_insurance_status")
-    if health_insurance_status == "cannot_obtain":
+    if _is_no(health_insurance_status):
         failed.append("health_insurance_unavailable")
     elif health_insurance_status != "have_it":
         failed.append("health_insurance_needs_review")

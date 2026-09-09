@@ -441,7 +441,7 @@ def _spain_nlv_payload(
     intends_to_work_in_spain="no",
     monthly_financial_means="2400",
     dependents_count=None,
-    minor_children_schooling_status="can_enroll",
+    minor_children_schooling_status="yes",
     spanish_company_ownership="no",
     performs_labor_for_spanish_company=None,
     health_insurance_status="have_it",
@@ -1126,7 +1126,7 @@ def test_spain_nlv_family_question_sequence():
         "routing.dependents_count": "1",
         "routing.dependent_relationships": "spouse",
         "routing.dependent_ages": "9",
-        "routing.minor_children_schooling_status": "can_enroll",
+        "routing.minor_children_schooling_status": "yes",
         "routing.passport_validity_months": "24",
         "routing.health_insurance_status": "have_it",
         "routing.background_check_available": "yes",
@@ -1272,11 +1272,15 @@ def test_spain_nlv_spanish_company_labor_activity_polarity():
 
 
 def test_spain_nlv_minor_children_schooling_branch():
+    """The schooling question stays in the Family branch unconditionally
+    (dependent ages are too unstructured to reliably gate it to only
+    school-age dependents), and instead offers a legitimate factual
+    "Not Applicable" state alongside Yes/No -- not an escape choice."""
     cannot_enroll = evaluate_eligibility(
         _spain_nlv_payload(
             applicant_type="family",
             monthly_financial_means="3000",
-            minor_children_schooling_status="cannot_enroll",
+            minor_children_schooling_status="no",
         ),
         pathway="spain-nlv",
     )
@@ -1291,21 +1295,84 @@ def test_spain_nlv_minor_children_schooling_branch():
         _spain_nlv_payload(
             applicant_type="family",
             monthly_financial_means="3000",
-            minor_children_schooling_status="can_enroll",
+            minor_children_schooling_status="yes",
         ),
         pathway="spain-nlv",
     )
     assert "minor_children_schooling_issue" not in can_enroll["failed_requirements"]
+    assert can_enroll["eligibility_status"] == "eligible"
 
-    no_minor_children = evaluate_eligibility(
+    not_applicable = evaluate_eligibility(
         _spain_nlv_payload(
             applicant_type="family",
             monthly_financial_means="3000",
-            minor_children_schooling_status="no_minor_children",
+            minor_children_schooling_status="not_applicable",
         ),
         pathway="spain-nlv",
     )
-    assert no_minor_children["eligibility_status"] == "eligible"
+    assert not_applicable["failed_requirements"] == []
+    assert not_applicable["eligibility_status"] == "eligible"
+
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_nlv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    field = next(
+        f
+        for f in data["taxonomy_fields"]
+        if f["key"] == "routing.minor_children_schooling_status"
+    )
+    assert field["choices"] == ["yes", "no", "not_applicable"]
+    assert "no_minor_children" not in field["choices"]
+    assert field["label"] == (
+        "If you have a dependent child of compulsory school age, can they be "
+        "enrolled in school during your stay in Spain?"
+    )
+    assert field["applies_when"] == {"equals": ["routing.applicant_type", "family"]}
+
+
+def test_spain_nlv_schooling_question_only_shown_to_family_applicants():
+    individual_result = evaluate(
+        {"routing": {"applicant_type": "individual"}}, pathway="spain-nlv"
+    )
+    assert individual_result["next_field_key"] != "routing.minor_children_schooling_status"
+
+    payload = {"routing": {"applicant_type": "family"}}
+    seen_keys = []
+    guard = 0
+    while guard < 40:
+        result = evaluate(payload, pathway="spain-nlv")
+        key = result.get("next_field_key")
+        if key is None:
+            break
+        seen_keys.append(key)
+        if key == "routing.minor_children_schooling_status":
+            break
+        field = result["field"]
+        itype = field.get("input_type")
+        if itype == "number":
+            val = "10"
+        elif itype == "multi_choice":
+            val = field["choices"][0]
+        elif itype == "choice":
+            val = field["choices"][-1]
+        else:
+            val = "test"
+        current = payload
+        parts = key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = val
+        guard += 1
+
+    assert "routing.minor_children_schooling_status" in seen_keys
 
 
 def test_spain_nlv_health_insurance_three_state_behavior():
@@ -1321,10 +1388,27 @@ def test_spain_nlv_health_insurance_three_state_behavior():
     assert will_obtain["failed_requirements"] == ["health_insurance_needs_review"]
 
     cannot_obtain = evaluate_eligibility(
-        _spain_nlv_payload(health_insurance_status="cannot_obtain"), pathway="spain-nlv"
+        _spain_nlv_payload(health_insurance_status="no"), pathway="spain-nlv"
     )
     assert cannot_obtain["eligibility_status"] == "not_eligible"
     assert cannot_obtain["failed_requirements"] == ["health_insurance_unavailable"]
+
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_nlv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    field = next(
+        f for f in data["taxonomy_fields"] if f["key"] == "routing.health_insurance_status"
+    )
+    assert field["choices"] == ["have_it", "will_obtain", "no"]
+    assert "cannot_obtain" not in field["choices"]
 
 
 def test_spain_nlv_background_check_availability_choices_are_binary():
@@ -1406,6 +1490,49 @@ def test_spain_nlv_renewal_question_absent_from_live_taxonomy_fields():
 
     source = inspect.getsource(spain_nlv_rules.evaluate_eligibility)
     assert "renewal_residence_days_expected" not in source
+
+
+def test_spain_nlv_wording_matches_approved_questions_nlv_md():
+    """Wording/choice migrations approved via questions_nlv.md."""
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_nlv"
+        / "questions.json"
+    )
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["routing.irregular_presence_spain"]["label"] == (
+        "Are you currently living in Spain without valid legal immigration status?"
+    )
+    assert fields_by_key["financial.monthly_passive_income_or_assets_eur"]["label"] == (
+        "What is the total monthly amount in EUR you can support yourself with "
+        "from passive income or available assets?"
+    )
+    assert fields_by_key["financial.funds_evidence_types"]["label"] == (
+        "Which documents can you provide as evidence of your financial means?"
+    )
+    assert fields_by_key["financial.funds_evidence_types"]["choices"] == [
+        "bank_certificates",
+        "property_titles",
+        "certified_checks",
+        "credit_cards_with_bank_certification",
+        "passive_income_proof",
+        "other",
+    ]
+    assert fields_by_key["financial.spanish_company_ownership"]["label"] == (
+        "Do any of the funds supporting your application come from ownership "
+        "or shares in a company based in Spain?"
+    )
+    assert fields_by_key["routing.background_check_available"]["label"] == (
+        "Can you obtain criminal record certificates from your country of "
+        "origin and countries where you have lived during the previous 5 years?"
+    )
 
 
 def test_spain_nlv_no_escape_choices_anywhere_in_schema():

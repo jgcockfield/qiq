@@ -49,7 +49,7 @@
     {
       "key": "routing.irregular_presence_spain",
       "depends_on": ["work.intends_to_work_in_spain"],
-      "label": "Are you currently living in Spain without valid legal status — for example, overstaying a visa or having entered without authorization?",
+      "label": "Are you currently living in Spain without valid legal immigration status?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -57,7 +57,7 @@
     {
       "key": "financial.monthly_passive_income_or_assets_eur",
       "depends_on": ["routing.irregular_presence_spain"],
-      "label": "What monthly amount in EUR can you support from passive income or available assets without working in Spain?",
+      "label": "What is the total monthly amount in EUR you can support yourself with from passive income or available assets?",
       "description": "Spain NLV screening requires monthly passive income or assets equal to at least 400% of Spain's IPREM (a public income reference index the government updates periodically) for the main applicant, plus 100% of IPREM for each dependent.",
       "input_type": "number",
       "required": true
@@ -65,7 +65,7 @@
     {
       "key": "financial.funds_evidence_types",
       "depends_on": ["financial.monthly_passive_income_or_assets_eur"],
-      "label": "Which documents can you provide as proof of passive income or available assets?",
+      "label": "Which documents can you provide as evidence of your financial means?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
@@ -80,7 +80,7 @@
     {
       "key": "financial.spanish_company_ownership",
       "depends_on": ["financial.funds_evidence_types"],
-      "label": "Do any of the funds supporting your Spain NLV case come from shares or ownership in a company based in Spain?",
+      "label": "Do any of the funds supporting your application come from ownership or shares in a company based in Spain?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -121,10 +121,11 @@
     {
       "key": "routing.minor_children_schooling_status",
       "depends_on": ["routing.dependent_ages"],
-      "label": "If any of your dependent children are of compulsory school age (typically 6–16), can they be enrolled in school during your stay in Spain?",
+      "label": "If you have a dependent child of compulsory school age, can they be enrolled in school during your stay in Spain?",
+      "description": "Compulsory school age is typically 6-16. Answer Not Applicable if no included dependent is of compulsory school age.",
       "input_type": "choice",
       "required": true,
-      "choices": ["no_minor_children", "can_enroll", "cannot_enroll"],
+      "choices": ["yes", "no", "not_applicable"],
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
@@ -137,15 +138,15 @@
     {
       "key": "routing.health_insurance_status",
       "depends_on": ["routing.passport_validity_months"],
-      "label": "Do you have qualifying health insurance with an insurer authorized to operate in Spain, or will you obtain it?",
+      "label": "Do you have qualifying health insurance for Spain, or will you obtain it?",
       "input_type": "choice",
       "required": true,
-      "choices": ["have_it", "will_obtain", "cannot_obtain"]
+      "choices": ["have_it", "will_obtain", "no"]
     },
     {
       "key": "routing.background_check_available",
       "depends_on": ["routing.health_insurance_status"],
-      "label": "Can you obtain criminal record certificates for your country of origin and countries of residence during the previous 5 years?",
+      "label": "Can you obtain criminal record certificates from your country of origin and countries where you have lived during the previous 5 years?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
