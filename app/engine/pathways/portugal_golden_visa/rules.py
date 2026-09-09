@@ -28,9 +28,14 @@ VALID_COMPANY_CAPITALIZATION_JOB_PLANS = {
     "maintain_10_jobs_minimum_5_permanent_for_3_years",
 }
 
-VALID_CLEARANCE_STATUSES = {
-    "debt_clearance_certificate",
-    "non_registration_proof",
+VALID_TAX_CLEARANCE_STATUSES = {
+    "no_outstanding_tax_debts",
+    "not_registered_with_the_portuguese_tax_authority",
+}
+
+VALID_SOCIAL_SECURITY_CLEARANCE_STATUSES = {
+    "no_outstanding_social_security_debts",
+    "not_registered_with_portuguese_social_security",
 }
 
 VALID_FOREIGN_TAX_ID_STATUSES = {
@@ -38,6 +43,26 @@ VALID_FOREIGN_TAX_ID_STATUSES = {
     "proof_none_exists",
 }
 
+# NOTE: routing.family_documents_available and routing.additional_information
+# were removed from the live eligibility flow (and from this module) per Phase
+# A of the approved Portugal Golden Visa cleanup (questions_golden_visa.md).
+# family_documents_available's only eligibility consequence
+# (family_documents_needs_review) was never a hard failure, so removing it
+# loses no substantive eligibility behavior. additional_information had no
+# eligibility effect at all (required: false, never evaluated).
+#
+# The following fields remain live with UNCHANGED behavior pending MoveWise
+# legal/product review, per Phase A scope: investment.real_estate_only_basis,
+# investment.job_creation.evidence_available,
+# investment.scientific_research.institution_confirmation_available,
+# investment.arts_cultural_heritage.qualifying_entity_confirmation_available,
+# investment.fund.subscription_documents_available,
+# investment.company_capitalization.company_and_employment_documents_available,
+# investment.proof_of_funds_or_transfer_available,
+# documents.valid_passport_available,
+# documents.criminal_record_certificate_available,
+# documents.foreign_tax_id_disclosure_available,
+# compliance.investment_maintenance_declaration_available.
 HARD_FAILURES = {
     "arts_cultural_heritage_amount_below_minimum",
     "arts_cultural_heritage_qualifying_entity_unavailable",
@@ -47,8 +72,9 @@ HARD_FAILURES = {
     "entry_stay_ban",
     "foreign_tax_id_disclosure_unavailable",
     "fund_amount_below_minimum",
-    "fund_maturity_or_portuguese_company_investment_not_confirmed",
+    "fund_maturity_below_minimum",
     "fund_not_non_real_estate",
+    "fund_portuguese_company_investment_below_minimum",
     "fund_subscription_documents_unavailable",
     "investment_maintenance_declaration_unavailable",
     "investment_proof_or_transfer_unavailable",
@@ -125,9 +151,9 @@ def _evaluate_nationality(payload: Dict[str, Any], failed: List[str]) -> None:
         payload,
         "identity.third_country_national_status",
     )
-    if third_country_status == "portuguese_eu_eea_andorra_swiss":
+    if third_country_status == "yes":
         failed.append("portuguese_eu_eea_andorra_swiss_national")
-    elif third_country_status != "third_country_national":
+    elif third_country_status != "no":
         failed.append("third_country_national_status_needs_review")
 
 
@@ -206,9 +232,16 @@ def _evaluate_fund_route(payload: Dict[str, Any], failed: List[str]) -> None:
     _evaluate_yes_no_requirement(
         payload,
         failed,
-        "investment.fund.maturity_and_portuguese_company_investment_confirmed",
-        unavailable_key="fund_maturity_or_portuguese_company_investment_not_confirmed",
-        review_key="fund_maturity_or_portuguese_company_investment_needs_review",
+        "investment.fund.maturity_at_least_5_years",
+        unavailable_key="fund_maturity_below_minimum",
+        review_key="fund_maturity_needs_review",
+    )
+    _evaluate_yes_no_requirement(
+        payload,
+        failed,
+        "investment.fund.portuguese_company_investment_at_least_60_percent",
+        unavailable_key="fund_portuguese_company_investment_below_minimum",
+        review_key="fund_portuguese_company_investment_needs_review",
     )
     _evaluate_yes_no_requirement(
         payload,
@@ -309,16 +342,15 @@ def _evaluate_applicant_route(payload: Dict[str, Any], failed: List[str]) -> Non
     if not _get_dotted(payload, "routing.dependent_relationships"):
         failed.append("dependent_relationships_missing")
 
-    family_documents = _get_dotted(payload, "routing.family_documents_available")
-    if _is_no(family_documents):
-        failed.append("family_documents_needs_review")
-    elif not _is_yes(family_documents):
-        failed.append("family_documents_needs_review")
-
-    # NOTE: process.portal_ari_family_application_acknowledged was removed from
-    # the live eligibility flow (and from this function) because it describes a
-    # portal/process step, not a fact needed to determine INITIAL eligibility.
-    # See questions.json's "post_eligibility_checklist" block and
+    # NOTE: routing.family_documents_available was removed from the live
+    # eligibility flow (and from this function) per Phase A of the approved
+    # Portugal Golden Visa cleanup -- its only consequence
+    # (family_documents_needs_review) was never a hard failure.
+    #
+    # NOTE: process.portal_ari_family_application_acknowledged was removed
+    # from the live eligibility flow (and from this function) because it
+    # describes a portal/process step, not a fact needed to determine INITIAL
+    # eligibility. See questions.json's "post_eligibility_checklist" block and
     # clarifications.json for the preserved question/requirement content.
 
 
@@ -378,18 +410,18 @@ def _evaluate_tax_social_security_and_ids(
         payload,
         "documents.portuguese_tax_clearance_status",
     )
-    if tax_clearance == "has_tax_debts":
+    if tax_clearance == "outstanding_portuguese_tax_debts":
         failed.append("portuguese_tax_debts")
-    elif tax_clearance not in VALID_CLEARANCE_STATUSES:
+    elif tax_clearance not in VALID_TAX_CLEARANCE_STATUSES:
         failed.append("portuguese_tax_clearance_needs_review")
 
     social_security_clearance = _get_dotted(
         payload,
         "documents.social_security_clearance_status",
     )
-    if social_security_clearance == "has_social_security_debts":
+    if social_security_clearance == "outstanding_social_security_debts":
         failed.append("social_security_debts")
-    elif social_security_clearance not in VALID_CLEARANCE_STATUSES:
+    elif social_security_clearance not in VALID_SOCIAL_SECURITY_CLEARANCE_STATUSES:
         failed.append("social_security_clearance_needs_review")
 
     foreign_tax_id = _get_dotted(

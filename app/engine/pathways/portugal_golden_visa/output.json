@@ -94,11 +94,17 @@
       "fund_non_real_estate_status_needs_review": {
         "text": "The fund's non-real-estate status is unclear and needs manual review."
       },
-      "fund_maturity_or_portuguese_company_investment_not_confirmed": {
-        "text": "The fund route requires 5-year maturity and at least 60% investment in Portuguese companies. Based on the information provided, this requirement is not confirmed."
+      "fund_maturity_below_minimum": {
+        "text": "The fund route requires a minimum 5-year maturity. Based on the information provided, this requirement is not currently met."
       },
-      "fund_maturity_or_portuguese_company_investment_needs_review": {
-        "text": "The fund's 5-year maturity or 60% Portuguese-company investment requirement is unclear and needs manual review."
+      "fund_maturity_needs_review": {
+        "text": "The fund's 5-year maturity requirement is unclear and needs manual review."
+      },
+      "fund_portuguese_company_investment_below_minimum": {
+        "text": "The fund route requires at least 60% investment in Portuguese companies. Based on the information provided, this requirement is not currently met."
+      },
+      "fund_portuguese_company_investment_needs_review": {
+        "text": "The fund's 60% Portuguese-company investment requirement is unclear and needs manual review."
       },
       "fund_subscription_documents_unavailable": {
         "text": "The fund route requires fund subscription proof and fund documentation. Based on the information provided, those documents are not available."
@@ -138,9 +144,6 @@
       },
       "dependent_relationships_missing": {
         "text": "Family relationship details are missing or unclear and need manual review."
-      },
-      "family_documents_needs_review": {
-        "text": "Family relationship documents are missing, unclear, or not confirmed and need manual review."
       },
       "passport_unavailable": {
         "text": "Portugal ARI guidance requires a valid passport. Based on the information provided, this requirement is not currently met."
@@ -471,17 +474,6 @@
         },
         "stage": "post_eligibility_checklist",
         "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.minimum_stay_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
-      },
-      "family_documents_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your family reunification documents need manual review.",
-          "The team should verify relationship documents for each included family member."
-        ],
-        "action": {
-          "label": "Wait for family-document review",
-          "type": "email_followup"
-        }
       },
       "renewal_investment_maintenance_needs_review": {
         "enabled": true,

@@ -704,7 +704,7 @@ def _portugal_dnv_payload(
 def _portugal_golden_visa_payload(
     *,
     investment_route="job_creation",
-    third_country_national_status="third_country_national",
+    third_country_national_status="no",
     real_estate_only_basis="no",
     jobs_created_count="10",
     job_creation_evidence_available="yes",
@@ -714,21 +714,21 @@ def _portugal_golden_visa_payload(
     arts_cultural_heritage_confirmation_available="yes",
     fund_amount_eur="500000",
     fund_non_real_estate_confirmed="yes",
-    fund_maturity_confirmed="yes",
+    fund_maturity_at_least_5_years="yes",
+    fund_portuguese_company_investment_at_least_60_percent="yes",
     fund_subscription_documents_available="yes",
     company_capitalization_amount_eur="500000",
     company_capitalization_job_plan="create_5_permanent_jobs",
     company_documents_available="yes",
     proof_of_funds_or_transfer_available="yes",
     applicant_type="individual",
-    family_documents_available="yes",
     valid_passport_available="yes",
     criminal_record_certificate_available="yes_recent_translated_apostilled",
     serious_criminal_conviction_flag="no",
     entry_stay_ban_flag="no",
     sii_ucfe_refusal_alert_flag="no",
-    portuguese_tax_clearance_status="debt_clearance_certificate",
-    social_security_clearance_status="debt_clearance_certificate",
+    portuguese_tax_clearance_status="no_outstanding_tax_debts",
+    social_security_clearance_status="no_outstanding_social_security_debts",
     foreign_tax_id_disclosure_available="yes",
     investment_maintenance_declaration_available="yes",
 ):
@@ -760,8 +760,9 @@ def _portugal_golden_visa_payload(
             "fund": {
                 "amount_eur": fund_amount_eur,
                 "non_real_estate_confirmed": fund_non_real_estate_confirmed,
-                "maturity_and_portuguese_company_investment_confirmed": (
-                    fund_maturity_confirmed
+                "maturity_at_least_5_years": fund_maturity_at_least_5_years,
+                "portuguese_company_investment_at_least_60_percent": (
+                    fund_portuguese_company_investment_at_least_60_percent
                 ),
                 "subscription_documents_available": (
                     fund_subscription_documents_available
@@ -802,7 +803,6 @@ def _portugal_golden_visa_payload(
             {
                 "dependents_count": "2",
                 "dependent_relationships": "spouse, child",
-                "family_documents_available": family_documents_available,
             }
         )
 
@@ -3175,15 +3175,45 @@ def test_portugal_golden_visa_aliases_load_first_question():
     result_underscore = evaluate({}, pathway="portugal_golden_visa")
 
     assert result_dash == result_underscore
-    assert result_dash["next_field_key"] == "identity.nationality"
-    assert result_dash["field"]["input_type"] == "text"
+    assert result_dash["next_field_key"] == "investment.route"
+    assert result_dash["field"]["input_type"] == "choice"
+
+
+def test_portugal_golden_visa_applicant_type_is_second_question():
+    result = evaluate(
+        {"investment": {"route": "job_creation"}},
+        pathway="portugal-golden-visa",
+    )
+    assert result["next_field_key"] == "routing.applicant_type"
+
+
+def test_portugal_golden_visa_all_six_investment_routes_preserved():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["investment.route"]["choices"] == [
+        "job_creation",
+        "scientific_research",
+        "arts_cultural_heritage",
+        "non_real_estate_investment_fund",
+        "company_capitalization_jobs",
+        "real_estate_only",
+    ]
 
 
 def test_portugal_golden_visa_non_third_country_national_returns_not_eligible():
     result = evaluate_eligibility(
-        _portugal_golden_visa_payload(
-            third_country_national_status="portuguese_eu_eea_andorra_swiss"
-        ),
+        _portugal_golden_visa_payload(third_country_national_status="yes"),
         pathway="portugal-golden-visa",
     )
 
@@ -3193,12 +3223,45 @@ def test_portugal_golden_visa_non_third_country_national_returns_not_eligible():
     ]
 
 
+def test_portugal_golden_visa_qualifying_third_country_national_passes():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(third_country_national_status="no"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+
 def test_portugal_golden_visa_real_estate_only_returns_not_eligible():
     result = evaluate_eligibility(
         _portugal_golden_visa_payload(investment_route="real_estate_only"),
         pathway="portugal-ari",
     )
 
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["real_estate_only_basis"]
+
+
+def test_portugal_golden_visa_real_estate_only_basis_remains_live():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "investment.real_estate_only_basis" in live_keys
+
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(real_estate_only_basis="yes"),
+        pathway="portugal-golden-visa",
+    )
     assert result["eligibility_status"] == "not_eligible"
     assert result["failed_requirements"] == ["real_estate_only_basis"]
 
@@ -3215,6 +3278,31 @@ def test_portugal_golden_visa_valid_job_creation_returns_eligible():
     assert result["pathway"] == "portugal_golden_visa"
 
 
+def test_portugal_golden_visa_job_creation_threshold_and_evidence_unchanged():
+    below_minimum = evaluate_eligibility(
+        _portugal_golden_visa_payload(jobs_created_count="9"),
+        pathway="portugal-golden-visa",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert below_minimum["failed_requirements"] == ["job_creation_below_minimum"]
+
+    evidence_missing = evaluate_eligibility(
+        _portugal_golden_visa_payload(job_creation_evidence_available="no"),
+        pathway="portugal-golden-visa",
+    )
+    assert evidence_missing["eligibility_status"] == "not_eligible"
+    assert evidence_missing["failed_requirements"] == [
+        "job_creation_evidence_unavailable"
+    ]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "job_creation_evidence_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+
 def test_portugal_golden_visa_valid_scientific_research_returns_eligible():
     result = evaluate_eligibility(
         _portugal_golden_visa_payload(investment_route="scientific_research"),
@@ -3226,6 +3314,39 @@ def test_portugal_golden_visa_valid_scientific_research_returns_eligible():
     assert result["investment_route"] == "scientific_research"
 
 
+def test_portugal_golden_visa_research_threshold_and_confirmation_unchanged():
+    below_minimum = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="scientific_research",
+            scientific_research_amount_eur="499999",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert below_minimum["failed_requirements"] == [
+        "scientific_research_amount_below_minimum"
+    ]
+
+    confirmation_missing = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="scientific_research",
+            scientific_research_confirmation_available="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert confirmation_missing["eligibility_status"] == "not_eligible"
+    assert confirmation_missing["failed_requirements"] == [
+        "scientific_research_institution_confirmation_unavailable"
+    ]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "scientific_research_institution_confirmation_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+
 def test_portugal_golden_visa_valid_arts_cultural_heritage_returns_eligible():
     result = evaluate_eligibility(
         _portugal_golden_visa_payload(investment_route="arts_cultural_heritage"),
@@ -3235,6 +3356,39 @@ def test_portugal_golden_visa_valid_arts_cultural_heritage_returns_eligible():
     assert result["eligibility_status"] == "eligible"
     assert result["failed_requirements"] == []
     assert result["investment_route"] == "arts_cultural_heritage"
+
+
+def test_portugal_golden_visa_arts_threshold_and_confirmation_unchanged():
+    below_minimum = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="arts_cultural_heritage",
+            arts_cultural_heritage_amount_eur="249999",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert below_minimum["failed_requirements"] == [
+        "arts_cultural_heritage_amount_below_minimum"
+    ]
+
+    confirmation_missing = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="arts_cultural_heritage",
+            arts_cultural_heritage_confirmation_available="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert confirmation_missing["eligibility_status"] == "not_eligible"
+    assert confirmation_missing["failed_requirements"] == [
+        "arts_cultural_heritage_qualifying_entity_unavailable"
+    ]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "arts_cultural_heritage_qualifying_entity_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
 
 
 def test_portugal_golden_visa_valid_non_real_estate_fund_returns_eligible():
@@ -3250,6 +3404,113 @@ def test_portugal_golden_visa_valid_non_real_estate_fund_returns_eligible():
     assert result["investment_route"] == "non_real_estate_investment_fund"
 
 
+def test_portugal_golden_visa_fund_amount_and_non_real_estate_unchanged():
+    below_minimum = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund",
+            fund_amount_eur="499999",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert below_minimum["failed_requirements"] == ["fund_amount_below_minimum"]
+
+    not_non_real_estate = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund",
+            fund_non_real_estate_confirmed="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert not_non_real_estate["eligibility_status"] == "not_eligible"
+    assert not_non_real_estate["failed_requirements"] == ["fund_not_non_real_estate"]
+
+
+def test_portugal_golden_visa_fund_maturity_and_60_percent_fields_exist():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+
+    assert "investment.fund.maturity_at_least_5_years" in live_keys
+    assert (
+        "investment.fund.portuguese_company_investment_at_least_60_percent"
+        in live_keys
+    )
+    # The old bundled field is gone entirely.
+    assert (
+        "investment.fund.maturity_and_portuguese_company_investment_confirmed"
+        not in live_keys
+    )
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert "maturity_and_portuguese_company_investment_confirmed" not in source_text
+    assert (
+        "fund_maturity_or_portuguese_company_investment_not_confirmed"
+        not in source_text
+    )
+
+
+def test_portugal_golden_visa_fund_maturity_no_is_hard_failure():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund",
+            fund_maturity_at_least_5_years="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["fund_maturity_below_minimum"]
+
+
+def test_portugal_golden_visa_fund_60_percent_no_is_hard_failure():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund",
+            fund_portuguese_company_investment_at_least_60_percent="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == [
+        "fund_portuguese_company_investment_below_minimum"
+    ]
+
+
+def test_portugal_golden_visa_fund_subscription_documents_hard_fail_unchanged():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="non_real_estate_investment_fund",
+            fund_subscription_documents_available="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["fund_subscription_documents_unavailable"]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "fund_subscription_documents_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+
 def test_portugal_golden_visa_valid_company_capitalization_returns_eligible():
     result = evaluate_eligibility(
         _portugal_golden_visa_payload(investment_route="company_capitalization_jobs"),
@@ -3261,38 +3522,156 @@ def test_portugal_golden_visa_valid_company_capitalization_returns_eligible():
     assert result["investment_route"] == "company_capitalization_jobs"
 
 
-def test_portugal_golden_visa_below_route_threshold_returns_not_eligible():
+def test_portugal_golden_visa_company_capitalization_amount_unchanged():
     result = evaluate_eligibility(
         _portugal_golden_visa_payload(
-            investment_route="scientific_research",
-            scientific_research_amount_eur="499999",
+            investment_route="company_capitalization_jobs",
+            company_capitalization_amount_eur="499999",
         ),
         pathway="portugal-golden-visa",
     )
-
     assert result["eligibility_status"] == "not_eligible"
     assert result["failed_requirements"] == [
-        "scientific_research_amount_below_minimum"
+        "company_capitalization_amount_below_minimum"
     ]
 
 
-def test_portugal_golden_visa_missing_route_evidence_returns_expected_status():
-    missing = evaluate_eligibility(
-        _portugal_golden_visa_payload(job_creation_evidence_available="no"),
-        pathway="portugal-golden-visa",
+def test_portugal_golden_visa_company_job_plan_labels_and_neither_hard_fail():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
     )
-    unclear = evaluate_eligibility(
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["investment.company_capitalization.jobs_requirement_plan"][
+        "choices"
+    ] == [
+        "create_5_permanent_jobs",
+        "maintain_10_jobs_minimum_5_permanent_for_3_years",
+        "does_not_meet_job_requirement",
+    ]
+
+    neither = evaluate_eligibility(
         _portugal_golden_visa_payload(
-            investment_route="non_real_estate_investment_fund",
-            fund_non_real_estate_confirmed="not_sure",
+            investment_route="company_capitalization_jobs",
+            company_capitalization_job_plan="does_not_meet_job_requirement",
         ),
         pathway="portugal-golden-visa",
     )
+    assert neither["eligibility_status"] == "not_eligible"
+    assert neither["failed_requirements"] == [
+        "company_capitalization_job_requirement_not_met"
+    ]
 
-    assert missing["eligibility_status"] == "not_eligible"
-    assert missing["failed_requirements"] == ["job_creation_evidence_unavailable"]
-    assert unclear["eligibility_status"] == "needs_review"
-    assert unclear["failed_requirements"] == ["fund_non_real_estate_status_needs_review"]
+    maintain_plan = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="company_capitalization_jobs",
+            company_capitalization_job_plan=(
+                "maintain_10_jobs_minimum_5_permanent_for_3_years"
+            ),
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert maintain_plan["eligibility_status"] == "eligible"
+
+
+def test_portugal_golden_visa_company_documents_hard_fail_unchanged():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            investment_route="company_capitalization_jobs",
+            company_documents_available="no",
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["company_capitalization_documents_unavailable"]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "company_capitalization_documents_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+
+def test_portugal_golden_visa_shared_proof_of_funds_hard_fail_unchanged():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(proof_of_funds_or_transfer_available="no"),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["investment_proof_or_transfer_unavailable"]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "investment_proof_or_transfer_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+
+def test_portugal_golden_visa_passport_behavior_unchanged():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(valid_passport_available="no"),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["passport_unavailable"]
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert (
+        fields_by_key["documents.valid_passport_available"]["label"]
+        == "Do you have a valid passport available for the Portugal ARI application?"
+    )
+
+
+def test_portugal_golden_visa_criminal_certificate_behavior_unchanged():
+    # criminal_record_certificate_unavailable was never in HARD_FAILURES in the
+    # original implementation -- a "no" answer here has always produced
+    # needs_review, not not_eligible. Phase A leaves this field untouched.
+    missing = evaluate_eligibility(
+        _portugal_golden_visa_payload(criminal_record_certificate_available="no"),
+        pathway="portugal-golden-visa",
+    )
+    assert missing["eligibility_status"] == "needs_review"
+    assert missing["failed_requirements"] == ["criminal_record_certificate_unavailable"]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "criminal_record_certificate_unavailable"
+        not in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+    needs_translation = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            criminal_record_certificate_available=(
+                "available_but_needs_translation_or_apostille"
+            )
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert needs_translation["eligibility_status"] == "needs_review"
+    assert needs_translation["failed_requirements"] == [
+        "criminal_record_certificate_needs_translation_or_apostille"
+    ]
 
 
 def test_portugal_golden_visa_serious_criminal_conviction_not_eligible():
@@ -3321,51 +3700,215 @@ def test_portugal_golden_visa_entry_ban_or_refusal_alert_not_eligible():
     assert refusal_alert["failed_requirements"] == ["sii_ucfe_refusal_alert"]
 
 
-def test_portugal_golden_visa_tax_or_social_security_gaps_expected_status():
-    tax_debt = evaluate_eligibility(
+def test_portugal_golden_visa_tax_status_factual_labels_and_outcomes():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["documents.portuguese_tax_clearance_status"]["choices"] == [
+        "no_outstanding_tax_debts",
+        "not_registered_with_the_portuguese_tax_authority",
+        "outstanding_portuguese_tax_debts",
+    ]
+
+    no_debts = evaluate_eligibility(
         _portugal_golden_visa_payload(
-            portuguese_tax_clearance_status="has_tax_debts"
+            portuguese_tax_clearance_status="no_outstanding_tax_debts"
         ),
         pathway="portugal-golden-visa",
     )
-    social_unclear = evaluate_eligibility(
-        _portugal_golden_visa_payload(social_security_clearance_status="not_sure"),
+    assert no_debts["eligibility_status"] == "eligible"
+
+    not_registered = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            portuguese_tax_clearance_status=(
+                "not_registered_with_the_portuguese_tax_authority"
+            )
+        ),
         pathway="portugal-golden-visa",
     )
+    assert not_registered["eligibility_status"] == "eligible"
 
-    assert tax_debt["eligibility_status"] == "not_eligible"
-    assert tax_debt["failed_requirements"] == ["portuguese_tax_debts"]
-    assert social_unclear["eligibility_status"] == "needs_review"
-    assert social_unclear["failed_requirements"] == [
-        "social_security_clearance_needs_review"
+    outstanding = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            portuguese_tax_clearance_status="outstanding_portuguese_tax_debts"
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert outstanding["eligibility_status"] == "not_eligible"
+    assert outstanding["failed_requirements"] == ["portuguese_tax_debts"]
+
+
+def test_portugal_golden_visa_social_security_factual_labels_and_outcomes():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["documents.social_security_clearance_status"]["choices"] == [
+        "no_outstanding_social_security_debts",
+        "not_registered_with_portuguese_social_security",
+        "outstanding_social_security_debts",
     ]
 
+    no_debts = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            social_security_clearance_status="no_outstanding_social_security_debts"
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert no_debts["eligibility_status"] == "eligible"
 
-def test_portugal_golden_visa_family_route_can_return_needs_review():
+    not_registered = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            social_security_clearance_status=(
+                "not_registered_with_portuguese_social_security"
+            )
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert not_registered["eligibility_status"] == "eligible"
+
+    outstanding = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            social_security_clearance_status="outstanding_social_security_debts"
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert outstanding["eligibility_status"] == "not_eligible"
+    assert outstanding["failed_requirements"] == ["social_security_debts"]
+
+
+def test_portugal_golden_visa_foreign_tax_id_behavior_unchanged():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(foreign_tax_id_disclosure_available="no"),
+        pathway="portugal-golden-visa",
+    )
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["foreign_tax_id_disclosure_unavailable"]
+
+    proof_none = evaluate_eligibility(
+        _portugal_golden_visa_payload(
+            foreign_tax_id_disclosure_available="proof_none_exists"
+        ),
+        pathway="portugal-golden-visa",
+    )
+    assert proof_none["eligibility_status"] == "eligible"
+
+
+def test_portugal_golden_visa_investment_maintenance_declaration_unchanged():
     result = evaluate_eligibility(
         _portugal_golden_visa_payload(
-            applicant_type="family",
-            family_documents_available="no",
+            investment_maintenance_declaration_available="no"
         ),
         pathway="portugal-golden-visa",
     )
-
-    assert result["eligibility_status"] == "needs_review"
+    assert result["eligibility_status"] == "not_eligible"
     assert result["failed_requirements"] == [
-        "family_documents_needs_review",
+        "investment_maintenance_declaration_unavailable"
     ]
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert (
+        "investment_maintenance_declaration_unavailable"
+        in portugal_golden_visa_rules.HARD_FAILURES
+    )
+
+
+def test_portugal_golden_visa_family_documents_field_absent():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.family_documents_available" not in live_keys
+
+    import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
+
+    assert "family_documents_needs_review" not in portugal_golden_visa_rules.HARD_FAILURES
+
+    source_text = Path(
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "rules.py"
+    ).read_text(encoding="utf-8")
+    assert '"family_documents_needs_review"' not in source_text
+    assert '"routing.family_documents_available"' not in source_text
+
+
+def test_portugal_golden_visa_family_route_preserves_dependent_fields():
+    result = evaluate_eligibility(
+        _portugal_golden_visa_payload(applicant_type="family"),
+        pathway="portugal-golden-visa",
+    )
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+    payload = _portugal_golden_visa_payload(applicant_type="family")
+    payload["routing"].pop("dependents_count", None)
+    payload["routing"].pop("dependent_relationships", None)
+    missing_dependents = evaluate_eligibility(payload, pathway="portugal-golden-visa")
+
+    assert missing_dependents["eligibility_status"] == "needs_review"
+    assert set(missing_dependents["failed_requirements"]) == {
+        "dependents_count_missing",
+        "dependent_relationships_missing",
+    }
+
+
+def test_portugal_golden_visa_additional_information_absent():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.additional_information" not in live_keys
 
 
 def test_portugal_golden_visa_individual_question_sequence():
     answers = {
-        "identity.nationality": "United States",
-        "identity.third_country_national_status": "third_country_national",
         "investment.route": "job_creation",
+        "routing.applicant_type": "individual",
         "investment.real_estate_only_basis": "no",
         "investment.job_creation.jobs_created_count": "10",
         "investment.job_creation.evidence_available": "yes",
         "investment.proof_of_funds_or_transfer_available": "yes",
-        "routing.applicant_type": "individual",
+        "identity.nationality": "United States",
+        "identity.third_country_national_status": "no",
         "documents.valid_passport_available": "yes",
         "documents.criminal_record_certificate_available": (
             "yes_recent_translated_apostilled"
@@ -3373,8 +3916,10 @@ def test_portugal_golden_visa_individual_question_sequence():
         "routing.serious_criminal_conviction_flag": "no",
         "routing.entry_stay_ban_flag": "no",
         "routing.sii_ucfe_refusal_alert_flag": "no",
-        "documents.portuguese_tax_clearance_status": "debt_clearance_certificate",
-        "documents.social_security_clearance_status": "debt_clearance_certificate",
+        "documents.portuguese_tax_clearance_status": "no_outstanding_tax_debts",
+        "documents.social_security_clearance_status": (
+            "no_outstanding_social_security_debts"
+        ),
         "documents.foreign_tax_id_disclosure_available": "yes",
         "compliance.investment_maintenance_declaration_available": "yes",
     }
@@ -3395,11 +3940,63 @@ def test_portugal_golden_visa_individual_question_sequence():
     result = evaluate(payload, pathway="portugal-golden-visa")
     assert result["next_field_key"] is None
     assert asked_keys == expected_order
+    assert asked_keys[0] == "investment.route"
+    assert asked_keys[1] == "routing.applicant_type"
+    assert "routing.family_documents_available" not in asked_keys
+    assert "routing.additional_information" not in asked_keys
     assert "process.portal_ari_family_application_acknowledged" not in asked_keys
     assert "compliance.minimum_stay_acknowledged" not in asked_keys
     assert "process.portal_ari_acknowledged" not in asked_keys
     assert "compliance.renewal_investment_maintenance_acknowledged" not in asked_keys
     assert "compliance.permanent_residence_later_stage_acknowledged" not in asked_keys
+
+
+def test_portugal_golden_visa_family_fund_question_sequence():
+    answers = {
+        "investment.route": "non_real_estate_investment_fund",
+        "routing.applicant_type": "family",
+        "investment.real_estate_only_basis": "no",
+        "investment.fund.amount_eur": "500000",
+        "investment.fund.non_real_estate_confirmed": "yes",
+        "investment.fund.maturity_at_least_5_years": "yes",
+        "investment.fund.portuguese_company_investment_at_least_60_percent": "yes",
+        "investment.fund.subscription_documents_available": "yes",
+        "investment.proof_of_funds_or_transfer_available": "yes",
+        "routing.dependents_count": "2",
+        "routing.dependent_relationships": "spouse, child",
+        "identity.nationality": "United States",
+        "identity.third_country_national_status": "no",
+        "documents.valid_passport_available": "yes",
+        "documents.criminal_record_certificate_available": (
+            "yes_recent_translated_apostilled"
+        ),
+        "routing.serious_criminal_conviction_flag": "no",
+        "routing.entry_stay_ban_flag": "no",
+        "routing.sii_ucfe_refusal_alert_flag": "no",
+        "documents.portuguese_tax_clearance_status": "no_outstanding_tax_debts",
+        "documents.social_security_clearance_status": (
+            "no_outstanding_social_security_debts"
+        ),
+        "documents.foreign_tax_id_disclosure_available": "yes",
+        "compliance.investment_maintenance_declaration_available": "yes",
+    }
+    expected_order = list(answers.keys())
+
+    payload: dict = {}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="portugal-golden-visa")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="portugal-golden-visa")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
 
 
 def test_portugal_golden_visa_relocated_and_removed_questions():
@@ -3455,10 +4052,49 @@ def test_portugal_golden_visa_relocated_and_removed_questions():
     assert result["eligibility_status"] == "eligible"
 
 
-def test_portugal_golden_visa_investment_routes_untouched_pending_legal_review():
-    """Section 3 items: the 5 investment-route evidence questions and the
-    investment-maintenance declaration still carry HARD_FAILURES codes --
-    only their escape choices were removed, not touched otherwise."""
+def test_portugal_golden_visa_movewise_blocked_fields_untouched_pending_legal_review():
+    """MoveWise-blocked in Phase A: these 11 fields must remain live with their
+    exact current wording, choices, and hard/soft severity unchanged."""
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_golden_visa"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    blocked_keys = [
+        "investment.real_estate_only_basis",
+        "investment.job_creation.evidence_available",
+        "investment.scientific_research.institution_confirmation_available",
+        "investment.arts_cultural_heritage.qualifying_entity_confirmation_available",
+        "investment.fund.subscription_documents_available",
+        "investment.company_capitalization.company_and_employment_documents_available",
+        "investment.proof_of_funds_or_transfer_available",
+        "documents.valid_passport_available",
+        "documents.criminal_record_certificate_available",
+        "documents.foreign_tax_id_disclosure_available",
+        "compliance.investment_maintenance_declaration_available",
+    ]
+    for key in blocked_keys:
+        assert key in fields_by_key, f"{key} must remain live in Phase A"
+
+    assert fields_by_key["documents.criminal_record_certificate_available"][
+        "choices"
+    ] == [
+        "yes_recent_translated_apostilled",
+        "available_but_needs_translation_or_apostille",
+        "no",
+    ]
+    assert fields_by_key["documents.foreign_tax_id_disclosure_available"][
+        "choices"
+    ] == ["yes", "proof_none_exists", "no"]
+
     import app.engine.pathways.portugal_golden_visa.rules as portugal_golden_visa_rules
 
     for code in (
@@ -3467,6 +4103,9 @@ def test_portugal_golden_visa_investment_routes_untouched_pending_legal_review()
         "arts_cultural_heritage_qualifying_entity_unavailable",
         "fund_subscription_documents_unavailable",
         "company_capitalization_documents_unavailable",
+        "investment_proof_or_transfer_unavailable",
+        "passport_unavailable",
+        "foreign_tax_id_disclosure_unavailable",
         "investment_maintenance_declaration_unavailable",
     ):
         assert code in portugal_golden_visa_rules.HARD_FAILURES

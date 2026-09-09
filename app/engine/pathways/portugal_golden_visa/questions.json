@@ -7,24 +7,8 @@
   },
   "taxonomy_fields": [
     {
-      "key": "identity.nationality",
-      "depends_on": [],
-      "label": "What is your nationality?",
-      "input_type": "text",
-      "required": true
-    },
-    {
-      "key": "identity.third_country_national_status",
-      "depends_on": ["identity.nationality"],
-      "label": "Are you a third-country national for Portugal ARI purposes?",
-      "description": "Portugal Golden Visa / ARI is not available to Portuguese, EU, EEA, Andorra, or Swiss nationals.",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["third_country_national", "portuguese_eu_eea_andorra_swiss"]
-    },
-    {
       "key": "investment.route",
-      "depends_on": ["identity.third_country_national_status"],
+      "depends_on": [],
       "label": "Which qualifying Portugal Golden Visa / ARI investment route are you using?",
       "input_type": "choice",
       "required": true,
@@ -38,8 +22,16 @@
       ]
     },
     {
-      "key": "investment.real_estate_only_basis",
+      "key": "routing.applicant_type",
       "depends_on": ["investment.route"],
+      "label": "Are you applying as an individual or with family dependents?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["individual", "family"]
+    },
+    {
+      "key": "investment.real_estate_only_basis",
+      "depends_on": ["routing.applicant_type"],
       "label": "Is your Portugal ARI case relying only on a real-estate purchase or real-estate rehabilitation investment?",
       "description": "AIMA's current ARI page does not list real-estate purchase or real-estate rehabilitation as qualifying categories.",
       "input_type": "choice",
@@ -49,7 +41,7 @@
     },
     {
       "key": "investment.job_creation.jobs_created_count",
-      "depends_on": ["investment.route"],
+      "depends_on": ["investment.real_estate_only_basis"],
       "label": "How many jobs will your Portugal ARI investment create?",
       "description": "The job creation route requires creating at least 10 jobs.",
       "input_type": "number",
@@ -67,7 +59,7 @@
     },
     {
       "key": "investment.scientific_research.amount_eur",
-      "depends_on": ["investment.route"],
+      "depends_on": ["investment.real_estate_only_basis"],
       "label": "How much will you transfer into qualifying scientific research activities in Portugal?",
       "description": "The scientific research route requires at least EUR 500,000.",
       "input_type": "number",
@@ -85,7 +77,7 @@
     },
     {
       "key": "investment.arts_cultural_heritage.amount_eur",
-      "depends_on": ["investment.route"],
+      "depends_on": ["investment.real_estate_only_basis"],
       "label": "How much will you transfer into qualifying artistic production or cultural heritage recovery or maintenance?",
       "description": "The arts / cultural heritage route requires at least EUR 250,000.",
       "input_type": "number",
@@ -103,7 +95,7 @@
     },
     {
       "key": "investment.fund.amount_eur",
-      "depends_on": ["investment.route"],
+      "depends_on": ["investment.real_estate_only_basis"],
       "label": "How much will you transfer into qualifying non-real-estate investment fund units?",
       "description": "The non-real-estate investment fund route requires at least EUR 500,000.",
       "input_type": "number",
@@ -120,9 +112,18 @@
       "applies_when": { "equals": ["investment.route", "non_real_estate_investment_fund"] }
     },
     {
-      "key": "investment.fund.maturity_and_portuguese_company_investment_confirmed",
+      "key": "investment.fund.maturity_at_least_5_years",
       "depends_on": ["investment.fund.non_real_estate_confirmed"],
-      "label": "Does the fund have 5-year maturity and at least 60% invested in Portuguese companies?",
+      "label": "Does the fund have a maturity of at least 5 years?",
+      "input_type": "choice",
+      "required": true,
+      "choices": ["yes", "no"],
+      "applies_when": { "equals": ["investment.route", "non_real_estate_investment_fund"] }
+    },
+    {
+      "key": "investment.fund.portuguese_company_investment_at_least_60_percent",
+      "depends_on": ["investment.fund.maturity_at_least_5_years"],
+      "label": "Will at least 60% of the fund's investment be in Portuguese companies?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
@@ -130,7 +131,7 @@
     },
     {
       "key": "investment.fund.subscription_documents_available",
-      "depends_on": ["investment.fund.maturity_and_portuguese_company_investment_confirmed"],
+      "depends_on": ["investment.fund.portuguese_company_investment_at_least_60_percent"],
       "label": "Can you provide fund subscription proof and fund documentation?",
       "input_type": "choice",
       "required": true,
@@ -139,7 +140,7 @@
     },
     {
       "key": "investment.company_capitalization.amount_eur",
-      "depends_on": ["investment.route"],
+      "depends_on": ["investment.real_estate_only_basis"],
       "label": "How much will you transfer to create or reinforce a Portuguese company?",
       "description": "The company capitalization route requires at least EUR 500,000 plus the required job creation or maintenance commitment.",
       "input_type": "number",
@@ -170,23 +171,15 @@
     },
     {
       "key": "investment.proof_of_funds_or_transfer_available",
-      "depends_on": ["investment.route"],
+      "depends_on": ["investment.real_estate_only_basis"],
       "label": "Can you provide investment transfer proof, fund documentation, company records, or other evidence required for your selected investment route?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
     },
     {
-      "key": "routing.applicant_type",
-      "depends_on": ["investment.proof_of_funds_or_transfer_available"],
-      "label": "Are you applying as an individual or with family dependents?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["individual", "family"]
-    },
-    {
       "key": "routing.dependents_count",
-      "depends_on": ["routing.applicant_type"],
+      "depends_on": ["investment.proof_of_funds_or_transfer_available"],
       "label": "How many family members are included for family reunification with the ARI holder?",
       "input_type": "number",
       "required": true,
@@ -201,17 +194,24 @@
       "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
-      "key": "routing.family_documents_available",
-      "depends_on": ["routing.dependent_relationships"],
-      "label": "Can you provide family relationship documents for each included family member?",
+      "key": "identity.nationality",
+      "depends_on": ["investment.proof_of_funds_or_transfer_available"],
+      "label": "What is your nationality?",
+      "input_type": "text",
+      "required": true
+    },
+    {
+      "key": "identity.third_country_national_status",
+      "depends_on": ["identity.nationality"],
+      "label": "Are you a citizen of Portugal, another EU or EEA country, Andorra, or Switzerland?",
+      "description": "Portugal Golden Visa / ARI is not available to Portuguese, EU, EEA, Andorra, or Swiss nationals.",
       "input_type": "choice",
       "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+      "choices": ["yes", "no"]
     },
     {
       "key": "documents.valid_passport_available",
-      "depends_on": ["routing.applicant_type"],
+      "depends_on": ["identity.third_country_national_status"],
       "label": "Do you have a valid passport available for the Portugal ARI application?",
       "input_type": "choice",
       "required": true,
@@ -256,18 +256,26 @@
     {
       "key": "documents.portuguese_tax_clearance_status",
       "depends_on": ["routing.sii_ucfe_refusal_alert_flag"],
-      "label": "Can you provide a Portuguese Tax Authority certificate of no debts or proof of non-registration?",
+      "label": "Which best describes your status with the Portuguese Tax Authority?",
       "input_type": "choice",
       "required": true,
-      "choices": ["debt_clearance_certificate", "non_registration_proof", "has_tax_debts"]
+      "choices": [
+        "no_outstanding_tax_debts",
+        "not_registered_with_the_portuguese_tax_authority",
+        "outstanding_portuguese_tax_debts"
+      ]
     },
     {
       "key": "documents.social_security_clearance_status",
       "depends_on": ["documents.portuguese_tax_clearance_status"],
-      "label": "Can you provide a Social Security certificate of no debts or proof of non-registration?",
+      "label": "Which best describes your status with Portuguese Social Security?",
       "input_type": "choice",
       "required": true,
-      "choices": ["debt_clearance_certificate", "non_registration_proof", "has_social_security_debts"]
+      "choices": [
+        "no_outstanding_social_security_debts",
+        "not_registered_with_portuguese_social_security",
+        "outstanding_social_security_debts"
+      ]
     },
     {
       "key": "documents.foreign_tax_id_disclosure_available",
@@ -284,13 +292,6 @@
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
-    },
-    {
-      "key": "routing.additional_information",
-      "depends_on": ["compliance.investment_maintenance_declaration_available"],
-      "label": "What else about your Portugal Golden Visa / ARI situation should QIQ consider?",
-      "input_type": "text",
-      "required": false
     }
   ],
   "post_eligibility_checklist": {

@@ -108,14 +108,24 @@
       "clarification": "It is unclear whether the fund is a qualifying non-real-estate collective investment under Portuguese law. The fund structure should be reviewed before eligibility is confirmed."
     },
     {
-      "requirement": "fund_maturity_or_portuguese_company_investment_not_confirmed",
-      "title": "Fund Maturity / Portuguese Company Investment Not Confirmed",
-      "clarification": "The fund route requires 5-year maturity and at least 60% invested in Portuguese companies. If those features are not confirmed, this route does not appear to meet Portugal ARI requirements."
+      "requirement": "fund_maturity_below_minimum",
+      "title": "Fund Maturity Below Minimum",
+      "clarification": "The fund route requires a minimum 5-year maturity. Based on the information provided, this route does not appear to meet that requirement."
     },
     {
-      "requirement": "fund_maturity_or_portuguese_company_investment_needs_review",
-      "title": "Fund Maturity / Portuguese Company Investment Needs Review",
-      "clarification": "The fund's 5-year maturity or 60% Portuguese-company investment requirement is missing or unclear. The fund documents should be reviewed before eligibility is confirmed."
+      "requirement": "fund_maturity_needs_review",
+      "title": "Fund Maturity Needs Review",
+      "clarification": "The fund's 5-year maturity requirement is missing or unclear. The fund documents should be reviewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "fund_portuguese_company_investment_below_minimum",
+      "title": "Fund Portuguese-Company Investment Below Minimum",
+      "clarification": "The fund route requires at least 60% invested in Portuguese companies. Based on the information provided, this route does not appear to meet that requirement."
+    },
+    {
+      "requirement": "fund_portuguese_company_investment_needs_review",
+      "title": "Fund Portuguese-Company Investment Needs Review",
+      "clarification": "The fund's 60% Portuguese-company investment requirement is missing or unclear. The fund documents should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "fund_subscription_documents_unavailable",
@@ -181,11 +191,6 @@
       "requirement": "dependent_relationships_missing",
       "title": "Family Relationships Missing",
       "clarification": "Family reunification cases should identify each included family member's relationship to the ARI applicant so eligibility and documentation can be reviewed."
-    },
-    {
-      "requirement": "family_documents_needs_review",
-      "title": "Family Documents Need Review",
-      "clarification": "Family reunification cases require relationship documents for each included family member. The availability or sufficiency of those documents is missing, unclear, or not confirmed."
     },
     {
       "requirement": "passport_unavailable",
