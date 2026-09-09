@@ -33,11 +33,6 @@
       "clarification": "Family applications should identify each dependent's relationship to the main applicant so the accompanying-family route can be reviewed."
     },
     {
-      "requirement": "family_documents_needs_review",
-      "title": "Family Documents Need Review",
-      "clarification": "Family cases require relationship documents for each included family member. The availability of those documents is missing, unclear, or not confirmed."
-    },
-    {
       "requirement": "application_country_needs_review",
       "title": "Application Country Needs Review",
       "clarification": "It is unclear whether the applicant is applying from their country of nationality. This matters because lawful residence evidence may be required when applying elsewhere."
@@ -51,16 +46,6 @@
       "requirement": "lawful_residence_where_applying_needs_review",
       "title": "Lawful Residence Where Applying Needs Review",
       "clarification": "The applicant is applying outside the country of nationality, but lawful residence status in the application country is unclear. The case should be reviewed before eligibility is confirmed."
-    },
-    {
-      "requirement": "active_employment_or_non_passive_intent",
-      "title": "Passive-Income Intent Not Confirmed",
-      "clarification": "Portugal's D7 pathway is for people living from passive or own income. If the case is not based on passive or own income, this pathway does not appear to fit."
-    },
-    {
-      "requirement": "passive_own_income_intent_needs_review",
-      "title": "Passive-Income Intent Needs Review",
-      "clarification": "It is unclear whether the applicant's Portugal D7 case is based on passive or own income. The case should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "annual_passive_income_missing_or_unrecognized",
@@ -88,24 +73,14 @@
       "clarification": "The selected documents do not clearly prove passive income, own income, or funds. Evidence may include bank statements, income proof, pension proof, investment income proof, property income proof, or royalty/intellectual-property income proof."
     },
     {
-      "requirement": "income_not_available_in_portugal",
-      "title": "Income Not Available in Portugal",
-      "clarification": "The D7 source reference requires the applicant to prove income availability in Portuguese territory. If income or funds cannot be made available in Portugal, this requirement does not appear to be met."
-    },
-    {
-      "requirement": "portuguese_bank_availability_needs_review",
-      "title": "Portuguese Bank Availability Needs Review",
-      "clarification": "The availability of income or funds in Portugal is unclear or depends on a future bank account opening or transfer. The case should be reviewed before eligibility is confirmed."
-    },
-    {
       "requirement": "portugal_accommodation_12_months_unavailable",
       "title": "12-Month Portugal Accommodation Unavailable",
-      "clarification": "The D7 pathway requires permanent accommodation in Portugal for at least 12 months. If qualifying accommodation is not available or is for less than 12 months, this requirement does not appear to be met."
+      "clarification": "The D7 pathway requires accommodation available in Portugal for at least 12 months. If the applicant has indicated no qualifying accommodation is available, this requirement does not appear to be met."
     },
     {
-      "requirement": "portugal_accommodation_12_months_needs_review",
+      "requirement": "portugal_accommodation_needs_review",
       "title": "Portugal Accommodation Needs Review",
-      "clarification": "The applicant's Portugal accommodation status is missing or unclear. The case should be reviewed to confirm whether a lease, property deed, or other qualifying accommodation covers at least 12 months."
+      "clarification": "The applicant has indicated they will arrange accommodation in Portugal rather than already having it, or the accommodation status is otherwise unclear. The case should be reviewed to confirm 12-month accommodation before eligibility is confirmed."
     },
     {
       "requirement": "passport_validity_missing_or_unrecognized",
@@ -130,12 +105,12 @@
     {
       "requirement": "police_clearance_unavailable",
       "title": "Police Clearance Unavailable",
-      "clarification": "Portugal D7 applicants generally need a criminal record certificate from the country of nationality or any country where they lived over 1 year, unless under 16. If the certificate cannot be obtained, this requirement is not met."
+      "clarification": "Applicants age 16 or older generally need a criminal record certificate from the country of nationality or any country where they lived over 1 year. If the certificate cannot be obtained, this requirement is not met."
     },
     {
       "requirement": "police_clearance_needs_review",
       "title": "Police Clearance Needs Review",
-      "clarification": "The police clearance status is unclear. The case should be reviewed to confirm whether the required criminal record certificate can be obtained or whether an under-16 exemption applies."
+      "clarification": "The applicant's police clearance status is unclear. The case should be reviewed to confirm whether the required criminal record certificate can be obtained."
     },
     {
       "requirement": "criminal_record_needs_review",
@@ -148,16 +123,6 @@
       "clarification": "After D7 visa approval, the applicant must request a residence title from AIMA during the residence stage. The applicant's understanding of this post-approval step is unclear and should be reviewed.",
       "stage": "post_eligibility_checklist",
       "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.aima_residence_step_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
-    },
-    {
-      "requirement": "false_statement_risk_not_acknowledged",
-      "title": "False Statement Risk Not Acknowledged",
-      "clarification": "False statements may cause refusal or annulment of an already granted visa and legal action under Portuguese law. If the applicant does not acknowledge this compliance requirement, the case does not appear ready to proceed."
-    },
-    {
-      "requirement": "truthful_documents_needs_review",
-      "title": "Truthful Documents Need Review",
-      "clarification": "The applicant's understanding of the truthful-document requirement is unclear. The case should be reviewed because inconsistent or false documentation can lead to refusal or annulment."
     }
   ]
 }

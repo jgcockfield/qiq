@@ -558,9 +558,10 @@ def _portugal_d7_payload(
     annual_passive_income_eur="20000",
     application_country_matches_nationality="yes",
     lawful_residence_where_applying=None,
-    passive_own_income_intent="yes",
-    portuguese_bank_availability="yes",
-    portugal_accommodation_12_months="lease_12_months_or_more",
+    income_source_types=None,
+    portugal_accommodation_12_months="have_it",
+    health_travel_insurance_status="have_it",
+    age="30",
     police_clearance_available="yes",
     criminal_record_flag="no",
     dependents_count=None,
@@ -571,26 +572,24 @@ def _portugal_d7_payload(
         "routing": {
             "applicant_type": applicant_type,
             "application_country_matches_nationality": application_country_matches_nationality,
-            "passive_own_income_intent": passive_own_income_intent,
             "passport_validity_months": "12",
-            "health_travel_insurance_status": "have_it",
+            "health_travel_insurance_status": health_travel_insurance_status,
             "police_clearance_available": police_clearance_available,
             "criminal_record_flag": criminal_record_flag,
         },
         "identity": {
             "nationality": "United States",
+            "age": age,
         },
         "financial": {
             "annual_passive_income_eur": annual_passive_income_eur,
-            "income_source_types": ["pension"],
+            "income_source_types": (
+                ["pension"] if income_source_types is None else income_source_types
+            ),
             "income_evidence_types": ["bank_statements"],
-            "portuguese_bank_availability": portuguese_bank_availability,
         },
         "housing": {
             "portugal_accommodation_12_months": portugal_accommodation_12_months,
-        },
-        "compliance": {
-            "truthful_documents_acknowledged": "yes",
         },
     }
 
@@ -616,7 +615,6 @@ def _portugal_d7_payload(
                     else child_or_dependent_non_minor_count
                 ),
                 "dependent_relationships": "spouse, child",
-                "family_documents_available": "yes",
             }
         )
 
@@ -2134,35 +2132,40 @@ def test_portugal_d7_insufficient_income_returns_not_eligible():
     assert result["failed_requirements"] == ["insufficient_passive_income"]
 
 
-def test_portugal_d7_active_employment_intent_returns_not_eligible():
+def test_portugal_d7_active_work_income_selection_retains_hard_failure():
+    """Removing the standalone passive_own_income_intent self-declaration
+    must not weaken the independent income_source_types check."""
     result = evaluate_eligibility(
-        _portugal_d7_payload(passive_own_income_intent="no"),
+        _portugal_d7_payload(
+            income_source_types=["pension", "employment_or_active_work_income"]
+        ),
         pathway="portugal-d7",
     )
 
     assert result["eligibility_status"] == "not_eligible"
-    assert result["failed_requirements"] == ["active_employment_or_non_passive_intent"]
+    assert result["failed_requirements"] == ["employment_or_active_work_income_not_accepted"]
 
 
-def test_portugal_d7_missing_portugal_income_availability_not_eligible():
-    result = evaluate_eligibility(
-        _portugal_d7_payload(portuguese_bank_availability="no"),
+def test_portugal_d7_lawful_residence_branch():
+    eligible_result = evaluate_eligibility(
+        _portugal_d7_payload(
+            application_country_matches_nationality="no",
+            lawful_residence_where_applying="yes",
+        ),
         pathway="portugal-d7",
     )
+    assert eligible_result["eligibility_status"] == "eligible"
 
-    assert result["eligibility_status"] == "not_eligible"
-    assert result["failed_requirements"] == ["income_not_available_in_portugal"]
-
-
-def test_portugal_d7_missing_12_month_accommodation_returns_not_eligible():
-    result = evaluate_eligibility(
-        _portugal_d7_payload(portugal_accommodation_12_months="not_available"),
+    not_eligible_result = evaluate_eligibility(
+        _portugal_d7_payload(
+            application_country_matches_nationality="no",
+            lawful_residence_where_applying="no",
+        ),
         pathway="portugal-d7",
     )
-
-    assert result["eligibility_status"] == "not_eligible"
-    assert result["failed_requirements"] == [
-        "portugal_accommodation_12_months_unavailable"
+    assert not_eligible_result["eligibility_status"] == "not_eligible"
+    assert not_eligible_result["failed_requirements"] == [
+        "lawful_residence_where_applying_unavailable"
     ]
 
 
@@ -2188,7 +2191,7 @@ def test_portugal_d7_family_route_applies_dependent_income_formula():
 def test_portugal_d7_background_gaps_can_return_needs_review():
     result = evaluate_eligibility(
         _portugal_d7_payload(
-            police_clearance_available="not_sure",
+            police_clearance_available="maybe",
             criminal_record_flag="yes",
         ),
         pathway="portugal-d7",
@@ -2201,22 +2204,119 @@ def test_portugal_d7_background_gaps_can_return_needs_review():
     ]
 
 
+def test_portugal_d7_accommodation_severity_by_choice():
+    have_it = evaluate_eligibility(
+        _portugal_d7_payload(portugal_accommodation_12_months="have_it"),
+        pathway="portugal-d7",
+    )
+    assert have_it["eligibility_status"] == "eligible"
+
+    will_arrange = evaluate_eligibility(
+        _portugal_d7_payload(portugal_accommodation_12_months="will_arrange"),
+        pathway="portugal-d7",
+    )
+    assert will_arrange["eligibility_status"] == "needs_review"
+    assert will_arrange["failed_requirements"] == ["portugal_accommodation_needs_review"]
+
+    no_accommodation = evaluate_eligibility(
+        _portugal_d7_payload(portugal_accommodation_12_months="no"),
+        pathway="portugal-d7",
+    )
+    assert no_accommodation["eligibility_status"] == "not_eligible"
+    assert no_accommodation["failed_requirements"] == [
+        "portugal_accommodation_12_months_unavailable"
+    ]
+
+
+def test_portugal_d7_insurance_severity_by_choice():
+    have_it = evaluate_eligibility(
+        _portugal_d7_payload(health_travel_insurance_status="have_it"),
+        pathway="portugal-d7",
+    )
+    assert have_it["eligibility_status"] == "eligible"
+
+    bilateral = evaluate_eligibility(
+        _portugal_d7_payload(health_travel_insurance_status="bilateral_exception_applies"),
+        pathway="portugal-d7",
+    )
+    assert bilateral["eligibility_status"] == "eligible"
+
+    will_obtain = evaluate_eligibility(
+        _portugal_d7_payload(health_travel_insurance_status="will_obtain"),
+        pathway="portugal-d7",
+    )
+    assert will_obtain["eligibility_status"] == "needs_review"
+    assert will_obtain["failed_requirements"] == ["health_travel_insurance_needs_review"]
+
+    no_insurance = evaluate_eligibility(
+        _portugal_d7_payload(health_travel_insurance_status="no"),
+        pathway="portugal-d7",
+    )
+    assert no_insurance["eligibility_status"] == "not_eligible"
+    assert no_insurance["failed_requirements"] == ["health_travel_insurance_unavailable"]
+
+
+def test_portugal_d7_age_15_skips_background_questions_without_review():
+    # A real client never sends these keys once identity.age < 16 hides the
+    # questions in the live flow, so the payload omits them entirely rather
+    # than sending an empty/None value.
+    payload = _portugal_d7_payload(age="15")
+    payload["routing"].pop("police_clearance_available", None)
+    payload["routing"].pop("criminal_record_flag", None)
+    result = evaluate_eligibility(payload, pathway="portugal-d7")
+
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+    assert "police_clearance_needs_review" not in result["failed_requirements"]
+    assert "police_clearance_unavailable" not in result["failed_requirements"]
+    assert "criminal_record_needs_review" not in result["failed_requirements"]
+
+
+def test_portugal_d7_age_16_requires_police_clearance():
+    payload = _portugal_d7_payload(age="16")
+    payload["routing"].pop("police_clearance_available", None)
+    payload["routing"].pop("criminal_record_flag", None)
+    result = evaluate_eligibility(payload, pathway="portugal-d7")
+
+    assert result["eligibility_status"] == "needs_review"
+    assert "police_clearance_needs_review" in result["failed_requirements"]
+    assert "criminal_record_needs_review" in result["failed_requirements"]
+
+
+def test_portugal_d7_age_16_or_older_no_police_clearance_is_hard_failure():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(age="16", police_clearance_available="no"),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "not_eligible"
+    assert result["failed_requirements"] == ["police_clearance_unavailable"]
+
+
+def test_portugal_d7_criminal_record_flag_needs_review_when_disclosed():
+    result = evaluate_eligibility(
+        _portugal_d7_payload(age="30", criminal_record_flag="yes"),
+        pathway="portugal-d7",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["criminal_record_needs_review"]
+
+
 def test_portugal_d7_individual_question_sequence():
     answers = {
         "routing.applicant_type": "individual",
         "identity.nationality": "United States",
         "routing.application_country_matches_nationality": "yes",
-        "routing.passive_own_income_intent": "yes",
-        "financial.annual_passive_income_eur": "20000",
         "financial.income_source_types": ["pension"],
+        "financial.annual_passive_income_eur": "20000",
         "financial.income_evidence_types": ["bank_statements"],
-        "financial.portuguese_bank_availability": "yes",
-        "housing.portugal_accommodation_12_months": "lease_12_months_or_more",
         "routing.passport_validity_months": "12",
+        "housing.portugal_accommodation_12_months": "have_it",
         "routing.health_travel_insurance_status": "have_it",
+        "identity.age": "30",
         "routing.police_clearance_available": "yes",
         "routing.criminal_record_flag": "no",
-        "compliance.truthful_documents_acknowledged": "yes",
     }
     expected_order = list(answers.keys())
 
@@ -2233,13 +2333,142 @@ def test_portugal_d7_individual_question_sequence():
         current[parts[-1]] = answers[expected_key]
 
     result = evaluate(payload, pathway="portugal-d7")
+    # routing.additional_information is required: false and is never
+    # surfaced as a next question by the evaluator.
     assert result["next_field_key"] is None
     assert asked_keys == expected_order
-    assert "compliance.aima_residence_step_acknowledged" not in asked_keys
-    assert "consulate.discretion_extra_documents_acknowledged" not in asked_keys
 
 
-def test_portugal_d7_relocated_and_removed_questions():
+def test_portugal_d7_family_question_sequence_includes_dependent_questions():
+    answers = {
+        "routing.applicant_type": "family",
+        "identity.nationality": "United States",
+        "routing.application_country_matches_nationality": "yes",
+        "financial.income_source_types": ["pension"],
+        "financial.annual_passive_income_eur": "40000",
+        "financial.income_evidence_types": ["bank_statements"],
+        "routing.dependents_count": "2",
+        "routing.dependent_relationships": "spouse, child",
+        "routing.additional_adult_dependents_count": "1",
+        "routing.child_or_dependent_non_minor_count": "1",
+        "routing.passport_validity_months": "12",
+        "housing.portugal_accommodation_12_months": "have_it",
+        "routing.health_travel_insurance_status": "have_it",
+        "identity.age": "30",
+        "routing.police_clearance_available": "yes",
+        "routing.criminal_record_flag": "no",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="portugal-d7")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="portugal-d7")
+    # routing.additional_information is required: false and is never
+    # surfaced as a next question by the evaluator.
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+
+
+def test_portugal_d7_income_source_and_evidence_choices_unchanged():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_d7"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert fields_by_key["financial.income_source_types"]["choices"] == [
+        "pension",
+        "rental_property_income",
+        "dividends",
+        "royalties",
+        "financial_investments",
+        "intellectual_property",
+        "savings_or_bank_balance",
+        "employment_or_active_work_income",
+        "other",
+    ]
+    assert fields_by_key["financial.income_evidence_types"]["choices"] == [
+        "bank_statements",
+        "income_proof",
+        "pension_proof",
+        "investment_income_proof",
+        "property_income_proof",
+        "royalty_or_ip_income_proof",
+        "other",
+    ]
+    assert fields_by_key["housing.portugal_accommodation_12_months"]["choices"] == [
+        "have_it",
+        "will_arrange",
+        "no",
+    ]
+    assert fields_by_key["routing.health_travel_insurance_status"]["choices"] == [
+        "have_it",
+        "will_obtain",
+        "bilateral_exception_applies",
+        "no",
+    ]
+    assert fields_by_key["identity.age"]["input_type"] == "number"
+    assert fields_by_key["routing.police_clearance_available"]["applies_when"] == {
+        "greater_than_or_equal": ["identity.age", 16]
+    }
+    assert fields_by_key["routing.criminal_record_flag"]["applies_when"] == {
+        "greater_than_or_equal": ["identity.age", 16]
+    }
+
+
+def test_portugal_d7_removed_questions_are_absent():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "portugal_d7"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+
+    # Removed entirely per the approved canonical flow (questions_d7.md):
+    assert "routing.passive_own_income_intent" not in live_keys
+    assert "financial.portuguese_bank_availability" not in live_keys
+    assert "routing.family_documents_available" not in live_keys
+    assert "compliance.truthful_documents_acknowledged" not in live_keys
+
+    # Never part of the live D7 flow; must not have been (re)introduced:
+    assert "compliance.aima_residence_step_acknowledged" not in live_keys
+    assert "consulate.discretion_extra_documents_acknowledged" not in live_keys
+
+    import app.engine.pathways.portugal_d7.rules as portugal_d7_rules
+
+    assert "active_employment_or_non_passive_intent" not in portugal_d7_rules.HARD_FAILURES
+    assert "income_not_available_in_portugal" not in portugal_d7_rules.HARD_FAILURES
+    assert "false_statement_risk_not_acknowledged" not in portugal_d7_rules.HARD_FAILURES
+
+    result = evaluate_eligibility(_portugal_d7_payload(), pathway="portugal-d7")
+    assert result["eligibility_status"] == "eligible"
+    assert "routing.passive_own_income_intent" not in result.get("routing", {})
+
+
+def test_portugal_d7_relocated_questions_stay_inert():
     questions_path = (
         Path(__file__).resolve().parents[1]
         / "app"
@@ -2254,15 +2483,11 @@ def test_portugal_d7_relocated_and_removed_questions():
 
     live_keys = {f["key"] for f in data["taxonomy_fields"]}
     assert "compliance.aima_residence_step_acknowledged" not in live_keys
-    assert "consulate.discretion_extra_documents_acknowledged" not in live_keys
 
     checklist_keys = {
         f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
     }
     assert "compliance.aima_residence_step_acknowledged" in checklist_keys
-    assert "consulate.discretion_extra_documents_acknowledged" not in checklist_keys
-
-    import app.engine.pathways.portugal_d7.rules as portugal_d7_rules
 
     source_text = Path(
         Path(__file__).resolve().parents[1]
@@ -2273,41 +2498,9 @@ def test_portugal_d7_relocated_and_removed_questions():
         / "rules.py"
     ).read_text(encoding="utf-8")
     assert '"compliance.aima_residence_step_acknowledged"' not in source_text
-    assert '"consulate.discretion_extra_documents_acknowledged"' not in source_text
-
-    result = evaluate_eligibility(_portugal_d7_payload(), pathway="portugal-d7")
-    assert result["eligibility_status"] == "eligible"
 
 
-def test_portugal_d7_truthful_documents_untouched_pending_legal_review():
-    """Section 3 item: this question still carries a HARD_FAILURES code and
-    still offers 'not_sure' -- explicitly left unchanged pending a legal-review
-    decision, not touched by this Batch 1 cleanup."""
-    questions_path = (
-        Path(__file__).resolve().parents[1]
-        / "app"
-        / "engine"
-        / "pathways"
-        / "portugal_d7"
-        / "questions.json"
-    )
-    import json
-
-    data = json.loads(questions_path.read_text(encoding="utf-8"))
-    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
-
-    assert fields_by_key["compliance.truthful_documents_acknowledged"]["choices"] == [
-        "yes",
-        "no",
-        "not_sure",
-    ]
-
-    import app.engine.pathways.portugal_d7.rules as portugal_d7_rules
-
-    assert "false_statement_risk_not_acknowledged" in portugal_d7_rules.HARD_FAILURES
-
-
-def test_portugal_d7_no_escape_choices_outside_section_3_items():
+def test_portugal_d7_no_escape_choices():
     import json
 
     questions_path = (
@@ -2321,10 +2514,7 @@ def test_portugal_d7_no_escape_choices_outside_section_3_items():
     data = json.loads(questions_path.read_text(encoding="utf-8"))
 
     forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
-    allowed_exceptions = {"compliance.truthful_documents_acknowledged"}
     for field in data["taxonomy_fields"]:
-        if field["key"] in allowed_exceptions:
-            continue
         choices = field.get("choices") or []
         overlap = forbidden.intersection(choices)
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"

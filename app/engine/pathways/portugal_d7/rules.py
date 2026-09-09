@@ -13,6 +13,7 @@ MAIN_APPLICANT_ANNUAL_INCOME_EUR = MINIMUM_MONTHLY_WAGE_EUR_2026 * 12
 ADDITIONAL_ADULT_DEPENDENT_MULTIPLIER = 0.5
 CHILD_DEPENDENT_MULTIPLIER = 0.3
 MINIMUM_PASSPORT_VALIDITY_MONTHS = 3
+MINIMUM_BACKGROUND_CHECK_AGE = 16
 
 VALID_PASSIVE_INCOME_SOURCE_TYPES = {
     "pension",
@@ -33,28 +34,31 @@ VALID_INCOME_EVIDENCE_TYPES = {
     "royalty_or_ip_income_proof",
 }
 
-VALID_ACCOMMODATION_STATUSES = {
-    "lease_12_months_or_more",
-    "property_deed",
-    "other_qualifying_accommodation",
-}
-
 VALID_INSURANCE_STATUSES = {
     "have_it",
     "bilateral_exception_applies",
 }
 
-VALID_POLICE_CLEARANCE_STATUSES = {
-    "yes",
-    "under_16_exempt",
-}
-
+# NOTE: routing.passive_own_income_intent (a standalone self-declaration),
+# financial.portuguese_bank_availability, routing.family_documents_available,
+# and compliance.truthful_documents_acknowledged were removed from the live
+# eligibility flow (and from this module) per the approved canonical
+# Markdown (questions_d7.md). Their former requirement codes
+# (active_employment_or_non_passive_intent, passive_own_income_intent_needs_review,
+# income_not_available_in_portugal, portuguese_bank_availability_needs_review,
+# family_documents_needs_review, false_statement_risk_not_acknowledged,
+# truthful_documents_needs_review) are no longer emitted anywhere. See
+# clarifications.json/output.json for what was cleaned up alongside them, and
+# the MoveWise Review Notes for the open legal questions this removal raises.
+#
+# The substantive "must not be supported by active employment income" rule is
+# preserved unchanged -- it now relies solely on whether the applicant
+# selects "employment_or_active_work_income" in financial.income_source_types
+# (see _evaluate_financials below), which was already an independent,
+# unmodified check.
 HARD_FAILURES = {
-    "active_employment_or_non_passive_intent",
     "employment_or_active_work_income_not_accepted",
-    "false_statement_risk_not_acknowledged",
     "health_travel_insurance_unavailable",
-    "income_not_available_in_portugal",
     "insufficient_passive_income",
     "lawful_residence_where_applying_unavailable",
     "passport_validity_below_minimum",
@@ -176,16 +180,10 @@ def _evaluate_applicant_route(
     if not _get_dotted(payload, "routing.dependent_relationships"):
         failed.append("dependent_relationships_missing")
 
-    family_documents = _get_dotted(payload, "routing.family_documents_available")
-    if _is_no(family_documents):
-        failed.append("family_documents_needs_review")
-    elif not _is_yes(family_documents):
-        failed.append("family_documents_needs_review")
-
     return additional_adult_count, child_or_dependent_non_minor_count
 
 
-def _evaluate_route_intent_and_lawful_status(
+def _evaluate_application_country_and_lawful_status(
     payload: Dict[str, Any],
     failed: List[str],
 ) -> None:
@@ -204,12 +202,6 @@ def _evaluate_route_intent_and_lawful_status(
             failed.append("lawful_residence_where_applying_needs_review")
     elif matches_nationality_country != "yes":
         failed.append("application_country_needs_review")
-
-    passive_income_intent = _get_dotted(payload, "routing.passive_own_income_intent")
-    if _is_no(passive_income_intent):
-        failed.append("active_employment_or_non_passive_intent")
-    elif not _is_yes(passive_income_intent):
-        failed.append("passive_own_income_intent_needs_review")
 
 
 def _evaluate_financials(
@@ -237,15 +229,6 @@ def _evaluate_financials(
     if not income_evidence.intersection(VALID_INCOME_EVIDENCE_TYPES):
         failed.append("income_evidence_needs_review")
 
-    portuguese_bank_availability = _get_dotted(
-        payload,
-        "financial.portuguese_bank_availability",
-    )
-    if portuguese_bank_availability == "no":
-        failed.append("income_not_available_in_portugal")
-    elif portuguese_bank_availability != "yes":
-        failed.append("portuguese_bank_availability_needs_review")
-
 
 def _evaluate_accommodation_passport_and_insurance(
     payload: Dict[str, Any],
@@ -255,10 +238,11 @@ def _evaluate_accommodation_passport_and_insurance(
         payload,
         "housing.portugal_accommodation_12_months",
     )
-    if accommodation in {"less_than_12_months", "not_available"}:
+    if accommodation == "no":
         failed.append("portugal_accommodation_12_months_unavailable")
-    elif accommodation not in VALID_ACCOMMODATION_STATUSES:
-        failed.append("portugal_accommodation_12_months_needs_review")
+    elif accommodation != "have_it":
+        # Covers "will_arrange" and any missing/unrecognized value.
+        failed.append("portugal_accommodation_needs_review")
 
     passport_months = _as_int(_get_dotted(payload, "routing.passport_validity_months"))
     if passport_months is None:
@@ -267,20 +251,35 @@ def _evaluate_accommodation_passport_and_insurance(
         failed.append("passport_validity_below_minimum")
 
     insurance_status = _get_dotted(payload, "routing.health_travel_insurance_status")
-    if insurance_status == "cannot_obtain":
+    if insurance_status == "no":
         failed.append("health_travel_insurance_unavailable")
     elif insurance_status not in VALID_INSURANCE_STATUSES:
+        # Covers "will_obtain" and any missing/unrecognized value -- preserved
+        # exactly as before; whether "will_obtain" should ultimately pass is
+        # an open MoveWise item, not decided by this migration.
         failed.append("health_travel_insurance_needs_review")
 
 
-def _evaluate_background_and_compliance(
+def _evaluate_background(
     payload: Dict[str, Any],
     failed: List[str],
 ) -> None:
+    # Portugal D7's criminal-record-certificate requirement does not apply
+    # under age 16 (the live flow's former "under_16_exempt" choice). The
+    # background questions are only asked (see questions.json's applies_when)
+    # when identity.age >= 16, so a missing answer here for an applicant
+    # under 16 must NOT be treated as needs_review -- it's the same pass
+    # state the old exemption choice produced. If age itself can't be
+    # parsed, fall through and evaluate normally rather than silently
+    # exempting an applicant of unknown age.
+    age = _as_int(_get_dotted(payload, "identity.age"))
+    if age is not None and age < MINIMUM_BACKGROUND_CHECK_AGE:
+        return
+
     police_clearance = _get_dotted(payload, "routing.police_clearance_available")
-    if police_clearance == "no":
+    if _is_no(police_clearance):
         failed.append("police_clearance_unavailable")
-    elif police_clearance not in VALID_POLICE_CLEARANCE_STATUSES:
+    elif not _is_yes(police_clearance):
         failed.append("police_clearance_needs_review")
 
     criminal_record = _get_dotted(payload, "routing.criminal_record_flag")
@@ -288,25 +287,6 @@ def _evaluate_background_and_compliance(
         failed.append("criminal_record_needs_review")
     elif criminal_record != "no":
         failed.append("criminal_record_needs_review")
-
-    # NOTE: compliance.aima_residence_step_acknowledged was removed from the live
-    # eligibility flow (and from this function) because requesting a residence
-    # title from AIMA is a post-approval step, not a fact needed to determine
-    # INITIAL visa eligibility. See questions.json's "post_eligibility_checklist"
-    # block and clarifications.json for the preserved question/requirement content.
-    #
-    # NOTE: consulate.discretion_extra_documents_acknowledged was removed entirely
-    # (not preserved) -- it was a pure consular-discretion disclaimer with no
-    # eligibility fact behind it.
-
-    truthful_documents_acknowledged = _get_dotted(
-        payload,
-        "compliance.truthful_documents_acknowledged",
-    )
-    if _is_no(truthful_documents_acknowledged):
-        failed.append("false_statement_risk_not_acknowledged")
-    elif not _is_yes(truthful_documents_acknowledged):
-        failed.append("truthful_documents_needs_review")
 
 
 def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -321,10 +301,10 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
         child_or_dependent_non_minor_count,
     )
 
-    _evaluate_route_intent_and_lawful_status(payload, failed)
+    _evaluate_application_country_and_lawful_status(payload, failed)
     _evaluate_financials(payload, failed, required_annual_income)
     _evaluate_accommodation_passport_and_insurance(payload, failed)
-    _evaluate_background_and_compliance(payload, failed)
+    _evaluate_background(payload, failed)
 
     if any(requirement in HARD_FAILURES for requirement in failed):
         status = "not_eligible"

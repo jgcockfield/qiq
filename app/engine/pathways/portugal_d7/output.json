@@ -14,17 +14,11 @@
       }
     },
     "requirement_variants": {
-      "active_employment_or_non_passive_intent": {
-        "text": "Portugal's D7 Passive Income Visa is for residence based on passive or own income. Based on the information provided, this pathway does not appear to match the stated income or residence plan."
-      },
       "insufficient_passive_income": {
         "text": "Based on the annual passive or own income provided, you do not currently appear to meet the Portugal D7 income threshold for your applicant route."
       },
       "employment_or_active_work_income_not_accepted": {
         "text": "Portugal's D7 pathway must be supported by passive or own income. Based on the information provided, active work income does not appear to satisfy this pathway."
-      },
-      "income_not_available_in_portugal": {
-        "text": "Portugal D7 screening requires income or funds to be available in Portuguese territory. Based on the information provided, this requirement is not currently met."
       },
       "portugal_accommodation_12_months_unavailable": {
         "text": "Portugal's D7 pathway requires permanent accommodation in Portugal for at least 12 months. Based on the information provided, this requirement is not currently met."
@@ -39,10 +33,7 @@
         "text": "Portugal D7 applicants must have health or travel insurance covering medical expenses, urgent medical assistance, and possible repatriation unless an exception applies. Without qualifying coverage, eligibility cannot be confirmed."
       },
       "police_clearance_unavailable": {
-        "text": "Portugal D7 applicants generally need a criminal record certificate unless an under-16 exemption applies. Based on the information provided, this requirement is not currently met."
-      },
-      "false_statement_risk_not_acknowledged": {
-        "text": "Portugal D7 screening requires truthful and consistent documentation. If the false-statement risk is not acknowledged, the case does not appear ready to proceed."
+        "text": "Portugal D7 applicants age 16 or older generally need a criminal record certificate. Based on the information provided, this requirement is not currently met."
       }
     }
   },
@@ -52,7 +43,7 @@
         "enabled": true,
         "text": [
           "You may be a good fit for Portugal's D7 Passive Income Visa.",
-          "The next step is to verify your passive or own income, dependent income calculation if applicable, Portugal bank or funds availability, 12-month accommodation, passport, insurance, police clearance, and AIMA residence-stage obligations before preparing an application."
+          "The next step is to verify your passive or own income, dependent income calculation if applicable, 12-month accommodation, passport, insurance, and police clearance before preparing an application."
         ],
         "action": {
           "label": "Book a Portugal D7 consultation",
@@ -74,7 +65,7 @@
         "enabled": true,
         "text": [
           "You do not currently appear to meet one or more mandatory Portugal D7 Passive Income Visa qualification requirements.",
-          "If your passive or own income, Portugal funds availability, accommodation, passport validity, insurance, police clearance, family route, or compliance answers change, you can complete the eligibility check again or ask the team about alternative Portugal pathways."
+          "If your passive or own income, accommodation, passport validity, insurance, police clearance, or family route answers change, you can complete the eligibility check again or ask the team about alternative Portugal pathways."
         ],
         "action": {
           "label": "Review alternative Portugal options",
@@ -102,17 +93,6 @@
         ],
         "action": {
           "label": "Wait for dependent-income review",
-          "type": "email_followup"
-        }
-      },
-      "passive_own_income_intent_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your passive or own-income residence intent needs manual review.",
-          "The team should confirm that your Portugal D7 case is based on qualifying passive or own income."
-        ],
-        "action": {
-          "label": "Wait for income-intent review",
           "type": "email_followup"
         }
       },
@@ -149,22 +129,11 @@
           "type": "email_followup"
         }
       },
-      "portuguese_bank_availability_needs_review": {
+      "portugal_accommodation_needs_review": {
         "enabled": true,
         "text": [
-          "Your Portugal funds availability needs manual review.",
-          "The team should verify whether your income or funds can be shown as available in Portugal, including through a Portuguese bank account or transfer plan."
-        ],
-        "action": {
-          "label": "Wait for Portugal funds review",
-          "type": "email_followup"
-        }
-      },
-      "portugal_accommodation_12_months_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your Portugal accommodation evidence needs manual review.",
-          "The team should verify whether your lease, property deed, or other accommodation proof satisfies the 12-month requirement."
+          "Your Portugal accommodation status needs manual review.",
+          "The team should verify your plan to arrange accommodation in Portugal for at least 12 months before eligibility is confirmed."
         ],
         "action": {
           "label": "Wait for accommodation review",
@@ -208,7 +177,7 @@
         "enabled": true,
         "text": [
           "Your police clearance status needs manual review.",
-          "The team should confirm whether the required criminal record certificate can be obtained or whether an under-16 exemption applies."
+          "The team should confirm whether the required criminal record certificate can be obtained."
         ],
         "action": {
           "label": "Wait for police-clearance review",
@@ -226,17 +195,6 @@
           "type": "email_followup"
         }
       },
-      "family_documents_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your family relationship documents need manual review.",
-          "The team should verify relationship documents for each included family member."
-        ],
-        "action": {
-          "label": "Wait for family-document review",
-          "type": "email_followup"
-        }
-      },
       "aima_residence_step_needs_review": {
         "enabled": true,
         "text": [
@@ -249,17 +207,6 @@
         },
         "stage": "post_eligibility_checklist",
         "stage_note": "Preserved for a future post-eligibility guidance surface. No longer emitted by rules.py's live eligibility screening -- compliance.aima_residence_step_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
-      },
-      "truthful_documents_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your truthful-document acknowledgment needs manual review.",
-          "The team should confirm that you understand false or inconsistent documents can lead to refusal or annulment."
-        ],
-        "action": {
-          "label": "Wait for truthful-document review",
-          "type": "email_followup"
-        }
       }
     }
   }
