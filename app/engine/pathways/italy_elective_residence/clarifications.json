@@ -5,37 +5,32 @@
     {
       "requirement": "applicant_type_missing",
       "title": "Applicant Type Needs Review",
-      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Family cases require additional financial and relationship-document review."
+      "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Family cases require additional financial and relationship review."
     },
     {
       "requirement": "dependents_count_missing",
       "title": "Dependent Count Missing",
-      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case because each dependent may increase the expected financial support."
+      "clarification": "When family dependents are included, the application should identify how many dependents are part of the case."
     },
     {
       "requirement": "dependent_relationships_missing",
       "title": "Dependent Relationships Missing",
-      "clarification": "Family applications should identify each dependent's relationship to the main applicant. Italy Elective Residence family routing may include a spouse, minor children, and certain dependent adult children."
+      "clarification": "Family applications should identify each dependent's relationship to the main applicant, such as spouse, minor child, or adult child."
     },
     {
       "requirement": "adult_child_dependency_not_met",
       "title": "Adult Child Dependency Not Met",
-      "clarification": "Dependent adult children may require proof that they live with and depend on the parent applicant. If that dependency is not met, the family route does not appear to satisfy the pathway requirement."
+      "clarification": "Dependent adult children must live with and depend financially on the parent applicant. If that dependency is not met, the family route does not appear to satisfy the pathway requirement."
     },
     {
       "requirement": "adult_child_dependency_needs_review",
       "title": "Adult Child Dependency Needs Review",
-      "clarification": "It is unclear whether any included adult children live with and depend on the parent applicant. The case should be reviewed before family eligibility is confirmed."
-    },
-    {
-      "requirement": "family_documents_needs_review",
-      "title": "Family Documents Need Review",
-      "clarification": "Family cases may require marriage, birth, or other relationship documents for each included dependent, with a separate application packet per applicant. The document availability should be reviewed."
+      "clarification": "It is unclear whether an included adult child lives with and depends financially on the parent applicant. The case should be reviewed before family eligibility is confirmed."
     },
     {
       "requirement": "consulate_jurisdiction_needs_review",
       "title": "Consulate Jurisdiction Needs Review",
-      "clarification": "The likely Italian consulate or jurisdiction is unclear. This matters because Elective Residence requirements can vary by consulate, including passport, FBI background, tax-return, insurance, travel, and lodging details."
+      "clarification": "The likely Italian consulate or jurisdiction is unclear. This matters because Elective Residence requirements can vary by consulate, including passport and lodging details."
     },
     {
       "requirement": "no_work_in_italy_not_confirmed",
@@ -45,7 +40,7 @@
     {
       "requirement": "no_work_in_italy_needs_review",
       "title": "No-Work Requirement Needs Review",
-      "clarification": "It is unclear whether the applicant's Italy residence will be funded without work. The case should be reviewed because this visa is not a digital nomad or remote-work visa."
+      "clarification": "It is unclear whether the applicant intends to work while living in Italy. The case should be reviewed because this visa is not a digital nomad or remote-work visa."
     },
     {
       "requirement": "extended_tourism_purpose",
@@ -65,7 +60,7 @@
     {
       "requirement": "insufficient_passive_income",
       "title": "Insufficient Passive Income",
-      "clarification": "Italy Elective Residence screening uses approximately EUR 31,000 per year as a reference point for the main applicant, with additional support expected for dependents. The stated passive income is below the calculated threshold."
+      "clarification": "Italy Elective Residence screening uses approximately EUR 31,000 per year as a reference point. The stated passive income is below that threshold."
     },
     {
       "requirement": "passive_income_at_reference_threshold_needs_review",
@@ -88,21 +83,6 @@
       "clarification": "The selected income sources do not clearly match accepted passive/private sources such as pensions, Social Security, annuities, property income, securities, investments, trusts, or stable commercial activity."
     },
     {
-      "requirement": "income_evidence_needs_review",
-      "title": "Income Evidence Needs Review",
-      "clarification": "The selected documents do not clearly prove passive income or private assets. Evidence may include bank letters, financial adviser letters, pension or Social Security letters, investment statements, tax returns, or property/rental income documents."
-    },
-    {
-      "requirement": "tax_returns_need_review",
-      "title": "Tax Returns Need Review",
-      "clarification": "Some consulates request the last 2 years of income tax returns. The applicant has less than 2 years available, is unsure, or the tax-return status is unclear."
-    },
-    {
-      "requirement": "tax_returns_complete_schedules_need_review",
-      "title": "Complete Tax Returns Need Review",
-      "clarification": "Some consulates, including San Francisco guidance, may request complete federal tax returns with schedules rather than basic returns only. The tax-return evidence should be reviewed."
-    },
-    {
       "requirement": "qualifying_italian_lodging_unavailable",
       "title": "Qualifying Italian Lodging Unavailable",
       "clarification": "Applicants must show qualifying lodging in Italy, such as a registered lease, rental contract, or property deed. Without lodging evidence, the case does not appear to meet this requirement."
@@ -120,17 +100,12 @@
     {
       "requirement": "health_insurance_unavailable",
       "title": "Health Insurance Unavailable",
-      "clarification": "Applicants must have overseas or international medical insurance valid in Italy. If qualifying coverage cannot be obtained, the case does not appear to meet this requirement."
+      "clarification": "Applicants must have health insurance valid in Italy covering medical care and hospitalization for the full stay. Based on the information provided, this requirement does not appear to be met."
     },
     {
       "requirement": "health_insurance_needs_review",
       "title": "Health Insurance Needs Review",
-      "clarification": "The applicant does not currently have qualifying insurance or the insurance status is unclear. The case should be reviewed to confirm coverage can be obtained for the stay."
-    },
-    {
-      "requirement": "health_insurance_coverage_needs_review",
-      "title": "Insurance Coverage Level Needs Review",
-      "clarification": "Consular guidance may require broad medical coverage, hospitalization, emergency repatriation, and a minimum coverage amount such as EUR 30,000. The policy benefits should be reviewed."
+      "clarification": "The applicant's health insurance status is missing or unclear. The case should be reviewed to confirm that valid medical and hospitalization coverage will be in place for the full stay."
     },
     {
       "requirement": "passport_validity_missing_or_unrecognized",
@@ -155,52 +130,70 @@
     {
       "requirement": "passport_issue_date_needs_review",
       "title": "Passport Issue Date Needs Review",
-      "clarification": "The passport issue date is unclear or may matter for the filing jurisdiction. The case should be reviewed, especially if filing through a consulate that applies a 10-year passport issuance rule."
-    },
-    {
-      "requirement": "passport_blank_pages_missing_or_unrecognized",
-      "title": "Blank Passport Pages Need Review",
-      "clarification": "The number of blank passport pages is missing or unclear. The case should be reviewed because some consulates require at least two blank passport pages."
-    },
-    {
-      "requirement": "passport_blank_pages_below_minimum",
-      "title": "Blank Passport Pages Below Minimum",
-      "clarification": "Some consular guidance requires at least two blank passport pages. If the passport has fewer than two blank pages, the case does not appear to meet that document requirement."
-    },
-    {
-      "requirement": "passport_blank_pages_need_review",
-      "title": "Blank Passport Pages Need Review",
-      "clarification": "The passport has fewer than two blank pages or the blank-page requirement depends on the filing jurisdiction. The case should be reviewed before eligibility is confirmed."
-    },
-    {
-      "requirement": "fbi_background_unavailable",
-      "title": "FBI Background Check Unavailable",
-      "clarification": "San Francisco guidance requires an FBI Identity History Summary issued within the last 6 months. If filing through San Francisco and this document cannot be obtained, the case does not appear to meet that requirement."
-    },
-    {
-      "requirement": "fbi_background_needs_review",
-      "title": "FBI Background Check Needs Review",
-      "clarification": "The FBI Identity History Summary status is unclear for a San Francisco filing. The case should be reviewed to confirm whether a recent FBI background check is required and available."
+      "clarification": "The passport issue date is unclear for a Paris filing, where a 10-year passport-issuance rule applies. The case should be reviewed before eligibility is confirmed."
     },
     {
       "requirement": "permesso_acknowledgement_missing",
       "title": "Residence Permit Acknowledgment Missing",
-      "clarification": "Applicants must apply for a permesso di soggiorno within 8 days of entering Italy. If the applicant will not comply, the case does not appear to meet the after-entry requirement."
+      "clarification": "Applicants must apply for a permesso di soggiorno within 8 days of entering Italy. If the applicant will not comply, the case does not appear to meet the after-entry requirement.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer a HARD_FAILURES entry and no longer emitted by rules.py's live eligibility screening -- compliance.permesso_8_day_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "permesso_acknowledgement_needs_review",
       "title": "Residence Permit Requirement Needs Review",
-      "clarification": "The applicant's understanding of the 8-day permesso di soggiorno requirement is unclear. The case should be reviewed before eligibility is confirmed."
+      "clarification": "The applicant's understanding of the 8-day permesso di soggiorno requirement is unclear. The case should be reviewed before eligibility is confirmed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer emitted by rules.py's live eligibility screening -- see compliance.permesso_8_day_acknowledged in questions.json's post_eligibility_checklist block."
     },
     {
       "requirement": "renewal_acknowledgement_missing",
       "title": "Renewal Requirement Acknowledgment Missing",
-      "clarification": "The permit is renewed annually only if the applicant continues to satisfy income, housing, insurance, and other requirements. If the applicant will not maintain those conditions, the case does not appear to meet the renewal requirement."
+      "clarification": "The permit is renewed annually only if the applicant continues to satisfy income, housing, insurance, and other requirements. If the applicant will not maintain those conditions, the case does not appear to meet the renewal requirement.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer a HARD_FAILURES entry and no longer emitted by rules.py's live eligibility screening -- compliance.annual_renewal_acknowledged was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "renewal_acknowledgement_needs_review",
       "title": "Renewal Requirement Needs Review",
-      "clarification": "The applicant's understanding of annual renewal requirements is unclear. The case should be reviewed to confirm the applicant can maintain income, housing, insurance, and related conditions."
+      "clarification": "The applicant's understanding of annual renewal requirements is unclear. The case should be reviewed to confirm the applicant can maintain income, housing, insurance, and related conditions.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist. No longer emitted by rules.py's live eligibility screening -- see compliance.annual_renewal_acknowledged in questions.json's post_eligibility_checklist block."
+    },
+    {
+      "requirement": "passport_blank_pages_below_minimum",
+      "title": "Blank Passport Pages Below Minimum",
+      "clarification": "Paris guidance requests at least two blank passport pages. If the passport has fewer than two blank pages, the case does not appear to meet that document requirement.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist / application-preparation surface. No longer a HARD_FAILURES entry and no longer emitted by rules.py's live eligibility screening -- routing.passport_blank_pages was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
+    },
+    {
+      "requirement": "passport_blank_pages_need_review",
+      "title": "Blank Passport Pages Need Review",
+      "clarification": "The blank-page requirement depends on the filing jurisdiction. The case should be reviewed before eligibility is confirmed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist / application-preparation surface. No longer emitted by rules.py's live eligibility screening -- see routing.passport_blank_pages in questions.json's post_eligibility_checklist block."
+    },
+    {
+      "requirement": "passport_blank_pages_missing_or_unrecognized",
+      "title": "Blank Passport Pages Missing",
+      "clarification": "The number of blank passport pages is missing or unclear.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist / application-preparation surface. No longer emitted by rules.py's live eligibility screening -- see routing.passport_blank_pages in questions.json's post_eligibility_checklist block."
+    },
+    {
+      "requirement": "fbi_background_unavailable",
+      "title": "FBI Background Check Unavailable",
+      "clarification": "San Francisco guidance requests an FBI Identity History Summary issued within the last 6 months. If filing through San Francisco and this document cannot be obtained, the case does not appear to meet that requirement.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist / application-preparation surface. No longer a HARD_FAILURES entry and no longer emitted by rules.py's live eligibility screening -- background.fbi_identity_history_available was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
+    },
+    {
+      "requirement": "fbi_background_needs_review",
+      "title": "FBI Background Check Needs Review",
+      "clarification": "The FBI Identity History Summary status is unclear for a San Francisco filing.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility checklist / application-preparation surface. No longer emitted by rules.py's live eligibility screening -- see background.fbi_identity_history_available in questions.json's post_eligibility_checklist block."
     }
   ]
 }

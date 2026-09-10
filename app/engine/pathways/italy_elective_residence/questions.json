@@ -15,16 +15,9 @@
       "choices": ["individual", "family"]
     },
     {
-      "key": "identity.nationality",
-      "depends_on": ["routing.applicant_type"],
-      "label": "What is your nationality?",
-      "input_type": "text",
-      "required": true
-    },
-    {
       "key": "routing.consulate_jurisdiction",
-      "depends_on": ["identity.nationality"],
-      "label": "Which Italian consulate or jurisdiction will likely handle your application?",
+      "depends_on": ["routing.applicant_type"],
+      "label": "Which Italian consulate will process your application?",
       "input_type": "choice",
       "required": true,
       "choices": [
@@ -40,7 +33,7 @@
     {
       "key": "work.intends_to_work_in_italy",
       "depends_on": ["routing.consulate_jurisdiction"],
-      "label": "Do you plan to work while living in Italy under this visa?",
+      "label": "Do you intend to work while living in Italy under this visa?",
       "description": "This pathway is a passive-income / no-work residence visa, not a digital nomad or remote-work visa.",
       "input_type": "choice",
       "required": true,
@@ -49,30 +42,23 @@
     {
       "key": "routing.stable_residence_intent",
       "depends_on": ["work.intends_to_work_in_italy"],
-      "label": "Is your intent to reside stably in Italy rather than use this visa for extended tourism?",
+      "label": "Is your purpose to establish stable residence in Italy rather than stay as an extended tourist?",
       "input_type": "choice",
       "required": true,
-      "choices": ["stable_residence", "extended_tourism"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "financial.annual_passive_income_eur",
       "depends_on": ["routing.stable_residence_intent"],
-      "label": "What annual passive or private income in EUR can you document without relying on work in Italy?",
+      "label": "What is your annual passive or private income in EUR?",
       "description": "Italy Elective Residence screening uses EUR 31,000/year as a reference point, but consulates may require more.",
       "input_type": "number",
       "required": true
     },
     {
-      "key": "financial.available_assets_eur",
-      "depends_on": ["financial.annual_passive_income_eur"],
-      "label": "What total financial assets in EUR can you document to support stable residence in Italy?",
-      "input_type": "number",
-      "required": true
-    },
-    {
       "key": "financial.income_source_types",
-      "depends_on": ["financial.available_assets_eur"],
-      "label": "Which passive or private income sources support your Italy Elective Residence case?",
+      "depends_on": ["financial.annual_passive_income_eur"],
+      "label": "Which sources will you rely on to meet the financial requirement?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
@@ -83,42 +69,46 @@
         "securities_or_investments",
         "trusts",
         "stable_commercial_activity",
-        "employment_or_work_income",
-        "other"
+        "employment_or_work_income"
       ]
     },
     {
-      "key": "financial.income_evidence_types",
+      "key": "financial.available_assets_eur",
       "depends_on": ["financial.income_source_types"],
-      "label": "Which documents can you provide as proof of passive income or private assets?",
+      "label": "How much do you have in available financial assets, in EUR?",
+      "input_type": "number",
+      "required": true
+    },
+    {
+      "key": "routing.dependents_count",
+      "depends_on": ["financial.available_assets_eur"],
+      "label": "How many dependents are included in your application?",
+      "input_type": "number",
+      "required": true,
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
+    },
+    {
+      "key": "routing.dependent_relationships",
+      "depends_on": ["routing.dependents_count"],
+      "label": "Which relationships are included?",
       "input_type": "multi_choice",
       "required": true,
-      "choices": [
-        "bank_letters",
-        "financial_adviser_letters",
-        "pension_or_social_security_letters",
-        "investment_statements",
-        "tax_returns",
-        "property_or_rental_income_documents",
-        "other"
-      ]
+      "choices": ["spouse", "minor_child", "adult_child"],
+      "applies_when": { "equals": ["routing.applicant_type", "family"] }
     },
     {
-      "key": "financial.tax_returns_available",
-      "depends_on": ["financial.income_evidence_types"],
-      "label": "Can you provide the last 2 years of income tax returns?",
+      "key": "routing.dependent_adult_children_living_with_parents",
+      "depends_on": ["routing.dependent_relationships"],
+      "label": "Do the adult children included in your application live with you and depend financially on you?",
       "input_type": "choice",
       "required": true,
-      "choices": [
-        "two_years_complete_with_schedules",
-        "two_years_basic_returns_only",
-        "less_than_two_years"
-      ]
+      "choices": ["yes", "no"],
+      "applies_when": { "contains": ["routing.dependent_relationships", "adult_child"] }
     },
     {
       "key": "housing.italy_lodging_status",
-      "depends_on": ["financial.tax_returns_available"],
-      "label": "Can you document qualifying lodging in Italy for the visa period?",
+      "depends_on": ["routing.dependent_adult_children_living_with_parents"],
+      "label": "What type of accommodation will you have in Italy?",
       "input_type": "choice",
       "required": true,
       "choices": [
@@ -132,106 +122,61 @@
     {
       "key": "routing.health_insurance_status",
       "depends_on": ["housing.italy_lodging_status"],
-      "label": "Do you have overseas or international medical insurance valid in Italy, or will you obtain it?",
+      "label": "Will you have health insurance valid in Italy covering medical care and hospitalization for the full stay?",
       "input_type": "choice",
       "required": true,
-      "choices": ["have_it", "will_obtain", "cannot_obtain"]
-    },
-    {
-      "key": "routing.health_insurance_coverage_level",
-      "depends_on": ["routing.health_insurance_status"],
-      "label": "Does or will the insurance cover medical care, hospitalization, and consular minimum coverage such as EUR 30,000 where required?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["meets_consular_coverage", "partial_or_unclear"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.passport_validity_months",
-      "depends_on": ["routing.health_insurance_coverage_level"],
-      "label": "How many months will your passport be valid beyond your intended visa or stay period?",
+      "depends_on": ["routing.health_insurance_status"],
+      "label": "How many months will your passport remain valid beyond your intended visa or stay period?",
       "input_type": "number",
       "required": true
     },
     {
       "key": "routing.passport_issued_within_10_years",
       "depends_on": ["routing.passport_validity_months"],
-      "label": "Was your passport issued within the previous 10 years?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"]
-    },
-    {
-      "key": "routing.passport_blank_pages",
-      "depends_on": ["routing.passport_issued_within_10_years"],
-      "label": "How many blank passport pages do you have available?",
-      "input_type": "number",
-      "required": true
-    },
-    {
-      "key": "background.fbi_identity_history_available",
-      "depends_on": ["routing.consulate_jurisdiction"],
-      "label": "If filing through San Francisco, can you provide an FBI Identity History Summary issued within the last 6 months?",
+      "label": "Was your passport issued within the last 10 years?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.consulate_jurisdiction", "san_francisco"] }
-    },
-    {
-      "key": "routing.dependents_count",
-      "depends_on": ["routing.applicant_type"],
-      "label": "How many dependents are included in your application?",
-      "input_type": "number",
-      "required": true,
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
-      "key": "routing.dependent_relationships",
-      "depends_on": ["routing.dependents_count"],
-      "label": "What is each dependent's relationship to you?",
-      "input_type": "text",
-      "required": true,
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
-      "key": "routing.dependent_adult_children_living_with_parents",
-      "depends_on": ["routing.dependent_relationships"],
-      "label": "If any dependent adult children are included, do they live with and depend on the parent applicant?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["no_adult_children", "yes", "no"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
-      "key": "routing.family_documents_available",
-      "depends_on": ["routing.dependent_relationships"],
-      "label": "Can you provide marriage, birth, or other family relationship documents for each included dependent?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.applicant_type", "family"] }
-    },
-    {
-      "key": "compliance.permesso_8_day_acknowledged",
-      "depends_on": ["routing.passport_blank_pages"],
-      "label": "Do you understand you must apply for a permesso di soggiorno within 8 days of entering Italy?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "compliance.annual_renewal_acknowledged",
-      "depends_on": ["compliance.permesso_8_day_acknowledged"],
-      "label": "Do you understand the permit is renewed annually only if income, housing, insurance, and other requirements remain satisfied?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no", "not_sure"]
-    },
-    {
-      "key": "routing.additional_information",
-      "depends_on": ["compliance.annual_renewal_acknowledged"],
-      "label": "What else about your Italy Elective Residence Visa situation should QIQ consider?",
-      "input_type": "text",
-      "required": false
+      "applies_when": { "equals": ["routing.consulate_jurisdiction", "paris"] }
     }
-  ]
+  ],
+  "post_eligibility_checklist": {
+    "note": "These are real Italy Elective Residence obligations/document requirements sourced from requirements_reference.md, but they describe post-entry compliance steps or consulate-specific document logistics rather than pre-visa eligibility facts. They were removed from (or never added to) the live eligibility-screening flow and are preserved here for a future post-eligibility checklist / application-preparation surface. Their former or associated requirement codes still exist in clarifications.json and output.json for that purpose and are never emitted by rules.py's live eligibility screening.",
+    "fields": [
+      {
+        "key": "compliance.permesso_8_day_acknowledged",
+        "label": "Do you understand you must apply for a permesso di soggiorno within 8 days of entering Italy?",
+        "input_type": "choice",
+        "choices": ["yes", "no", "not_sure"],
+        "related_requirements": ["permesso_acknowledgement_missing", "permesso_acknowledgement_needs_review"]
+      },
+      {
+        "key": "compliance.annual_renewal_acknowledged",
+        "label": "Do you understand the permit is renewed annually only if income, housing, insurance, and other requirements remain satisfied?",
+        "input_type": "choice",
+        "choices": ["yes", "no", "not_sure"],
+        "related_requirements": ["renewal_acknowledgement_missing", "renewal_acknowledgement_needs_review"]
+      },
+      {
+        "key": "routing.passport_blank_pages",
+        "label": "How many blank passport pages do you have available?",
+        "description": "Paris guidance requests at least two blank passport pages when filing.",
+        "input_type": "number",
+        "applies_when": { "equals": ["routing.consulate_jurisdiction", "paris"] },
+        "related_requirements": ["passport_blank_pages_below_minimum", "passport_blank_pages_need_review", "passport_blank_pages_missing_or_unrecognized"]
+      },
+      {
+        "key": "background.fbi_identity_history_available",
+        "label": "If filing through San Francisco, can you provide an FBI Identity History Summary issued within the last 6 months?",
+        "input_type": "choice",
+        "choices": ["yes", "no"],
+        "applies_when": { "equals": ["routing.consulate_jurisdiction", "san_francisco"] },
+        "related_requirements": ["fbi_background_unavailable", "fbi_background_needs_review"]
+      }
+    ]
+  }
 }

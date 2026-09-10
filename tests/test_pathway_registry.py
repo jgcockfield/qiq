@@ -497,26 +497,27 @@ def _spain_nlv_payload(
 def _italy_elective_residence_payload(
     *,
     applicant_type="individual",
+    consulate_jurisdiction="new_york",
     annual_passive_income_eur="50000",
     available_assets_eur="250000",
+    income_source_types=None,
     intends_to_work_in_italy="no",
+    stable_residence_intent="yes",
     italy_lodging_status="registered_lease",
+    health_insurance_status="yes",
+    passport_validity_months="24",
+    passport_issued_within_10_years="yes",
     dependents_count=None,
-    family_documents_available="yes",
+    dependent_relationships=None,
+    dependent_adult_children_living_with_parents=None,
 ):
     payload = {
         "routing": {
             "applicant_type": applicant_type,
-            "consulate_jurisdiction": "new_york",
-            "stable_residence_intent": "stable_residence",
-            "health_insurance_status": "have_it",
-            "health_insurance_coverage_level": "meets_consular_coverage",
-            "passport_validity_months": "24",
-            "passport_issued_within_10_years": "yes",
-            "passport_blank_pages": "2",
-        },
-        "identity": {
-            "nationality": "United States",
+            "consulate_jurisdiction": consulate_jurisdiction,
+            "stable_residence_intent": stable_residence_intent,
+            "health_insurance_status": health_insurance_status,
+            "passport_validity_months": passport_validity_months,
         },
         "work": {
             "intends_to_work_in_italy": intends_to_work_in_italy,
@@ -524,28 +525,26 @@ def _italy_elective_residence_payload(
         "financial": {
             "annual_passive_income_eur": annual_passive_income_eur,
             "available_assets_eur": available_assets_eur,
-            "income_source_types": ["pension"],
-            "income_evidence_types": ["bank_letters"],
-            "tax_returns_available": "two_years_complete_with_schedules",
+            "income_source_types": ["pension"] if income_source_types is None else income_source_types,
         },
         "housing": {
             "italy_lodging_status": italy_lodging_status,
         },
-        "compliance": {
-            "permesso_8_day_acknowledged": "yes",
-            "annual_renewal_acknowledged": "yes",
-        },
     }
 
+    if consulate_jurisdiction == "paris":
+        payload["routing"]["passport_issued_within_10_years"] = passport_issued_within_10_years
+
     if applicant_type == "family":
-        payload["routing"].update(
-            {
-                "dependents_count": "1" if dependents_count is None else dependents_count,
-                "dependent_relationships": "spouse",
-                "dependent_adult_children_living_with_parents": "no_adult_children",
-                "family_documents_available": family_documents_available,
-            }
-        )
+        relationships = ["spouse"] if dependent_relationships is None else dependent_relationships
+        payload["routing"]["dependents_count"] = "1" if dependents_count is None else dependents_count
+        payload["routing"]["dependent_relationships"] = relationships
+        if "adult_child" in relationships:
+            payload["routing"]["dependent_adult_children_living_with_parents"] = (
+                "yes"
+                if dependent_adult_children_living_with_parents is None
+                else dependent_adult_children_living_with_parents
+            )
 
     return payload
 
@@ -1861,6 +1860,34 @@ def test_spain_nlv_no_escape_choices_anywhere_in_schema():
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
 
+def _italy_elective_residence_questions_path():
+    return (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "italy_elective_residence"
+        / "questions.json"
+    )
+
+
+def _italy_elective_residence_questions_data():
+    import json
+
+    return json.loads(_italy_elective_residence_questions_path().read_text(encoding="utf-8"))
+
+
+def _italy_elective_residence_canonical_md_path():
+    return (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "italy_elective_residence"
+        / "questions_elective_residence.md"
+    )
+
+
 def test_italy_elective_residence_aliases_load_first_question():
     result_dash = evaluate({}, pathway="italy-elective-residence")
     result_underscore = evaluate({}, pathway="italy_elective_residence")
@@ -1883,6 +1910,131 @@ def test_italy_elective_residence_valid_individual_returns_eligible():
     assert result["visa_type"] == "Italy Elective Residence Visa"
 
 
+# ---------------------------------------------------------------------------
+# CANONICAL PARITY
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_canonical_field_count_and_keys():
+    data = _italy_elective_residence_questions_data()
+    fields = data["taxonomy_fields"]
+    assert len(fields) == 14
+
+    expected_keys = [
+        "routing.applicant_type",
+        "routing.consulate_jurisdiction",
+        "work.intends_to_work_in_italy",
+        "routing.stable_residence_intent",
+        "financial.annual_passive_income_eur",
+        "financial.income_source_types",
+        "financial.available_assets_eur",
+        "routing.dependents_count",
+        "routing.dependent_relationships",
+        "routing.dependent_adult_children_living_with_parents",
+        "housing.italy_lodging_status",
+        "routing.health_insurance_status",
+        "routing.passport_validity_months",
+        "routing.passport_issued_within_10_years",
+    ]
+    assert [f["key"] for f in fields] == expected_keys
+    assert data.get("post_eligibility_checklist") is not None
+
+
+def test_italy_elective_residence_canonical_md_matches_live_labels_in_order():
+    lines = _italy_elective_residence_canonical_md_path().read_text(encoding="utf-8").splitlines()
+    question_lines = [
+        line.strip()
+        for line in lines
+        if line.strip()
+        and not line.startswith("#")
+        and not line.startswith("-")
+        and line.strip() != "---"
+    ]
+
+    data = _italy_elective_residence_questions_data()
+    expected_labels = [f["label"] for f in data["taxonomy_fields"]]
+
+    assert question_lines == expected_labels
+
+
+# ---------------------------------------------------------------------------
+# APPLICANT TYPE
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_applicant_type_individual_and_family():
+    individual = evaluate_eligibility(
+        _italy_elective_residence_payload(applicant_type="individual"),
+        pathway="italy-elective-residence",
+    )
+    assert "applicant_type_missing" not in individual["failed_requirements"]
+
+    family = evaluate_eligibility(
+        _italy_elective_residence_payload(applicant_type="family"),
+        pathway="italy-elective-residence",
+    )
+    assert "applicant_type_missing" not in family["failed_requirements"]
+
+
+def test_italy_elective_residence_applicant_type_missing_needs_review():
+    payload = _italy_elective_residence_payload()
+    payload["routing"]["applicant_type"] = "not_a_real_value"
+
+    result = evaluate_eligibility(payload, pathway="italy-elective-residence")
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["applicant_type_missing"]
+
+
+# ---------------------------------------------------------------------------
+# CONSULATE
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_consulate_exact_choices():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["routing.consulate_jurisdiction"]["choices"] == [
+        "new_york",
+        "chicago",
+        "san_francisco",
+        "boston",
+        "los_angeles",
+        "paris",
+        "other",
+    ]
+
+
+def test_italy_elective_residence_consulate_missing_or_other_needs_review():
+    missing = evaluate_eligibility(
+        _italy_elective_residence_payload(consulate_jurisdiction=None),
+        pathway="italy-elective-residence",
+    )
+    assert "consulate_jurisdiction_needs_review" in missing["failed_requirements"]
+
+    other = evaluate_eligibility(
+        _italy_elective_residence_payload(consulate_jurisdiction="other"),
+        pathway="italy-elective-residence",
+    )
+    assert "consulate_jurisdiction_needs_review" in other["failed_requirements"]
+
+    valid = evaluate_eligibility(
+        _italy_elective_residence_payload(consulate_jurisdiction="chicago"),
+        pathway="italy-elective-residence",
+    )
+    assert "consulate_jurisdiction_needs_review" not in valid["failed_requirements"]
+
+
+def test_italy_elective_residence_no_live_not_sure_on_consulate():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert "not_sure" not in (fields_by_key["routing.consulate_jurisdiction"].get("choices") or [])
+
+
+# ---------------------------------------------------------------------------
+# WORK INTENT
+# ---------------------------------------------------------------------------
+
+
 def test_italy_elective_residence_work_intent_returns_not_eligible():
     result = evaluate_eligibility(
         _italy_elective_residence_payload(intends_to_work_in_italy="yes"),
@@ -1899,175 +2051,833 @@ def test_italy_elective_residence_work_intent_returns_not_eligible():
     assert "no_work_in_italy_not_confirmed" not in passes["failed_requirements"]
 
 
-def test_italy_elective_residence_insufficient_income_assets_not_eligible():
-    result = evaluate_eligibility(
-        _italy_elective_residence_payload(
-            annual_passive_income_eur="30000",
-            available_assets_eur="0",
-        ),
-        pathway="italy_elective_residence",
-    )
+def test_italy_elective_residence_work_intent_missing_needs_review():
+    payload = _italy_elective_residence_payload()
+    payload["work"]["intends_to_work_in_italy"] = "unclear"
 
-    assert result["eligibility_status"] == "not_eligible"
-    assert "insufficient_passive_income" in result["failed_requirements"]
-    assert "financial_assets_need_review" in result["failed_requirements"]
+    result = evaluate_eligibility(payload, pathway="italy-elective-residence")
+    assert "no_work_in_italy_needs_review" in result["failed_requirements"]
+    assert result["eligibility_status"] == "needs_review"
 
 
-def test_italy_elective_residence_missing_lodging_returns_not_eligible():
-    result = evaluate_eligibility(
-        _italy_elective_residence_payload(italy_lodging_status="not_available"),
+# ---------------------------------------------------------------------------
+# RESIDENCE INTENT
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_residence_intent_yes_passes_no_hard_fails():
+    passes = evaluate_eligibility(
+        _italy_elective_residence_payload(stable_residence_intent="yes"),
         pathway="italy-elective-residence",
     )
+    assert "extended_tourism_purpose" not in passes["failed_requirements"]
 
-    assert result["eligibility_status"] == "not_eligible"
-    assert result["failed_requirements"] == ["qualifying_italian_lodging_unavailable"]
+    fails = evaluate_eligibility(
+        _italy_elective_residence_payload(stable_residence_intent="no"),
+        pathway="italy-elective-residence",
+    )
+    assert fails["eligibility_status"] == "not_eligible"
+    assert "extended_tourism_purpose" in fails["failed_requirements"]
 
 
-def test_italy_elective_residence_family_route_can_return_needs_review():
-    result = evaluate_eligibility(
+def test_italy_elective_residence_residence_intent_missing_needs_review():
+    payload = _italy_elective_residence_payload()
+    payload["routing"]["stable_residence_intent"] = "unclear"
+
+    result = evaluate_eligibility(payload, pathway="italy-elective-residence")
+    assert "stable_residence_intent_needs_review" in result["failed_requirements"]
+
+
+# ---------------------------------------------------------------------------
+# INCOME THRESHOLD
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_canonical_income_wording():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert (
+        fields_by_key["financial.annual_passive_income_eur"]["label"]
+        == "What is your annual passive or private income in EUR?"
+    )
+
+
+def test_italy_elective_residence_income_threshold_tiers():
+    below = evaluate_eligibility(
+        _italy_elective_residence_payload(annual_passive_income_eur="30999"),
+        pathway="italy-elective-residence",
+    )
+    assert below["eligibility_status"] == "not_eligible"
+    assert "insufficient_passive_income" in below["failed_requirements"]
+
+    at_reference = evaluate_eligibility(
+        _italy_elective_residence_payload(annual_passive_income_eur="31000"),
+        pathway="italy-elective-residence",
+    )
+    assert at_reference["eligibility_status"] == "needs_review"
+    assert "passive_income_at_reference_threshold_needs_review" in at_reference["failed_requirements"]
+
+    above = evaluate_eligibility(
+        _italy_elective_residence_payload(annual_passive_income_eur="31001"),
+        pathway="italy-elective-residence",
+    )
+    assert "insufficient_passive_income" not in above["failed_requirements"]
+    assert "passive_income_at_reference_threshold_needs_review" not in above["failed_requirements"]
+
+    missing = evaluate_eligibility(
+        _italy_elective_residence_payload(annual_passive_income_eur=None),
+        pathway="italy-elective-residence",
+    )
+    assert "passive_income_missing_or_unrecognized" in missing["failed_requirements"]
+
+
+def test_italy_elective_residence_dependents_count_does_not_multiply_threshold():
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+
+    # The invented 100%-per-dependent multiplier must be gone entirely.
+    assert not hasattr(italy_er_rules, "_required_annual_income")
+
+    family_two_dependents = evaluate_eligibility(
         _italy_elective_residence_payload(
             applicant_type="family",
-            annual_passive_income_eur="70000",
-            family_documents_available="no",
+            annual_passive_income_eur="32000",
+            dependents_count="2",
         ),
         pathway="italy-elective-residence",
     )
+    # Under the old (now-removed) formula, EUR 32,000 with 2 dependents would
+    # have required EUR 93,000 and hard-failed. It must now pass the income
+    # check using the flat EUR 31,000 threshold only.
+    assert "insufficient_passive_income" not in family_two_dependents["failed_requirements"]
 
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["family_documents_needs_review"]
-    assert result["required_annual_passive_income_eur"] == 62000
-
-
-def test_italy_elective_residence_individual_question_sequence():
-    answers = {
-        "routing.applicant_type": "individual",
-        "identity.nationality": "United States",
-        "routing.consulate_jurisdiction": "new_york",
-        "work.intends_to_work_in_italy": "no",
-        "routing.stable_residence_intent": "stable_residence",
-        "financial.annual_passive_income_eur": "50000",
-        "financial.available_assets_eur": "250000",
-        "financial.income_source_types": ["pension"],
-        "financial.income_evidence_types": ["bank_letters"],
-        "financial.tax_returns_available": "two_years_complete_with_schedules",
-        "housing.italy_lodging_status": "registered_lease",
-        "routing.health_insurance_status": "have_it",
-        "routing.health_insurance_coverage_level": "meets_consular_coverage",
-        "routing.passport_validity_months": "24",
-        "routing.passport_issued_within_10_years": "yes",
-        "routing.passport_blank_pages": "2",
-        "compliance.permesso_8_day_acknowledged": "yes",
-        "compliance.annual_renewal_acknowledged": "yes",
-    }
-    expected_order = list(answers.keys())
-
-    payload = {"routing": {}}
-    asked_keys = []
-    for expected_key in expected_order:
-        result = evaluate(payload, pathway="italy-elective-residence")
-        assert result["next_field_key"] == expected_key
-        asked_keys.append(result["next_field_key"])
-        current = payload
-        parts = expected_key.split(".")
-        for part in parts[:-1]:
-            current = current.setdefault(part, {})
-        current[parts[-1]] = answers[expected_key]
-
-    result = evaluate(payload, pathway="italy-elective-residence")
-    assert result["next_field_key"] is None
-    assert asked_keys == expected_order
-    assert "consulate.additional_documents_acknowledged" not in asked_keys
+    assert "required_annual_passive_income_eur" not in family_two_dependents
 
 
-def test_italy_elective_residence_consulate_discretion_removed():
-    questions_path = (
-        Path(__file__).resolve().parents[1]
-        / "app"
-        / "engine"
-        / "pathways"
-        / "italy_elective_residence"
-        / "questions.json"
+# ---------------------------------------------------------------------------
+# INCOME SOURCES
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_income_sources_exact_choices_no_other():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    choices = fields_by_key["financial.income_source_types"]["choices"]
+    assert choices == [
+        "pension",
+        "social_security",
+        "annuities",
+        "rental_property",
+        "securities_or_investments",
+        "trusts",
+        "stable_commercial_activity",
+        "employment_or_work_income",
+    ]
+    assert "other" not in choices
+
+
+def test_italy_elective_residence_employment_income_hard_fails():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(income_source_types=["employment_or_work_income"]),
+        pathway="italy-elective-residence",
     )
-    import json
+    assert result["eligibility_status"] == "not_eligible"
+    assert "employment_or_work_income_not_accepted" in result["failed_requirements"]
 
-    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+def test_italy_elective_residence_valid_passive_source_passes_source_check():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(income_source_types=["pension"]),
+        pathway="italy-elective-residence",
+    )
+    assert "passive_income_source_needs_review" not in result["failed_requirements"]
+
+
+def test_italy_elective_residence_no_valid_passive_source_needs_review():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(income_source_types=[]),
+        pathway="italy-elective-residence",
+    )
+    assert "passive_income_source_needs_review" in result["failed_requirements"]
+
+
+# ---------------------------------------------------------------------------
+# ASSETS
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_assets_positive_passes():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(available_assets_eur="100000"),
+        pathway="italy-elective-residence",
+    )
+    assert "financial_assets_need_review" not in result["failed_requirements"]
+
+
+def test_italy_elective_residence_assets_zero_or_negative_needs_review():
+    zero = evaluate_eligibility(
+        _italy_elective_residence_payload(available_assets_eur="0"),
+        pathway="italy-elective-residence",
+    )
+    assert "financial_assets_need_review" in zero["failed_requirements"]
+
+    missing = evaluate_eligibility(
+        _italy_elective_residence_payload(available_assets_eur=None),
+        pathway="italy-elective-residence",
+    )
+    assert "financial_assets_need_review" in missing["failed_requirements"]
+
+
+# ---------------------------------------------------------------------------
+# REMOVED FINANCIAL READINESS FIELDS
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_income_evidence_and_tax_returns_removed():
+    data = _italy_elective_residence_questions_data()
     live_keys = {f["key"] for f in data["taxonomy_fields"]}
-    assert "consulate.additional_documents_acknowledged" not in live_keys
+    assert "financial.income_evidence_types" not in live_keys
+    assert "financial.tax_returns_available" not in live_keys
+    assert "identity.nationality" not in live_keys
 
     import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
     import inspect
 
-    source = inspect.getsource(italy_er_rules.evaluate_eligibility)
-    assert '"consulate.additional_documents_acknowledged"' not in source
-
-    # A fully answered payload omitting the removed field entirely must still
-    # be able to reach "eligible".
-    result = evaluate_eligibility(
-        _italy_elective_residence_payload(), pathway="italy-elective-residence"
-    )
-    assert result["eligibility_status"] == "eligible"
+    source = inspect.getsource(italy_er_rules)
+    for dead_code in (
+        '"income_evidence_needs_review"',
+        '"tax_returns_need_review"',
+        '"tax_returns_complete_schedules_need_review"',
+    ):
+        assert dead_code not in source
 
 
-def test_italy_elective_residence_permesso_and_renewal_untouched_pending_legal_review():
-    """Section 3 items: these two questions still carry HARD_FAILURES codes and
-    still offer 'not_sure' -- explicitly left unchanged pending a legal-review
-    decision, not touched by this Batch 1 cleanup."""
-    questions_path = (
-        Path(__file__).resolve().parents[1]
-        / "app"
-        / "engine"
-        / "pathways"
-        / "italy_elective_residence"
-        / "questions.json"
-    )
-    import json
+# ---------------------------------------------------------------------------
+# FAMILY STRUCTURE
+# ---------------------------------------------------------------------------
 
-    data = json.loads(questions_path.read_text(encoding="utf-8"))
+
+def test_italy_elective_residence_family_only_fields_gated():
+    data = _italy_elective_residence_questions_data()
     fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    for key in ("routing.dependents_count", "routing.dependent_relationships"):
+        assert fields_by_key[key]["applies_when"] == {"equals": ["routing.applicant_type", "family"]}
 
-    assert fields_by_key["compliance.permesso_8_day_acknowledged"]["choices"] == [
+
+def test_italy_elective_residence_relationships_multi_choice_exact_values():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    field = fields_by_key["routing.dependent_relationships"]
+    assert field["input_type"] == "multi_choice"
+    assert field["choices"] == ["spouse", "minor_child", "adult_child"]
+
+
+def test_italy_elective_residence_adult_child_question_only_when_selected():
+    spouse_only_asked = _walk_italy_elective_residence(
+        {"routing.applicant_type": "family", "routing.consulate_jurisdiction": "new_york"}
+    )
+    assert "routing.dependent_adult_children_living_with_parents" not in spouse_only_asked
+
+    payload = {"routing": {"applicant_type": "family", "consulate_jurisdiction": "new_york"}}
+    asked = []
+    result = evaluate(payload, pathway="italy-elective-residence")
+    while result["next_field_key"] is not None:
+        key = result["next_field_key"]
+        asked.append(key)
+        parts = key.split(".")
+        current = payload
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        field = result["field"]
+        if key == "routing.dependent_relationships":
+            current[parts[-1]] = ["adult_child"]
+        elif field.get("input_type") == "number":
+            current[parts[-1]] = "50000"
+        elif key == "work.intends_to_work_in_italy":
+            current[parts[-1]] = "no"
+        elif key == "routing.stable_residence_intent":
+            current[parts[-1]] = "yes"
+        elif key == "routing.health_insurance_status":
+            current[parts[-1]] = "yes"
+        else:
+            current[parts[-1]] = (field.get("choices") or ["x"])[0]
+        result = evaluate(payload, pathway="italy-elective-residence")
+    assert "routing.dependent_adult_children_living_with_parents" in asked
+
+
+def test_italy_elective_residence_adult_child_dependency_behavior():
+    passes = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            applicant_type="family",
+            dependent_relationships=["adult_child"],
+            dependent_adult_children_living_with_parents="yes",
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "adult_child_dependency_not_met" not in passes["failed_requirements"]
+
+    fails = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            applicant_type="family",
+            dependent_relationships=["adult_child"],
+            dependent_adult_children_living_with_parents="no",
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert fails["eligibility_status"] == "not_eligible"
+    assert "adult_child_dependency_not_met" in fails["failed_requirements"]
+
+    unclear = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            applicant_type="family",
+            dependent_relationships=["adult_child"],
+            dependent_adult_children_living_with_parents="not_a_real_value",
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "adult_child_dependency_needs_review" in unclear["failed_requirements"]
+
+    no_adult_child = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            applicant_type="family",
+            dependent_relationships=["spouse"],
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "adult_child_dependency_not_met" not in no_adult_child["failed_requirements"]
+    assert "adult_child_dependency_needs_review" not in no_adult_child["failed_requirements"]
+
+
+def test_italy_elective_residence_no_adult_children_value_removed():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["routing.dependent_adult_children_living_with_parents"]["choices"] == [
         "yes",
         "no",
-        "not_sure",
     ]
-    assert fields_by_key["compliance.annual_renewal_acknowledged"]["choices"] == [
-        "yes",
-        "no",
-        "not_sure",
+
+
+def test_italy_elective_residence_family_documents_removed():
+    data = _italy_elective_residence_questions_data()
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.family_documents_available" not in live_keys
+
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+    import inspect
+
+    source = inspect.getsource(italy_er_rules)
+    assert '"family_documents_needs_review"' not in source
+
+
+# ---------------------------------------------------------------------------
+# LODGING
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_lodging_exact_choices():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["housing.italy_lodging_status"]["choices"] == [
+        "registered_lease",
+        "rental_contract",
+        "property_deed",
+        "hotel_or_short_term_bookings",
+        "not_available",
     ]
+
+
+def test_italy_elective_residence_lodging_behavior():
+    for good_status in ("registered_lease", "rental_contract", "property_deed"):
+        result = evaluate_eligibility(
+            _italy_elective_residence_payload(italy_lodging_status=good_status),
+            pathway="italy-elective-residence",
+        )
+        assert "qualifying_italian_lodging_unavailable" not in result["failed_requirements"]
+        assert "lodging_hotels_or_short_term_bookings_need_review" not in result["failed_requirements"]
+
+    hotel = evaluate_eligibility(
+        _italy_elective_residence_payload(italy_lodging_status="hotel_or_short_term_bookings"),
+        pathway="italy-elective-residence",
+    )
+    assert "lodging_hotels_or_short_term_bookings_need_review" in hotel["failed_requirements"]
+    assert hotel["eligibility_status"] == "needs_review"
+
+    none_available = evaluate_eligibility(
+        _italy_elective_residence_payload(italy_lodging_status="not_available"),
+        pathway="italy-elective-residence",
+    )
+    assert none_available["eligibility_status"] == "not_eligible"
+    assert "qualifying_italian_lodging_unavailable" in none_available["failed_requirements"]
+
+    unclear = evaluate_eligibility(
+        _italy_elective_residence_payload(italy_lodging_status="not_a_real_value"),
+        pathway="italy-elective-residence",
+    )
+    assert "qualifying_italian_lodging_needs_review" in unclear["failed_requirements"]
+
+
+# ---------------------------------------------------------------------------
+# HEALTH INSURANCE (CONSOLIDATED)
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_single_insurance_field_only():
+    data = _italy_elective_residence_questions_data()
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.health_insurance_status" in live_keys
+    assert "routing.health_insurance_coverage_level" not in live_keys
+
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["routing.health_insurance_status"]["choices"] == ["yes", "no"]
+    assert (
+        fields_by_key["routing.health_insurance_status"]["label"]
+        == "Will you have health insurance valid in Italy covering medical care and hospitalization for the full stay?"
+    )
+
+
+def test_italy_elective_residence_insurance_behavior():
+    passes = evaluate_eligibility(
+        _italy_elective_residence_payload(health_insurance_status="yes"),
+        pathway="italy-elective-residence",
+    )
+    assert "health_insurance_unavailable" not in passes["failed_requirements"]
+    assert "health_insurance_needs_review" not in passes["failed_requirements"]
+
+    fails = evaluate_eligibility(
+        _italy_elective_residence_payload(health_insurance_status="no"),
+        pathway="italy-elective-residence",
+    )
+    assert fails["eligibility_status"] == "not_eligible"
+    assert "health_insurance_unavailable" in fails["failed_requirements"]
+
+    unclear = evaluate_eligibility(
+        _italy_elective_residence_payload(health_insurance_status="will_obtain"),
+        pathway="italy-elective-residence",
+    )
+    assert "health_insurance_needs_review" in unclear["failed_requirements"]
+    assert "health_insurance_unavailable" not in unclear["failed_requirements"]
+
+
+def test_italy_elective_residence_old_insurance_values_and_coverage_code_removed():
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+    import inspect
+
+    source = inspect.getsource(italy_er_rules)
+    for dead_value_or_code in ("cannot_obtain", "will_obtain", '"health_insurance_coverage_needs_review"'):
+        assert dead_value_or_code not in source
+
+
+# ---------------------------------------------------------------------------
+# PASSPORT
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_passport_validity_behavior():
+    missing = evaluate_eligibility(
+        _italy_elective_residence_payload(passport_validity_months=None),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_validity_missing_or_unrecognized" in missing["failed_requirements"]
+
+    below_minimum = evaluate_eligibility(
+        _italy_elective_residence_payload(passport_validity_months="2"),
+        pathway="italy-elective-residence",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert "passport_validity_below_minimum" in below_minimum["failed_requirements"]
+
+    sf_borderline = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            consulate_jurisdiction="san_francisco", passport_validity_months="10"
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_validity_san_francisco_threshold_needs_review" in sf_borderline["failed_requirements"]
+    assert "passport_validity_below_minimum" not in sf_borderline["failed_requirements"]
+
+    sf_sufficient = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            consulate_jurisdiction="san_francisco", passport_validity_months="15"
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_validity_san_francisco_threshold_needs_review" not in sf_sufficient["failed_requirements"]
+
+    non_sf_sufficient = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            consulate_jurisdiction="new_york", passport_validity_months="3"
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_validity_san_francisco_threshold_needs_review" not in non_sf_sufficient["failed_requirements"]
+    assert "passport_validity_below_minimum" not in non_sf_sufficient["failed_requirements"]
+
+
+def test_italy_elective_residence_passport_issued_within_10_years_paris_only():
+    data = _italy_elective_residence_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["routing.passport_issued_within_10_years"]["applies_when"] == {
+        "equals": ["routing.consulate_jurisdiction", "paris"]
+    }
+
+    # Non-Paris: the field is never asked.
+    payload = {"routing": {"applicant_type": "individual", "consulate_jurisdiction": "new_york"}}
+    result = evaluate(payload, pathway="italy-elective-residence")
+    asked = []
+    while result["next_field_key"] is not None:
+        asked.append(result["next_field_key"])
+        key = result["next_field_key"]
+        parts = key.split(".")
+        current = payload
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        choices = result["field"].get("choices")
+        if choices:
+            current[parts[-1]] = choices[0] if key != "work.intends_to_work_in_italy" else "no"
+        else:
+            current[parts[-1]] = "50000"
+        result = evaluate(payload, pathway="italy-elective-residence")
+    assert "routing.passport_issued_within_10_years" not in asked
+
+
+def test_italy_elective_residence_paris_passport_issue_date_behavior():
+    passes = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            consulate_jurisdiction="paris", passport_issued_within_10_years="yes"
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_issued_too_old_for_paris" not in passes["failed_requirements"]
+
+    fails = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            consulate_jurisdiction="paris", passport_issued_within_10_years="no"
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert fails["eligibility_status"] == "not_eligible"
+    assert "passport_issued_too_old_for_paris" in fails["failed_requirements"]
+
+    unclear = evaluate_eligibility(
+        _italy_elective_residence_payload(
+            consulate_jurisdiction="paris", passport_issued_within_10_years="not_a_real_value"
+        ),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_issue_date_needs_review" in unclear["failed_requirements"]
+
+
+def test_italy_elective_residence_non_paris_never_emits_issue_date_review():
+    result = evaluate_eligibility(
+        _italy_elective_residence_payload(consulate_jurisdiction="new_york"),
+        pathway="italy-elective-residence",
+    )
+    assert "passport_issue_date_needs_review" not in result["failed_requirements"]
+    assert "passport_issued_too_old_for_paris" not in result["failed_requirements"]
+
+
+def test_italy_elective_residence_passport_blank_pages_removed_from_live():
+    data = _italy_elective_residence_questions_data()
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.passport_blank_pages" not in live_keys
+
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+    import inspect
+
+    source = inspect.getsource(italy_er_rules)
+    for dead_code in (
+        '"passport_blank_pages_below_minimum"',
+        '"passport_blank_pages_need_review"',
+        '"passport_blank_pages_missing_or_unrecognized"',
+    ):
+        assert dead_code not in source
+
+
+# ---------------------------------------------------------------------------
+# FBI BACKGROUND CHECK
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_fbi_check_removed_from_live():
+    data = _italy_elective_residence_questions_data()
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "background.fbi_identity_history_available" not in live_keys
+
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+    import inspect
+
+    source = inspect.getsource(italy_er_rules)
+    for dead_code in ('"fbi_background_unavailable"', '"fbi_background_needs_review"'):
+        assert dead_code not in source
+
+    # Even if the answer is present in the payload, it must have zero effect.
+    payload = _italy_elective_residence_payload(consulate_jurisdiction="san_francisco")
+    payload["background"] = {"fbi_identity_history_available": "no"}
+    result = evaluate_eligibility(payload, pathway="italy-elective-residence")
+    assert "fbi_background_unavailable" not in result["failed_requirements"]
+
+
+# ---------------------------------------------------------------------------
+# PERMESSO / ANNUAL RENEWAL RELOCATION
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_permesso_and_renewal_removed_from_live_and_relocated():
+    data = _italy_elective_residence_questions_data()
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "compliance.permesso_8_day_acknowledged" not in live_keys
+    assert "compliance.annual_renewal_acknowledged" not in live_keys
+
+    checklist_keys = {f["key"] for f in data["post_eligibility_checklist"]["fields"]}
+    assert "compliance.permesso_8_day_acknowledged" in checklist_keys
+    assert "compliance.annual_renewal_acknowledged" in checklist_keys
 
     import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
 
-    assert "permesso_acknowledgement_missing" in italy_er_rules.HARD_FAILURES
-    assert "renewal_acknowledgement_missing" in italy_er_rules.HARD_FAILURES
+    assert "permesso_acknowledgement_missing" not in italy_er_rules.HARD_FAILURES
+    assert "renewal_acknowledgement_missing" not in italy_er_rules.HARD_FAILURES
+
+    import inspect
+
+    source = inspect.getsource(italy_er_rules)
+    for dead_code in (
+        '"permesso_acknowledgement_missing"',
+        '"permesso_acknowledgement_needs_review"',
+        '"renewal_acknowledgement_missing"',
+        '"renewal_acknowledgement_needs_review"',
+    ):
+        assert dead_code not in source
 
 
-def test_italy_elective_residence_no_escape_choices_outside_section_3_items():
-    """Zero escape choices anywhere EXCEPT the two Section-3 items explicitly
-    left untouched pending legal review."""
+def test_italy_elective_residence_permesso_and_renewal_answers_never_affect_status():
+    payload = _italy_elective_residence_payload()
+    payload["compliance"] = {
+        "permesso_8_day_acknowledged": "no",
+        "annual_renewal_acknowledged": "no",
+    }
+    result = evaluate_eligibility(payload, pathway="italy-elective-residence")
+    assert result["eligibility_status"] == "eligible"
+    assert result["failed_requirements"] == []
+
+
+def test_italy_elective_residence_post_eligibility_checklist_inert_and_tagged():
+    data = _italy_elective_residence_questions_data()
+    checklist_fields = {f["key"]: f for f in data["post_eligibility_checklist"]["fields"]}
+
+    assert set(checklist_fields["compliance.permesso_8_day_acknowledged"]["related_requirements"]) == {
+        "permesso_acknowledgement_missing",
+        "permesso_acknowledgement_needs_review",
+    }
+    assert set(checklist_fields["compliance.annual_renewal_acknowledged"]["related_requirements"]) == {
+        "renewal_acknowledgement_missing",
+        "renewal_acknowledgement_needs_review",
+    }
+    assert checklist_fields["routing.passport_blank_pages"]["applies_when"] == {
+        "equals": ["routing.consulate_jurisdiction", "paris"]
+    }
+    assert checklist_fields["background.fbi_identity_history_available"]["applies_when"] == {
+        "equals": ["routing.consulate_jurisdiction", "san_francisco"]
+    }
+
     import json
 
-    questions_path = (
+    clarifications_path = (
         Path(__file__).resolve().parents[1]
         / "app"
         / "engine"
         / "pathways"
         / "italy_elective_residence"
-        / "questions.json"
+        / "clarifications.json"
     )
-    data = json.loads(questions_path.read_text(encoding="utf-8"))
-
-    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
-    allowed_exceptions = {
-        "compliance.permesso_8_day_acknowledged",
-        "compliance.annual_renewal_acknowledged",
+    clarifications = json.loads(clarifications_path.read_text(encoding="utf-8"))
+    staged = {
+        c["requirement"]
+        for c in clarifications["clarifications"]
+        if c.get("stage") == "post_eligibility_checklist"
     }
+    assert staged == {
+        "permesso_acknowledgement_missing",
+        "permesso_acknowledgement_needs_review",
+        "renewal_acknowledgement_missing",
+        "renewal_acknowledgement_needs_review",
+        "passport_blank_pages_below_minimum",
+        "passport_blank_pages_need_review",
+        "passport_blank_pages_missing_or_unrecognized",
+        "fbi_background_unavailable",
+        "fbi_background_needs_review",
+    }
+
+
+# ---------------------------------------------------------------------------
+# QUALITY: HARD_FAILURES, DEAD CODE, ESCAPE CHOICES
+# ---------------------------------------------------------------------------
+
+
+def test_italy_elective_residence_final_hard_failures_set():
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+
+    expected = {
+        "no_work_in_italy_not_confirmed",
+        "extended_tourism_purpose",
+        "insufficient_passive_income",
+        "employment_or_work_income_not_accepted",
+        "qualifying_italian_lodging_unavailable",
+        "health_insurance_unavailable",
+        "passport_validity_below_minimum",
+        "passport_issued_too_old_for_paris",
+        "adult_child_dependency_not_met",
+    }
+    assert italy_er_rules.HARD_FAILURES == expected
+    assert len(italy_er_rules.HARD_FAILURES) == 9
+
+    removed = {
+        "passport_blank_pages_below_minimum",
+        "fbi_background_unavailable",
+        "permesso_acknowledgement_missing",
+        "renewal_acknowledgement_missing",
+    }
+    assert not (removed & italy_er_rules.HARD_FAILURES)
+
+
+def test_italy_elective_residence_no_live_escape_choices_anywhere():
+    data = _italy_elective_residence_questions_data()
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe"}
     for field in data["taxonomy_fields"]:
-        if field["key"] in allowed_exceptions:
-            continue
         choices = field.get("choices") or []
         overlap = forbidden.intersection(choices)
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+    # The Section-3 freeze is gone: the two acknowledgment fields are no
+    # longer live at all (see the relocation tests above), so there is no
+    # exception list needed any more for the live taxonomy.
+
+
+def test_italy_elective_residence_no_phantom_or_orphaned_live_codes():
+    import app.engine.pathways.italy_elective_residence.rules as italy_er_rules
+    import inspect
+    import re
+
+    source = inspect.getsource(italy_er_rules)
+    emitted_codes = set(re.findall(r'failed\.append\(\s*"([a-z0-9_]+)"\s*\)', source))
+
+    expected_live_codes = {
+        "applicant_type_missing",
+        "dependents_count_missing",
+        "dependent_relationships_missing",
+        "adult_child_dependency_not_met",
+        "adult_child_dependency_needs_review",
+        "consulate_jurisdiction_needs_review",
+        "no_work_in_italy_not_confirmed",
+        "no_work_in_italy_needs_review",
+        "extended_tourism_purpose",
+        "stable_residence_intent_needs_review",
+        "passive_income_missing_or_unrecognized",
+        "insufficient_passive_income",
+        "passive_income_at_reference_threshold_needs_review",
+        "employment_or_work_income_not_accepted",
+        "passive_income_source_needs_review",
+        "financial_assets_need_review",
+        "qualifying_italian_lodging_unavailable",
+        "lodging_hotels_or_short_term_bookings_need_review",
+        "qualifying_italian_lodging_needs_review",
+        "health_insurance_unavailable",
+        "health_insurance_needs_review",
+        "passport_validity_missing_or_unrecognized",
+        "passport_validity_below_minimum",
+        "passport_validity_san_francisco_threshold_needs_review",
+        "passport_issued_too_old_for_paris",
+        "passport_issue_date_needs_review",
+    }
+    assert emitted_codes == expected_live_codes
+
+    # Every HARD_FAILURES entry must actually be emittable.
+    assert italy_er_rules.HARD_FAILURES <= emitted_codes
+
+    # Every emitted code must exist in clarifications.json.
+    import json
+
+    clarifications_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "italy_elective_residence"
+        / "clarifications.json"
+    )
+    clarifications = json.loads(clarifications_path.read_text(encoding="utf-8"))
+    clarification_codes = {c["requirement"] for c in clarifications["clarifications"]}
+    assert emitted_codes <= clarification_codes
+
+
+def test_italy_elective_residence_unrelated_pathways_unaffected():
+    # Light smoke check that touching this pathway did not disturb sibling
+    # pathway modules loaded via the same dispatcher.
+    import app.engine.pathways.italy_dnv.rules as italy_dnv_rules
+    import app.engine.pathways.portugal_d7.rules as portugal_d7_rules
+
+    assert "income_below_minimum" in italy_dnv_rules.HARD_FAILURES
+    assert resolve_pathway("portugal-d7").canonical_id == "portugal_d7"
+    assert callable(portugal_d7_rules.evaluate_eligibility)
+
+
+# ---------------------------------------------------------------------------
+# EXACT DIALOGUE COUNTS BY BRANCH
+# ---------------------------------------------------------------------------
+
+
+def _walk_italy_elective_residence(overrides):
+    payload = {"routing": {}}
+    asked = []
+    result = evaluate(payload, pathway="italy-elective-residence")
+    while result["next_field_key"] is not None:
+        key = result["next_field_key"]
+        asked.append(key)
+        parts = key.split(".")
+        current = payload
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        field = result["field"]
+        if key in overrides:
+            current[parts[-1]] = overrides[key]
+        elif field.get("input_type") == "number":
+            current[parts[-1]] = "50000"
+        elif field.get("input_type") == "multi_choice":
+            choices = field.get("choices") or ["x"]
+            current[parts[-1]] = [choices[0]]
+        elif key == "work.intends_to_work_in_italy":
+            current[parts[-1]] = "no"
+        elif key == "routing.stable_residence_intent":
+            current[parts[-1]] = "yes"
+        elif key == "routing.health_insurance_status":
+            current[parts[-1]] = "yes"
+        else:
+            choices = field.get("choices") or ["x"]
+            current[parts[-1]] = choices[0]
+        result = evaluate(payload, pathway="italy-elective-residence")
+    return asked
+
+
+def test_italy_elective_residence_exact_dialogue_counts_by_branch():
+    individual_non_paris = _walk_italy_elective_residence(
+        {"routing.applicant_type": "individual", "routing.consulate_jurisdiction": "new_york"}
+    )
+    assert len(individual_non_paris) == 10
+
+    individual_paris = _walk_italy_elective_residence(
+        {"routing.applicant_type": "individual", "routing.consulate_jurisdiction": "paris"}
+    )
+    assert len(individual_paris) == 11
+
+    family_non_paris = _walk_italy_elective_residence(
+        {"routing.applicant_type": "family", "routing.consulate_jurisdiction": "new_york"}
+    )
+    # With relationships defaulting to the first declared choice ("spouse"),
+    # the adult-child dependency question is never triggered.
+    assert len(family_non_paris) == 12
+
+    family_paris = _walk_italy_elective_residence(
+        {"routing.applicant_type": "family", "routing.consulate_jurisdiction": "paris"}
+    )
+    assert len(family_paris) == 13
 
 
 def test_portugal_d7_aliases_load_first_question():
