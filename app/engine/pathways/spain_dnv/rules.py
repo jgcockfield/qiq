@@ -448,6 +448,18 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     elif applicant_type not in {"individual", "family"}:
         failed.append("dependents_count_missing")
 
+    # Missing-input validation only for the existing, canonical-approved
+    # family fields routing.dependent_relationships / routing.dependent_ages.
+    # This checks that the already-required facts were actually supplied --
+    # it does NOT classify any relationship as acceptable/unacceptable, does
+    # NOT impose an age threshold, and never affects individual applicants or
+    # the SMI/dependent-count income formula above.
+    if applicant_type == "family":
+        if not _as_values(_get_dotted(payload, "routing.dependent_relationships")):
+            failed.append("dependent_relationships_missing")
+        if not _as_values(_get_dotted(payload, "routing.dependent_ages")):
+            failed.append("dependent_ages_missing")
+
     passport_months = _as_int(_get_dotted(payload, "routing.passport_validity_months"))
     if (
         passport_months is None
@@ -455,6 +467,12 @@ def evaluate_eligibility(payload: Dict[str, Any]) -> Dict[str, Any]:
     ):
         failed.append("passport_validity_needs_review")
 
+    # MoveWise note: confirm whether health_insurance_status == "will_obtain"
+    # should remain a passing state or route to needs_review. Current
+    # approved runtime behavior (treated as a pass, identical to "have_it")
+    # is intentionally preserved here pending legal/product confirmation --
+    # NOT changed merely because sibling pathways (Portugal D7/DNV, Spain
+    # NLV, Spain Student Visa) route the same choice value to needs_review.
     health_insurance_status = _get_dotted(payload, "routing.health_insurance_status")
     if health_insurance_status not in {"have_it", "will_obtain"}:
         failed.append("health_insurance_not_ready")

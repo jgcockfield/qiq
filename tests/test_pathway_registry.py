@@ -281,6 +281,8 @@ def _spain_payload(
     health_insurance_status="will_obtain",
     applicant_type="individual",
     dependents_count=None,
+    dependent_relationships="Spouse",
+    dependent_ages="35",
     employer_outside_spain="yes",
     foreign_employment_months="12",
     remote_work_approved="yes",
@@ -332,6 +334,10 @@ def _spain_payload(
         payload["routing"]["dependents_count"] = (
             "1" if dependents_count is None else dependents_count
         )
+        if dependent_relationships is not None:
+            payload["routing"]["dependent_relationships"] = dependent_relationships
+        if dependent_ages is not None:
+            payload["routing"]["dependent_ages"] = dependent_ages
 
     role_payload = payload["role"].setdefault(work_relationship, {})
     role_payload.update(
@@ -6649,6 +6655,359 @@ def test_spain_business_owner_evidence_choices_and_duration_bands_render_exactly
         == "What percentage of your total professional work will be for clients or companies based in Spain?"
     )
     assert "business" not in percentage_field["label"].lower()
+
+
+# ---------------------------------------------------------------------------
+# Cross-pathway consistency audit repair: D1 (work_relationship wording),
+# D2 (employee income-evidence wording), D3 (dependent_relationships /
+# dependent_ages missing-input validation). D4 (will_obtain) is explicitly
+# frozen and only regression-tested below, never changed.
+# ---------------------------------------------------------------------------
+
+
+def _spain_dnv_questions_data():
+    import json
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "questions.json"
+    )
+    return json.loads(questions_path.read_text(encoding="utf-8"))
+
+
+def test_spain_dnv_d1_work_relationship_label_matches_canonical():
+    data = _spain_dnv_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    field = fields_by_key["routing.work_relationship"]
+
+    assert field["label"] == "What best describes your work relationship?"
+    # Key, choices, and internal values must be untouched.
+    assert field["choices"] == ["business_owner", "contractor", "employee"]
+
+
+def test_spain_dnv_d1_canonical_parity_all_three_roles():
+    import re
+
+    md_files = {
+        "employee": "questions_employee.md",
+        "contractor": "questions_contractor.md",
+        "business_owner": "questions_business_owner.md",
+    }
+    base = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+    )
+    data = _spain_dnv_questions_data()
+    fields = data["taxonomy_fields"]
+
+    def keep(field, role):
+        aw = field.get("applies_when")
+        if not aw:
+            return True
+        if "equals" in aw:
+            key, value = aw["equals"]
+            if key == "routing.work_relationship":
+                return value == role
+            if key == f"role.{role}.spanish_clients_flag":
+                return True
+            if key.startswith("role.") and not key.startswith(f"role.{role}."):
+                return False
+            return True
+        return True
+
+    def md_question_lines(path):
+        lines = []
+        for raw in path.read_text(encoding="utf-8").splitlines():
+            s = raw.strip()
+            if not s or s.startswith("#") or s.startswith("-") or s == "---":
+                continue
+            lines.append(s)
+        return lines
+
+    for role, filename in md_files.items():
+        effective = [f for f in fields if keep(f, role) and f.get("required", True)]
+        live_labels = [f["label"] for f in effective]
+        md_labels = md_question_lines(base / filename)
+        assert live_labels == md_labels, f"{role} canonical/live parity mismatch"
+
+    # D1/D2 must no longer appear as parity findings.
+    assert not any(
+        re.search(r"profession or current occupation", label, re.IGNORECASE)
+        for label in [f["label"] for f in fields]
+    )
+    assert not any(
+        "employee documents" in f["label"].lower() for f in fields
+    )
+
+
+def test_spain_dnv_d2_employee_income_evidence_label_matches_canonical():
+    data = _spain_dnv_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    field = fields_by_key["role.employee.income_evidence_types"]
+
+    assert field["label"] == "Which documents can you provide as proof of salary?"
+    # Key, choices, branch condition must be untouched.
+    assert field["choices"] == [
+        "bank_statements",
+        "employment_contract",
+        "pay_stubs",
+        "other",
+    ]
+    assert field["applies_when"] == {"equals": ["routing.work_relationship", "employee"]}
+
+
+def test_spain_dnv_d2_contractor_and_business_owner_wording_untouched():
+    data = _spain_dnv_questions_data()
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+
+    assert (
+        fields_by_key["role.contractor.income_evidence_types"]["label"]
+        == "Which documents can you provide as proof of your contractor income?"
+    )
+    assert (
+        fields_by_key["role.business_owner.income_evidence_types"]["label"]
+        == "Which documents can you provide as proof of your business income?"
+    )
+
+
+def test_spain_dnv_d3_individual_never_affected_by_missing_family_fields():
+    payload = _spain_payload(applicant_type="individual")
+    payload["routing"].pop("dependent_relationships", None)
+    payload["routing"].pop("dependent_ages", None)
+
+    result = evaluate_eligibility(payload, pathway="spain-dnv")
+
+    assert "dependent_relationships_missing" not in result["failed_requirements"]
+    assert "dependent_ages_missing" not in result["failed_requirements"]
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_spain_dnv_d3_family_missing_relationships_needs_review():
+    result = evaluate_eligibility(
+        _spain_payload(
+            applicant_type="family",
+            dependent_relationships="",
+            monthly_income_eur="4000",
+        ),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["dependent_relationships_missing"]
+
+
+def test_spain_dnv_d3_family_missing_ages_needs_review():
+    result = evaluate_eligibility(
+        _spain_payload(
+            applicant_type="family",
+            dependent_ages="",
+            monthly_income_eur="4000",
+        ),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert result["failed_requirements"] == ["dependent_ages_missing"]
+
+
+def test_spain_dnv_d3_family_both_missing_emits_both_codes_no_duplicates():
+    result = evaluate_eligibility(
+        _spain_payload(
+            applicant_type="family",
+            dependent_relationships=None,
+            dependent_ages=None,
+            monthly_income_eur="4000",
+        ),
+        pathway="spain-dnv",
+    )
+
+    assert result["eligibility_status"] == "needs_review"
+    assert sorted(result["failed_requirements"]) == [
+        "dependent_ages_missing",
+        "dependent_relationships_missing",
+    ]
+    assert len(result["failed_requirements"]) == len(set(result["failed_requirements"]))
+
+
+def test_spain_dnv_d3_family_valid_relationships_and_ages_no_failure():
+    result = evaluate_eligibility(
+        _spain_payload(
+            applicant_type="family",
+            dependent_relationships="Spouse, Child",
+            dependent_ages="38, 9",
+            monthly_income_eur="4000",
+        ),
+        pathway="spain-dnv",
+    )
+
+    assert "dependent_relationships_missing" not in result["failed_requirements"]
+    assert "dependent_ages_missing" not in result["failed_requirements"]
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_spain_dnv_d3_no_age_threshold_or_relationship_hard_failure_invented():
+    import app.engine.pathways.spain_dnv.rules as spain_dnv_rules
+
+    assert "dependent_relationships_missing" not in spain_dnv_rules.HARD_FAILURES
+    assert "dependent_ages_missing" not in spain_dnv_rules.HARD_FAILURES
+
+    # An implausible relationship/age string must still only be a missing-input
+    # question, never a legal classification -- any non-empty text passes,
+    # proving no age threshold or relationship allow/deny list was invented.
+    result = evaluate_eligibility(
+        _spain_payload(
+            applicant_type="family",
+            dependent_relationships="Second Cousin Twice Removed",
+            dependent_ages="147",
+            monthly_income_eur="4000",
+        ),
+        pathway="spain-dnv",
+    )
+    assert "dependent_relationships_missing" not in result["failed_requirements"]
+    assert "dependent_ages_missing" not in result["failed_requirements"]
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_spain_dnv_d3_dependent_count_and_income_threshold_unchanged():
+    # Family validation must not alter the existing SMI/dependent-count income
+    # formula: 1 dependent raises the required income; the new checks fire
+    # independently and do not interact with that arithmetic.
+    below_threshold_income = "1221"  # well below the scaled threshold
+    result = evaluate_eligibility(
+        _spain_payload(
+            applicant_type="family",
+            dependents_count="1",
+            monthly_income_eur=below_threshold_income,
+        ),
+        pathway="spain-dnv",
+    )
+    assert "employee_income_below_minimum" in result["failed_requirements"]
+    assert result["eligibility_status"] == "not_eligible"
+    # The family-fact checks still ran independently (valid defaults supplied).
+    assert "dependent_relationships_missing" not in result["failed_requirements"]
+    assert "dependent_ages_missing" not in result["failed_requirements"]
+
+
+def test_spain_dnv_d3_family_validation_across_all_three_roles():
+    for role in ("employee", "contractor", "business_owner"):
+        result = evaluate_eligibility(
+            _spain_payload(
+                work_relationship=role,
+                applicant_type="family",
+                dependent_relationships="",
+                dependent_ages="",
+                # Family with 1 dependent scales up the required SMI-linked
+                # income threshold; supply enough income so only the two
+                # family-fact checks under test can fail.
+                monthly_income_eur="4000",
+            ),
+            pathway="spain-dnv",
+        )
+        assert "dependent_relationships_missing" in result["failed_requirements"]
+        assert "dependent_ages_missing" in result["failed_requirements"]
+        assert result["eligibility_status"] == "needs_review"
+
+
+def test_spain_dnv_d4_will_obtain_behavior_unchanged_regression():
+    """D4 is explicitly frozen by this repair -- will_obtain must continue to
+    behave exactly as it did before: a full pass, identical to have_it, with
+    no needs_review code emitted."""
+    have_it = evaluate_eligibility(
+        _spain_payload(health_insurance_status="have_it"),
+        pathway="spain-dnv",
+    )
+    will_obtain = evaluate_eligibility(
+        _spain_payload(health_insurance_status="will_obtain"),
+        pathway="spain-dnv",
+    )
+
+    assert "health_insurance_not_ready" not in have_it["failed_requirements"]
+    assert "health_insurance_not_ready" not in will_obtain["failed_requirements"]
+    assert have_it["eligibility_status"] == "eligible"
+    assert will_obtain["eligibility_status"] == "eligible"
+
+    # No new needs_review code was introduced for will_obtain by this repair.
+    assert "health_insurance_needs_review" not in will_obtain["failed_requirements"]
+
+
+def test_spain_dnv_hard_failures_unchanged_by_family_validation_repair():
+    import app.engine.pathways.spain_dnv.rules as spain_dnv_rules
+
+    expected = {
+        "business_owner_business_located_in_spain",
+        "business_owner_income_below_minimum",
+        "business_owner_ownership_duration_below_minimum",
+        "business_owner_qualification_or_experience_not_met",
+        "business_owner_remote_operation_not_possible",
+        "business_owner_spanish_activity_above_threshold",
+        "contractor_foreign_client_duration_below_minimum",
+        "contractor_foreign_client_relationship_missing",
+        "contractor_income_below_minimum",
+        "contractor_qualification_or_experience_not_met",
+        "contractor_remote_work_not_possible",
+        "contractor_spanish_activity_above_threshold",
+        "employee_employer_located_in_spain",
+        "employee_foreign_employment_duration_below_minimum",
+        "employee_income_below_minimum",
+        "employee_qualification_or_experience_not_met",
+        "employee_remote_work_not_approved",
+        "supporting_company_operating_history_below_minimum",
+    }
+    assert spain_dnv_rules.HARD_FAILURES == expected
+    assert len(spain_dnv_rules.HARD_FAILURES) == 18
+
+
+def test_spain_dnv_new_codes_have_clarifications_and_no_phantoms():
+    import json
+    import re
+    import inspect
+
+    import app.engine.pathways.spain_dnv.rules as spain_dnv_rules
+
+    clarifications_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "spain_dnv"
+        / "clarifications.json"
+    )
+    clarifications = json.loads(clarifications_path.read_text(encoding="utf-8"))
+    clarification_codes = {c["requirement"] for c in clarifications["clarifications"]}
+
+    assert "dependent_relationships_missing" in clarification_codes
+    assert "dependent_ages_missing" in clarification_codes
+
+    source = inspect.getsource(spain_dnv_rules)
+    emitted = set(re.findall(r'failed\.append\(\s*"([a-zA-Z0-9_]+)"\s*\)', source))
+    # The three income_below_minimum codes are emitted via an f-string, and
+    # the three qualification_or_experience "not met" codes are emitted via a
+    # shared helper's keyword arguments -- neither is a literal
+    # failed.append("...") call, so account for them explicitly rather than
+    # treating them as phantom (both patterns pre-date this repair).
+    emitted |= {f"{wt}_income_below_minimum" for wt in ("employee", "contractor", "business_owner")}
+    emitted |= {f"{wt}_qualification_or_experience_not_met" for wt in ("employee", "contractor", "business_owner")}
+
+    assert "dependent_relationships_missing" in emitted
+    assert "dependent_ages_missing" in emitted
+    assert spain_dnv_rules.HARD_FAILURES <= emitted
+    assert emitted <= clarification_codes
+
+
+def test_spain_dnv_no_live_escape_choices_after_repair():
+    data = _spain_dnv_questions_data()
+    forbidden = {"not_sure", "not_ready", "unknown", "unsure", "maybe", "cannot_confirm"}
+    for field in data["taxonomy_fields"]:
+        choices = field.get("choices") or []
+        overlap = forbidden.intersection(choices)
+        assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
 
 
 def test_spain_no_escape_choices_anywhere_in_schema():

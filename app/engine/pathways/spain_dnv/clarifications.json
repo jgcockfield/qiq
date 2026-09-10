@@ -208,6 +208,16 @@
       "clarification": "The application should confirm whether the applicant is applying individually or with family dependents. Dependent count can affect income review and family eligibility."
     },
     {
+      "requirement": "dependent_relationships_missing",
+      "title": "Dependent Relationships Missing",
+      "clarification": "Family dependent relationships must be provided for eligibility review. The case should be reviewed once this information is supplied."
+    },
+    {
+      "requirement": "dependent_ages_missing",
+      "title": "Dependent Ages Missing",
+      "clarification": "Dependent ages must be provided for eligibility review. The case should be reviewed once this information is supplied."
+    },
+    {
       "requirement": "passport_validity_needs_review",
       "title": "Passport Validity Needs Review",
       "clarification": "The passport validity answer is missing or below the screening threshold. The applicant may need to renew the passport or confirm validity before eligibility is confirmed."

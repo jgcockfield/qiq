@@ -10,7 +10,7 @@
     {
       "key": "routing.work_relationship",
       "depends_on": [],
-      "label": "How would you describe your profession or current occupation?",
+      "label": "What best describes your work relationship?",
       "input_type": "choice",
       "required": true,
       "choices": ["business_owner", "contractor", "employee"]
@@ -88,7 +88,7 @@
     {
       "key": "role.employee.income_evidence_types",
       "depends_on": ["role.employee.monthly_income_eur"],
-      "label": "Which employee documents can you provide as proof of salary?",
+      "label": "Which documents can you provide as proof of salary?",
       "input_type": "multi_choice",
       "required": true,
       "choices": [
