@@ -3,9 +3,19 @@
   "visa_type": "Costa Rica Pensionado Residency",
   "clarifications": [
     {
+      "requirement": "applicant_type_missing",
+      "title": "Applicant Type Needs Review",
+      "clarification": "The case should confirm whether the applicant is applying individually or with family dependents. Family cases require a dependent count."
+    },
+    {
       "requirement": "not_retired_from_habitual_occupation",
       "title": "Retirement Status Requirement",
       "clarification": "Costa Rica Pensionado temporary residence is for an applicant who is retired from their habitual occupation and receives pension income. If the applicant is not retired, the case does not appear to meet this core category requirement."
+    },
+    {
+      "requirement": "pension_income_missing_or_unrecognized",
+      "title": "Pension Income Needs Review",
+      "clarification": "The monthly pension income amount is missing or could not be interpreted as a numeric USD amount. The US$1,000/month threshold cannot be confirmed automatically."
     },
     {
       "requirement": "pension_income_below_minimum",
@@ -20,72 +30,17 @@
     {
       "requirement": "pension_not_retirement_based",
       "title": "Retirement-Based Pension Requirement",
-      "clarification": "The pension must arise from retirement or a similar pension benefit. Income that is not retirement-based does not appear to satisfy the pensionado category."
-    },
-    {
-      "requirement": "foreign_pension_source_unconfirmed",
-      "title": "Foreign Pension Source Needs Review",
-      "clarification": "The pension income should be reviewed to confirm whether it is issued from outside Costa Rica and fits the pensionado category. If the source is unclear or Costa Rica-based, eligibility should not be confirmed automatically."
+      "clarification": "The pension must arise from retirement or a similar pension benefit. For an applicant who selected an \"Other\" pension source and confirmed the income is not paid as a retirement or pension benefit, this does not appear to satisfy the pensionado category."
     },
     {
       "requirement": "pension_duration_needs_review",
       "title": "Pension Duration Needs Review",
-      "clarification": "The pension should be reviewed to confirm whether it is lifetime, indefinite, or otherwise sufficiently ongoing to support Pensionado residency. Fixed-term or uncertain pension duration requires manual review."
+      "clarification": "The pension should be reviewed to confirm whether it is lifetime, indefinite, or otherwise sufficiently ongoing to support Pensionado residency. A pension with a scheduled end date, or unclear duration, requires manual review."
     },
     {
-      "requirement": "pension_certificate_unavailable",
-      "title": "Pension Certification",
-      "clarification": "The applicant should be able to provide a pension certification from the issuing authority showing the pension source and amount."
-    },
-    {
-      "requirement": "passport_not_valid",
-      "title": "Valid Passport",
-      "clarification": "The applicant must provide passport identity pages and maintain a valid passport or travel document. A passport that is expired or not valid should be renewed before eligibility is confirmed."
-    },
-    {
-      "requirement": "passport_copy_unavailable",
-      "title": "Passport Identity Pages",
-      "clarification": "The application requires passport identity pages and may require the original passport when requested."
-    },
-    {
-      "requirement": "police_clearance_unavailable",
-      "title": "Police Clearance",
-      "clarification": "The applicant must provide a criminal background certificate from the country of origin or where legally resident. The certificate may need apostille or legalization."
-    },
-    {
-      "requirement": "criminal_record_needs_review",
-      "title": "Criminal Background Needs Review",
-      "clarification": "A disclosed criminal record should be reviewed before Pensionado eligibility is confirmed. Costa Rica may evaluate criminal background information case by case."
-    },
-    {
-      "requirement": "birth_certificate_unavailable",
-      "title": "Birth Certificate",
-      "clarification": "The applicant must provide a birth certificate. Foreign civil documents may need apostille or legalization and official Spanish translation."
-    },
-    {
-      "requirement": "passport_photos_unavailable",
-      "title": "Passport Photos",
-      "clarification": "The application requires recent passport-size photographs."
-    },
-    {
-      "requirement": "filiacion_form_incomplete",
-      "title": "Affiliation/Filiacion Form",
-      "clarification": "The applicant must complete and sign the official affiliation or filiacion form."
-    },
-    {
-      "requirement": "request_letter_incomplete",
-      "title": "Spanish Request Letter",
-      "clarification": "The request letter should be in Spanish and state the purpose, applicant identity, nationality, age, occupation, Costa Rica address, and notification method."
-    },
-    {
-      "requirement": "government_fees_not_ready",
-      "title": "Government Fees and Fiscal Stamps",
-      "clarification": "The applicant must pay the required DGME government fees and fiscal stamps and keep payment receipts."
-    },
-    {
-      "requirement": "apostille_translation_not_ready",
-      "title": "Apostille, Legalization, and Translation",
-      "clarification": "Foreign documents must be legalized or apostilled. Documents not in Spanish require official translation."
+      "requirement": "work_authorization_acknowledgement_missing",
+      "title": "Not a Work-Authorizing Category",
+      "clarification": "Pensionado status is based on pension income, not Costa Rican employment. If the applicant plans to work in Costa Rica, the case does not appear to satisfy this core category requirement."
     },
     {
       "requirement": "dependents_count_missing",
@@ -93,9 +48,21 @@
       "clarification": "If dependents are included, the application should identify how many dependents are part of the case."
     },
     {
-      "requirement": "dependent_documents_unavailable",
-      "title": "Dependent Documents",
-      "clarification": "When dependents are included, supporting evidence may include marriage certificates, birth certificates, or dependency evidence."
+      "requirement": "passport_not_valid",
+      "title": "Valid Passport",
+      "clarification": "The applicant must maintain a valid passport or travel document. A passport that is not currently valid should be renewed before eligibility is confirmed."
+    },
+    {
+      "requirement": "criminal_record_needs_review",
+      "title": "Criminal Background Needs Review",
+      "clarification": "A disclosed criminal record should be reviewed before Pensionado eligibility is confirmed. Costa Rica may evaluate criminal background information case by case."
+    },
+    {
+      "requirement": "pension_receipt_costa_rica_evidence_unavailable",
+      "title": "Pension Receipt in Costa Rica",
+      "clarification": "Pensionados/rentistas must demonstrate that they received the qualifying income in Costa Rica and converted it into national currency when required. Bank or exchange records may be needed.",
+      "stage": "post_eligibility_checklist",
+      "stage_note": "Preserved for a future post-eligibility / renewal-guidance checklist. No longer emitted by rules.py's live eligibility screening -- documents.pension_receipt_costa_rica_evidence_available was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
     },
     {
       "requirement": "ccss_renewal_not_ready",
@@ -103,16 +70,6 @@
       "clarification": "For renewal where applicable, residents must prove CCSS or Costa Rican social insurance coverage. Cases without registration or a plan to register after approval need manual review.",
       "stage": "post_eligibility_checklist",
       "stage_note": "Preserved for a future post-eligibility / renewal-guidance checklist. No longer emitted by rules.py's live eligibility screening -- documents.ccss_renewal_ready was moved out of questions.json's taxonomy_fields into its post_eligibility_checklist block."
-    },
-    {
-      "requirement": "pension_receipt_costa_rica_evidence_unavailable",
-      "title": "Pension Receipt in Costa Rica",
-      "clarification": "Pensionados/rentistas must demonstrate that they received the qualifying income in Costa Rica and converted it into national currency when required. Bank or exchange records may be needed."
-    },
-    {
-      "requirement": "work_authorization_acknowledgement_missing",
-      "title": "Not a Work-Authorizing Category",
-      "clarification": "Pensionado status is based on pension income, not Costa Rican employment. If the applicant plans to work in Costa Rica, the case does not appear to satisfy this core category requirement."
     },
     {
       "requirement": "renewal_acknowledgement_missing",

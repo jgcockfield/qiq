@@ -386,51 +386,49 @@ def _spain_payload(
 
 def _pensionado_payload(
     *,
+    applicant_type="individual",
+    retired_from_habitual_occupation="yes",
+    pension_source_type="social_security",
+    pension_retirement_based="yes",
     monthly_pension_usd="1000",
-    pension_foreign_source_confirmed="yes",
-    pension_duration_type="lifetime_or_indefinite",
-    police_clearance_available="yes",
-    criminal_record_flag="no",
-    pension_receipt_evidence="will_document_after_approval",
+    pension_has_scheduled_end_date="no",
     intends_to_work_in_costa_rica="no",
+    dependents_count=None,
+    valid_passport_available="yes",
+    criminal_record_flag="no",
 ):
-    return {
+    payload = {
         "routing": {
-            "applicant_type": "individual",
-            "passport_validity_months": "24",
+            "applicant_type": applicant_type,
             "criminal_record_flag": criminal_record_flag,
-        },
-        "identity": {
-            "nationality": "United States",
-            "country_of_residence": "United States",
         },
         "work": {
             "intends_to_work_in_costa_rica": intends_to_work_in_costa_rica,
         },
         "role": {
             "pensionado": {
-                "retired_from_habitual_occupation": "yes",
+                "retired_from_habitual_occupation": retired_from_habitual_occupation,
                 "monthly_pension_usd": monthly_pension_usd,
-                "pension_source_type": "social_security",
-                "pension_retirement_based": "yes",
-                "pension_foreign_source_confirmed": pension_foreign_source_confirmed,
-                "pension_duration_type": pension_duration_type,
-                "pension_certificate_available": "yes",
+                "pension_source_type": pension_source_type,
+                "pension_has_scheduled_end_date": pension_has_scheduled_end_date,
             }
         },
         "documents": {
-            "passport_copy_available": "yes",
-            "police_clearance_available": police_clearance_available,
-            "birth_certificate_available": "yes",
-            "passport_photos_available": "yes",
-            "filiacion_form_ready": "yes",
-            "request_letter_ready": "yes",
-            "government_fees_ready": "yes",
-            "apostille_translation_ready": "yes",
-            "ccss_renewal_ready": "will_register_after_approval",
-            "pension_receipt_costa_rica_evidence_available": pension_receipt_evidence,
+            "valid_passport_available": valid_passport_available,
         },
     }
+
+    if pension_source_type == "other":
+        payload["role"]["pensionado"]["pension_retirement_based"] = (
+            pension_retirement_based
+        )
+
+    if applicant_type == "family":
+        payload["routing"]["dependents_count"] = (
+            "2" if dependents_count is None else dependents_count
+        )
+
+    return payload
 
 
 def _spain_nlv_payload(
@@ -4343,187 +4341,282 @@ def test_costa_rica_pensionado_aliases_load_first_question():
     assert result_dash["field"]["choices"] == ["individual", "family"]
 
 
-def test_costa_rica_pensionado_standard_order_after_applicant_type():
-    payload = {"routing": {"applicant_type": "individual"}, "role": {"pensionado": {}}}
+def test_costa_rica_pensionado_canonical_and_live_sequence_parity():
+    """questions_pensionado.md is the final structural authority -- every
+    applicant-facing question prompt in the individual, non-Other live path
+    must match the canonical Markdown's unconditional questions in order."""
+    base = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+    )
+    import json
 
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "role.pensionado.retired_from_habitual_occupation"
+    md_text = (base / "questions_pensionado.md").read_text(encoding="utf-8")
+    md_questions = []
+    for line in (l.strip() for l in md_text.splitlines()):
+        if not line or line.startswith("#") or line == "---" or line.startswith("- "):
+            continue
+        md_questions.append(line)
 
-    payload["role"]["pensionado"]["retired_from_habitual_occupation"] = "yes"
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "role.pensionado.pension_source_type"
+    # The canonical MD lists 10 distinct question prompts (8 unconditional +
+    # the "Other" follow-up + the family dependents-count question).
+    assert len(md_questions) == 10
 
-    payload["role"]["pensionado"]["pension_source_type"] = "social_security"
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "role.pensionado.pension_retirement_based"
-
-    payload["role"]["pensionado"]["pension_retirement_based"] = "yes"
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "work.intends_to_work_in_costa_rica"
-
-
-def test_costa_rica_pensionado_uses_dnv_style_income_order():
-    payload = {
-        "routing": {
-            "applicant_type": "individual",
-        },
-        "work": {"intends_to_work_in_costa_rica": "no"},
-        "role": {
-            "pensionado": {
-                "retired_from_habitual_occupation": "yes",
-                "pension_source_type": "social_security",
-                "pension_retirement_based": "yes",
-                "pension_foreign_source_confirmed": "yes",
-                "monthly_pension_usd": "1000",
-            }
-        },
-    }
-
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "role.pensionado.pension_certificate_available"
-
-    payload["role"]["pensionado"]["pension_certificate_available"] = "yes"
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "role.pensionado.pension_duration_type"
+    data = json.loads((base / "questions.json").read_text(encoding="utf-8"))
+    live_labels = [f["label"] for f in data["taxonomy_fields"]]
+    assert live_labels == md_questions
+    assert len(live_labels) == 10
 
 
-def test_costa_rica_pensionado_asks_dependents_before_identity_when_family():
-    payload = {
-        "routing": {
-            "applicant_type": "family",
-        },
-        "work": {"intends_to_work_in_costa_rica": "no"},
-        "role": {
-            "pensionado": {
-                "retired_from_habitual_occupation": "yes",
-                "pension_source_type": "social_security",
-                "pension_retirement_based": "yes",
-                "pension_foreign_source_confirmed": "yes",
-                "monthly_pension_usd": "1000",
-                "pension_certificate_available": "yes",
-                "pension_duration_type": "lifetime_or_indefinite",
-            }
-        },
-    }
+def test_costa_rica_pensionado_applicant_type_values_and_missing_handling():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
 
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "routing.dependents_count"
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["routing.applicant_type"]["choices"] == [
+        "individual",
+        "family",
+    ]
 
-    payload["routing"]["dependents_count"] = "1"
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "documents.dependent_documents_available"
+    payload = _pensionado_payload()
+    del payload["routing"]["applicant_type"]
+    result = evaluate_eligibility(payload, pathway="costa-rica-pensionado")
 
-    payload["documents"] = {"dependent_documents_available": "yes"}
-    result = evaluate(payload, pathway="costa-rica-pensionado")
-    assert result["next_field_key"] == "identity.nationality"
+    assert result["eligibility_status"] == "needs_review"
+    assert "applicant_type_missing" in result["failed_requirements"]
 
 
-def test_costa_rica_pensionado_1000_plus_pension_can_return_eligible():
+def test_costa_rica_pensionado_retired_status_hard_failure():
     result = evaluate_eligibility(
-        _pensionado_payload(monthly_pension_usd="1000"),
+        _pensionado_payload(retired_from_habitual_occupation="yes"),
         pathway="costa-rica-pensionado",
     )
-
     assert result["eligibility_status"] == "eligible"
-    assert result["failed_requirements"] == []
-    assert result["pathway"] == "costa_rica_pensionado"
-    assert result["visa_type"] == "Costa Rica Pensionado Residency"
 
-
-def test_costa_rica_pensionado_below_1000_returns_not_eligible():
     result = evaluate_eligibility(
-        _pensionado_payload(monthly_pension_usd="999"),
-        pathway="costa_rica_pensionado",
+        _pensionado_payload(retired_from_habitual_occupation="no"),
+        pathway="costa-rica-pensionado",
     )
-
     assert result["eligibility_status"] == "not_eligible"
-    assert result["failed_requirements"] == ["pension_income_below_minimum"]
+    assert result["failed_requirements"] == ["not_retired_from_habitual_occupation"]
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "not_retired_from_habitual_occupation" in rules.HARD_FAILURES
 
 
-def test_costa_rica_pensionado_missing_documents_returns_needs_review():
-    result = evaluate_eligibility(
-        _pensionado_payload(police_clearance_available="no"),
-        pathway="costa-rica-pensionado",
+def test_costa_rica_pensionado_all_five_source_choices():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
     )
+    import json
 
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["police_clearance_unavailable"]
-
-
-def test_costa_rica_pensionado_foreign_pension_gap_returns_needs_review():
-    result = evaluate_eligibility(
-        _pensionado_payload(pension_foreign_source_confirmed="not_sure"),
-        pathway="costa-rica-pensionado",
-    )
-
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["foreign_pension_source_unconfirmed"]
-
-
-def test_costa_rica_pensionado_pension_duration_gap_returns_needs_review():
-    result = evaluate_eligibility(
-        _pensionado_payload(pension_duration_type="fixed_term_less_than_12_months"),
-        pathway="costa-rica-pensionado",
-    )
-
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["pension_duration_needs_review"]
-
-
-def test_costa_rica_pensionado_criminal_record_returns_needs_review():
-    result = evaluate_eligibility(
-        _pensionado_payload(criminal_record_flag="yes"),
-        pathway="costa-rica-pensionado",
-    )
-
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == ["criminal_record_needs_review"]
-
-
-def test_costa_rica_pensionado_pension_receipt_gap_returns_needs_review():
-    result = evaluate_eligibility(
-        _pensionado_payload(pension_receipt_evidence="cannot_document"),
-        pathway="costa-rica-pensionado",
-    )
-
-    assert result["eligibility_status"] == "needs_review"
-    assert result["failed_requirements"] == [
-        "pension_receipt_costa_rica_evidence_unavailable"
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["role.pensionado.pension_source_type"]["choices"] == [
+        "social_security",
+        "government_pension",
+        "private_pension",
+        "retirement_benefit",
+        "other",
     ]
 
 
-def test_costa_rica_pensionado_output_uses_pathway_files():
-    eligibility = evaluate_eligibility(
-        _pensionado_payload(police_clearance_available="no"),
+def test_costa_rica_pensionado_named_source_skips_retirement_based_followup():
+    for source in (
+        "social_security",
+        "government_pension",
+        "private_pension",
+        "retirement_benefit",
+    ):
+        payload = _pensionado_payload(pension_source_type=source)
+        assert "pension_retirement_based" not in payload["role"]["pensionado"]
+        result = evaluate_eligibility(payload, pathway="costa-rica-pensionado")
+        assert result["eligibility_status"] == "eligible", source
+        # A named source can never emit pension_not_retirement_based merely
+        # because the follow-up field is absent (it is legitimately skipped).
+        assert "pension_not_retirement_based" not in result["failed_requirements"]
+
+
+def test_costa_rica_pensionado_other_source_asks_followup():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert fields_by_key["role.pensionado.pension_retirement_based"][
+        "applies_when"
+    ] == {"equals": ["role.pensionado.pension_source_type", "other"]}
+
+    payload = {
+        "routing": {"applicant_type": "individual"},
+        "role": {
+            "pensionado": {
+                "retired_from_habitual_occupation": "yes",
+                "pension_source_type": "other",
+            }
+        },
+    }
+    result = evaluate(payload, pathway="costa-rica-pensionado")
+    assert result["next_field_key"] == "role.pensionado.pension_retirement_based"
+
+
+def test_costa_rica_pensionado_other_yes_no_retirement_failure_but_needs_review():
+    result = evaluate_eligibility(
+        _pensionado_payload(
+            pension_source_type="other", pension_retirement_based="yes"
+        ),
         pathway="costa-rica-pensionado",
     )
-    output = build_output(eligibility)
-
-    assert output["meta"]["visa_type"] == "Costa Rica Pensionado Residency"
-    assert "manual review" in output["summary"].lower()
-    assert output["next_steps"]["action"]["type"] == "email_followup"
-    assert output["clarifications"][0]["requirement"] == "police_clearance_unavailable"
+    assert result["eligibility_status"] == "needs_review"
+    # "Other" always needs review regardless of the follow-up answer.
+    assert result["failed_requirements"] == ["pension_source_needs_review"]
+    assert "pension_not_retirement_based" not in result["failed_requirements"]
 
 
-def test_costa_rica_pensionado_new_review_reasons_use_clarifications():
-    eligibility = evaluate_eligibility(
-        _pensionado_payload(pension_foreign_source_confirmed="no"),
+def test_costa_rica_pensionado_other_no_is_hard_failure():
+    result = evaluate_eligibility(
+        _pensionado_payload(
+            pension_source_type="other", pension_retirement_based="no"
+        ),
         pathway="costa-rica-pensionado",
     )
-    output = build_output(eligibility)
+    assert result["eligibility_status"] == "not_eligible"
+    assert "pension_not_retirement_based" in result["failed_requirements"]
+    assert "pension_source_needs_review" in result["failed_requirements"]
 
-    assert output["clarifications"][0]["requirement"] == "foreign_pension_source_unconfirmed"
-    assert "issued from outside Costa Rica" in output["clarifications"][0]["clarification"]
+
+def test_costa_rica_pensionado_monthly_pension_threshold():
+    at_minimum = evaluate_eligibility(
+        _pensionado_payload(monthly_pension_usd="1000"),
+        pathway="costa-rica-pensionado",
+    )
+    assert at_minimum["eligibility_status"] == "eligible"
+    assert at_minimum["failed_requirements"] == []
+
+    below_minimum = evaluate_eligibility(
+        _pensionado_payload(monthly_pension_usd="999"),
+        pathway="costa_rica_pensionado",
+    )
+    assert below_minimum["eligibility_status"] == "not_eligible"
+    assert below_minimum["failed_requirements"] == ["pension_income_below_minimum"]
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "pension_income_below_minimum" in rules.HARD_FAILURES
+
+
+def test_costa_rica_pensionado_missing_or_unparseable_pension_is_soft_only():
+    payload = _pensionado_payload()
+    del payload["role"]["pensionado"]["monthly_pension_usd"]
+    missing = evaluate_eligibility(payload, pathway="costa-rica-pensionado")
+    assert missing["eligibility_status"] == "needs_review"
+    assert missing["failed_requirements"] == ["pension_income_missing_or_unrecognized"]
+
+    unparseable = evaluate_eligibility(
+        _pensionado_payload(monthly_pension_usd="not-a-number"),
+        pathway="costa-rica-pensionado",
+    )
+    assert unparseable["eligibility_status"] == "needs_review"
+    assert unparseable["failed_requirements"] == [
+        "pension_income_missing_or_unrecognized"
+    ]
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "pension_income_missing_or_unrecognized" not in rules.HARD_FAILURES
+
+
+def test_costa_rica_pensionado_no_family_pension_multiplier():
+    # The same $1,000 pension amount qualifies identically whether the
+    # applicant is individual or family -- no per-dependent multiplier
+    # exists, and none should be invented.
+    individual = evaluate_eligibility(
+        _pensionado_payload(monthly_pension_usd="1000"),
+        pathway="costa-rica-pensionado",
+    )
+    family = evaluate_eligibility(
+        _pensionado_payload(
+            monthly_pension_usd="1000", applicant_type="family", dependents_count="5"
+        ),
+        pathway="costa-rica-pensionado",
+    )
+    assert individual["eligibility_status"] == "eligible"
+    assert family["eligibility_status"] == "eligible"
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    source_text = Path(rules.__file__).read_text(encoding="utf-8")
+    assert "dependents_count" not in source_text.split("def evaluate_eligibility")[0]
+
+
+def test_costa_rica_pensionado_scheduled_end_date_question_exists_and_old_choices_absent():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert "role.pensionado.pension_has_scheduled_end_date" in fields_by_key
+    assert fields_by_key["role.pensionado.pension_has_scheduled_end_date"][
+        "choices"
+    ] == ["no", "yes"]
+    assert "role.pensionado.pension_duration_type" not in fields_by_key
+
+    for old_choice in (
+        "lifetime_or_indefinite",
+        "fixed_term_12_months_or_more",
+        "fixed_term_less_than_12_months",
+    ):
+        for field in data["taxonomy_fields"]:
+            assert old_choice not in (field.get("choices") or [])
+
+
+def test_costa_rica_pensionado_duration_severity():
+    no_end_date = evaluate_eligibility(
+        _pensionado_payload(pension_has_scheduled_end_date="no"),
+        pathway="costa-rica-pensionado",
+    )
+    assert no_end_date["eligibility_status"] == "eligible"
+
+    has_end_date = evaluate_eligibility(
+        _pensionado_payload(pension_has_scheduled_end_date="yes"),
+        pathway="costa-rica-pensionado",
+    )
+    assert has_end_date["eligibility_status"] == "needs_review"
+    assert has_end_date["failed_requirements"] == ["pension_duration_needs_review"]
 
 
 def test_costa_rica_pensionado_work_intent_polarity():
-    working = evaluate_eligibility(
-        _pensionado_payload(intends_to_work_in_costa_rica="yes"),
-        pathway="costa-rica-pensionado",
-    )
-    assert working["failed_requirements"] == ["work_authorization_acknowledgement_missing"]
-    assert working["eligibility_status"] == "needs_review"
-
     not_working = evaluate_eligibility(
         _pensionado_payload(intends_to_work_in_costa_rica="no"),
         pathway="costa-rica-pensionado",
@@ -4531,31 +4624,323 @@ def test_costa_rica_pensionado_work_intent_polarity():
     assert "work_authorization_acknowledgement_missing" not in not_working["failed_requirements"]
     assert not_working["eligibility_status"] == "eligible"
 
+    working = evaluate_eligibility(
+        _pensionado_payload(intends_to_work_in_costa_rica="yes"),
+        pathway="costa-rica-pensionado",
+    )
+    assert working["failed_requirements"] == ["work_authorization_acknowledgement_missing"]
+    assert working["eligibility_status"] == "needs_review"
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "work_authorization_acknowledgement_missing" not in rules.HARD_FAILURES
+
+
+def test_costa_rica_pensionado_dependents_count_family_only():
+    individual_payload = {
+        "routing": {"applicant_type": "individual"},
+        "work": {"intends_to_work_in_costa_rica": "no"},
+        "role": {
+            "pensionado": {
+                "retired_from_habitual_occupation": "yes",
+                "pension_source_type": "social_security",
+                "monthly_pension_usd": "1000",
+                "pension_has_scheduled_end_date": "no",
+            }
+        },
+    }
+    result = evaluate(individual_payload, pathway="costa-rica-pensionado")
+    assert result["next_field_key"] == "documents.valid_passport_available"
+
+    family_payload = {
+        "routing": {"applicant_type": "family"},
+        "work": {"intends_to_work_in_costa_rica": "no"},
+        "role": {
+            "pensionado": {
+                "retired_from_habitual_occupation": "yes",
+                "pension_source_type": "social_security",
+                "monthly_pension_usd": "1000",
+                "pension_has_scheduled_end_date": "no",
+            }
+        },
+    }
+    result = evaluate(family_payload, pathway="costa-rica-pensionado")
+    assert result["next_field_key"] == "routing.dependents_count"
+
+
+def test_costa_rica_pensionado_missing_dependents_count_needs_review():
+    payload = _pensionado_payload(applicant_type="family")
+    del payload["routing"]["dependents_count"]
+    result = evaluate_eligibility(payload, pathway="costa-rica-pensionado")
+    assert result["eligibility_status"] == "needs_review"
+    assert "dependents_count_missing" in result["failed_requirements"]
+
+
+def test_costa_rica_pensionado_no_dependent_document_question_or_formula():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "documents.dependent_documents_available" not in live_keys
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "dependent_documents_unavailable" not in rules.HARD_FAILURES
+    source_text = Path(rules.__file__).read_text(encoding="utf-8")
+    assert '"dependent_documents_unavailable"' not in source_text
+
+
+def test_costa_rica_pensionado_passport_factual_question():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    fields_by_key = {f["key"]: f for f in data["taxonomy_fields"]}
+    assert (
+        fields_by_key["documents.valid_passport_available"]["label"]
+        == "Do you currently have a valid passport?"
+    )
+    assert fields_by_key["documents.valid_passport_available"]["choices"] == [
+        "yes",
+        "no",
+    ]
+    assert "routing.passport_validity_months" not in fields_by_key
+    assert "documents.passport_copy_available" not in fields_by_key
+
+    yes_result = evaluate_eligibility(
+        _pensionado_payload(valid_passport_available="yes"),
+        pathway="costa-rica-pensionado",
+    )
+    assert yes_result["eligibility_status"] == "eligible"
+
+    no_result = evaluate_eligibility(
+        _pensionado_payload(valid_passport_available="no"),
+        pathway="costa-rica-pensionado",
+    )
+    assert no_result["eligibility_status"] == "needs_review"
+    assert no_result["failed_requirements"] == ["passport_not_valid"]
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "passport_not_valid" not in rules.HARD_FAILURES
+    source_text = Path(rules.__file__).read_text(encoding="utf-8")
+    assert '"passport_copy_unavailable"' not in source_text
+
+
+def test_costa_rica_pensionado_criminal_record_and_police_clearance_absent():
+    no_conviction = evaluate_eligibility(
+        _pensionado_payload(criminal_record_flag="no"),
+        pathway="costa-rica-pensionado",
+    )
+    assert no_conviction["eligibility_status"] == "eligible"
+
+    yes_conviction = evaluate_eligibility(
+        _pensionado_payload(criminal_record_flag="yes"),
+        pathway="costa-rica-pensionado",
+    )
+    assert yes_conviction["eligibility_status"] == "needs_review"
+    assert yes_conviction["failed_requirements"] == ["criminal_record_needs_review"]
+
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "documents.police_clearance_available" not in live_keys
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert "criminal_record_needs_review" not in rules.HARD_FAILURES
+    assert "police_clearance_unavailable" not in rules.HARD_FAILURES
+    source_text = Path(rules.__file__).read_text(encoding="utf-8")
+    assert '"police_clearance_unavailable"' not in source_text
+
+
+def test_costa_rica_pensionado_removed_data_fields_absent():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+
+    removed_keys = [
+        "role.pensionado.pension_foreign_source_confirmed",
+        "identity.nationality",
+        "identity.country_of_residence",
+        "role.pensionado.pension_certificate_available",
+        "documents.dependent_documents_available",
+        "documents.birth_certificate_available",
+        "documents.passport_photos_available",
+        "documents.filiacion_form_ready",
+        "documents.request_letter_ready",
+        "documents.government_fees_ready",
+        "documents.apostille_translation_ready",
+        "routing.additional_information",
+        "documents.police_clearance_available",
+        "routing.passport_validity_months",
+        "documents.passport_copy_available",
+        "documents.pension_receipt_costa_rica_evidence_available",
+    ]
+    for key in removed_keys:
+        assert key not in live_keys, f"{key} should have been removed"
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    dead_codes = [
+        "foreign_pension_source_unconfirmed",
+        "pension_certificate_unavailable",
+        "dependent_documents_unavailable",
+        "passport_copy_unavailable",
+        "police_clearance_unavailable",
+        "birth_certificate_unavailable",
+        "passport_photos_unavailable",
+        "filiacion_form_incomplete",
+        "request_letter_incomplete",
+        "government_fees_not_ready",
+        "apostille_translation_not_ready",
+        "pension_receipt_costa_rica_evidence_unavailable",
+    ]
+    for code in dead_codes:
+        assert code not in rules.HARD_FAILURES
+    source_text = Path(rules.__file__).read_text(encoding="utf-8")
+    for code in dead_codes:
+        assert f'"{code}"' not in source_text
+
+
+def test_costa_rica_pensionado_pension_receipt_relocated_not_live():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "documents.pension_receipt_costa_rica_evidence_available" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert "documents.pension_receipt_costa_rica_evidence_available" in checklist_keys
+
+    clar_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "clarifications.json"
+    )
+    clar = json.loads(clar_path.read_text(encoding="utf-8"))
+    entry = next(
+        c
+        for c in clar["clarifications"]
+        if c["requirement"] == "pension_receipt_costa_rica_evidence_unavailable"
+    )
+    assert entry["stage"] == "post_eligibility_checklist"
+
+    result = evaluate_eligibility(_pensionado_payload(), pathway="costa-rica-pensionado")
+    assert result["eligibility_status"] == "eligible"
+
+
+def test_costa_rica_pensionado_ccss_and_renewal_remain_inert():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "documents.ccss_renewal_ready" not in live_keys
+    assert "routing.renewal_every_two_years_acknowledged" not in live_keys
+
+    checklist_keys = {
+        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    }
+    assert "documents.ccss_renewal_ready" in checklist_keys
+    assert "routing.renewal_every_two_years_acknowledged" in checklist_keys
+
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    source_text = Path(rules.__file__).read_text(encoding="utf-8")
+    assert '"documents.ccss_renewal_ready"' not in source_text
+    assert '"routing.renewal_every_two_years_acknowledged"' not in source_text
+
+
+def test_costa_rica_pensionado_additional_information_absent():
+    questions_path = (
+        Path(__file__).resolve().parents[1]
+        / "app"
+        / "engine"
+        / "pathways"
+        / "costa_rica_pensionado"
+        / "questions.json"
+    )
+    import json
+
+    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    live_keys = {f["key"] for f in data["taxonomy_fields"]}
+    assert "routing.additional_information" not in live_keys
+
+
+def test_costa_rica_pensionado_only_three_hard_failure_codes():
+    import app.engine.pathways.costa_rica_pensionado.rules as rules
+
+    assert rules.HARD_FAILURES == {
+        "not_retired_from_habitual_occupation",
+        "pension_income_below_minimum",
+        "pension_not_retirement_based",
+    }
+
 
 def test_costa_rica_pensionado_individual_question_sequence():
     answers = {
         "routing.applicant_type": "individual",
         "role.pensionado.retired_from_habitual_occupation": "yes",
         "role.pensionado.pension_source_type": "social_security",
-        "role.pensionado.pension_retirement_based": "yes",
-        "work.intends_to_work_in_costa_rica": "no",
-        "role.pensionado.pension_foreign_source_confirmed": "yes",
         "role.pensionado.monthly_pension_usd": "1000",
-        "role.pensionado.pension_certificate_available": "yes",
-        "role.pensionado.pension_duration_type": "lifetime_or_indefinite",
-        "identity.nationality": "United States",
-        "identity.country_of_residence": "United States",
-        "routing.passport_validity_months": "24",
-        "documents.passport_copy_available": "yes",
-        "documents.police_clearance_available": "yes",
+        "role.pensionado.pension_has_scheduled_end_date": "no",
+        "work.intends_to_work_in_costa_rica": "no",
+        "documents.valid_passport_available": "yes",
         "routing.criminal_record_flag": "no",
-        "documents.birth_certificate_available": "yes",
-        "documents.passport_photos_available": "yes",
-        "documents.filiacion_form_ready": "yes",
-        "documents.request_letter_ready": "yes",
-        "documents.government_fees_ready": "yes",
-        "documents.apostille_translation_ready": "yes",
-        "documents.pension_receipt_costa_rica_evidence_available": "can_document",
     }
     expected_order = list(answers.keys())
 
@@ -4574,51 +4959,80 @@ def test_costa_rica_pensionado_individual_question_sequence():
     result = evaluate(payload, pathway="costa-rica-pensionado")
     assert result["next_field_key"] is None
     assert asked_keys == expected_order
-    # Relocated/removed questions must never appear in the live flow.
+    assert "role.pensionado.pension_retirement_based" not in asked_keys
+    assert "routing.dependents_count" not in asked_keys
     assert "documents.ccss_renewal_ready" not in asked_keys
-    assert "routing.temporary_residence_acknowledged" not in asked_keys
     assert "routing.renewal_every_two_years_acknowledged" not in asked_keys
+    assert "documents.pension_receipt_costa_rica_evidence_available" not in asked_keys
 
 
-def test_costa_rica_pensionado_relocated_questions_do_not_affect_eligibility():
-    questions_path = (
+def test_costa_rica_pensionado_other_and_family_question_sequence():
+    answers = {
+        "routing.applicant_type": "family",
+        "role.pensionado.retired_from_habitual_occupation": "yes",
+        "role.pensionado.pension_source_type": "other",
+        "role.pensionado.pension_retirement_based": "yes",
+        "role.pensionado.monthly_pension_usd": "1000",
+        "role.pensionado.pension_has_scheduled_end_date": "no",
+        "work.intends_to_work_in_costa_rica": "no",
+        "routing.dependents_count": "2",
+        "documents.valid_passport_available": "yes",
+        "routing.criminal_record_flag": "no",
+    }
+    expected_order = list(answers.keys())
+
+    payload = {"routing": {}}
+    asked_keys = []
+    for expected_key in expected_order:
+        result = evaluate(payload, pathway="costa-rica-pensionado")
+        assert result["next_field_key"] == expected_key
+        asked_keys.append(result["next_field_key"])
+        current = payload
+        parts = expected_key.split(".")
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+        current[parts[-1]] = answers[expected_key]
+
+    result = evaluate(payload, pathway="costa-rica-pensionado")
+    assert result["next_field_key"] is None
+    assert asked_keys == expected_order
+
+
+def test_costa_rica_pensionado_no_phantom_or_orphaned_codes():
+    import json
+    import re
+
+    base = (
         Path(__file__).resolve().parents[1]
         / "app"
         / "engine"
         / "pathways"
         / "costa_rica_pensionado"
-        / "questions.json"
     )
-    import json
+    rules_src = (base / "rules.py").read_text(encoding="utf-8")
+    codes_in_rules = set(re.findall(r'failed\.append\("([a-z0-9_]+)"\)', rules_src))
 
-    data = json.loads(questions_path.read_text(encoding="utf-8"))
+    hard_failures_block = re.search(
+        r"HARD_FAILURES = \{(.*?)\}", rules_src, re.S
+    ).group(1)
+    codes_in_hardfail = set(re.findall(r'"([a-z0-9_]+)"', hard_failures_block))
 
-    live_keys = {f["key"] for f in data["taxonomy_fields"]}
-    assert "documents.ccss_renewal_ready" not in live_keys
-    assert "routing.temporary_residence_acknowledged" not in live_keys
-    assert "routing.renewal_every_two_years_acknowledged" not in live_keys
-
-    checklist_keys = {
-        f["key"] for f in data.get("post_eligibility_checklist", {}).get("fields", [])
+    clar = json.loads((base / "clarifications.json").read_text(encoding="utf-8"))
+    clar_codes = {c["requirement"] for c in clar["clarifications"]}
+    inert_codes = {
+        c["requirement"]
+        for c in clar["clarifications"]
+        if c.get("stage") == "post_eligibility_checklist"
     }
-    assert "documents.ccss_renewal_ready" in checklist_keys
-    assert "routing.renewal_every_two_years_acknowledged" in checklist_keys
-    # temporary_residence_acknowledged was removed outright (not preserved).
-    assert "routing.temporary_residence_acknowledged" not in checklist_keys
 
-    import app.engine.pathways.costa_rica_pensionado.rules as pensionado_rules
-    import inspect
+    out = json.loads((base / "output.json").read_text(encoding="utf-8"))
+    out_summary_codes = set(out["summary_statement"]["requirement_variants"].keys())
+    out_cta_codes = set(out["next_steps_cta"]["requirement_variants"].keys())
 
-    source = inspect.getsource(pensionado_rules.evaluate_eligibility)
-    assert '"documents.ccss_renewal_ready"' not in source
-    assert '"routing.temporary_residence_acknowledged"' not in source
-    assert '"routing.renewal_every_two_years_acknowledged"' not in source
-
-    # A fully answered payload omitting the relocated/removed fields entirely
-    # must still be able to reach "eligible" -- confirms they no longer gate
-    # current eligibility.
-    result = evaluate_eligibility(_pensionado_payload(), pathway="costa-rica-pensionado")
-    assert result["eligibility_status"] == "eligible"
+    assert codes_in_hardfail - codes_in_rules == set()
+    assert codes_in_rules - clar_codes == set()
+    assert out_summary_codes - codes_in_rules - inert_codes == set()
+    assert out_cta_codes - codes_in_rules - inert_codes == set()
 
 
 def test_costa_rica_pensionado_no_escape_choices_anywhere_in_schema():
@@ -4639,6 +5053,13 @@ def test_costa_rica_pensionado_no_escape_choices_anywhere_in_schema():
         choices = field.get("choices") or []
         overlap = forbidden.intersection(choices)
         assert not overlap, f"{field['key']} has escape choice(s): {overlap}"
+
+    # NOTE: documents.ccss_renewal_ready (inert, post_eligibility_checklist,
+    # pre-existing and out of scope for this task) has a literal "not_ready"
+    # choice. In context it is a genuine third factual state ("no CCSS
+    # coverage and no plan to register"), not an uncertainty escape, and it
+    # is not part of the live eligibility dialogue -- reported, not asserted
+    # here, since fixing inert/out-of-scope content was not authorized.
 
 
 def test_spain_business_owner_below_2026_smi_threshold_returns_not_eligible():
