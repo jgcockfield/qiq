@@ -18,23 +18,16 @@
     {
       "key": "work.remote_work_confirmed",
       "depends_on": ["routing.worker_category"],
-      "label": "Will you be working remotely while living in Italy?",
+      "label": "Will you perform your work remotely while living in Italy?",
       "description": "This includes work performed using a computer or similar technology, from anywhere in Italy.",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
     },
     {
-      "key": "identity.nationality",
-      "depends_on": ["work.remote_work_confirmed"],
-      "label": "What is your nationality?",
-      "input_type": "text",
-      "required": true
-    },
-    {
       "key": "identity.eu_citizen_status",
-      "depends_on": ["identity.nationality"],
-      "label": "Do you hold citizenship of an EU, EEA, or Swiss country (in addition to any other citizenship)?",
+      "depends_on": ["work.remote_work_confirmed"],
+      "label": "Are you a citizen of an EU, EEA, or Swiss country?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"]
@@ -42,7 +35,7 @@
     {
       "key": "work.highly_qualified_basis",
       "depends_on": ["identity.eu_citizen_status"],
-      "label": "Which of these best describes your qualifications?",
+      "label": "Which of these applies to your qualifications for the work you will perform in Italy?",
       "description": "Italy's visa rules require meeting one of these 'highly qualified worker' categories.",
       "input_type": "choice",
       "required": true,
@@ -64,57 +57,15 @@
     {
       "key": "financial.annual_work_income_eur",
       "depends_on": ["work.prior_experience_months"],
-      "label": "What annual income in EUR can you document from lawful work-related sources?",
+      "label": "What annual income in EUR do you earn from the remote work you will perform while living in Italy?",
       "description": "Italy DNV screening uses the official annual income threshold from the source reference and consular guidance.",
       "input_type": "number",
       "required": true
     },
     {
-      "key": "financial.income_from_remote_work_confirmed",
-      "depends_on": ["financial.annual_work_income_eur"],
-      "label": "Is this income from the remote work you'll be doing while in Italy?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"]
-    },
-    {
-      "key": "financial.non_remote_income_source",
-      "depends_on": ["financial.income_from_remote_work_confirmed"],
-      "label": "What is this income from instead?",
-      "description": "Passive income (investments, rental income, etc.) doesn't qualify for this visa. Other active income will need manual review.",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["passive_income", "other_active_work"],
-      "applies_when": { "equals": ["financial.income_from_remote_work_confirmed", "no"] }
-    },
-    {
-      "key": "financial.income_evidence_types",
-      "depends_on": ["financial.income_from_remote_work_confirmed"],
-      "label": "Which documents can you provide as proof of work-derived income?",
-      "input_type": "multi_choice",
-      "required": true,
-      "choices": [
-        "payslips",
-        "tax_return",
-        "bank_statements",
-        "invoices",
-        "income_proof",
-        "other"
-      ]
-    },
-    {
-      "key": "role.digital_nomad.self_employment_proof_available",
-      "depends_on": ["routing.worker_category"],
-      "label": "As a self-employed digital nomad, can you document your self-employment or freelance activity?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.worker_category", "self_employed_freelance"] }
-    },
-    {
       "key": "role.remote_worker.contract_available",
-      "depends_on": ["routing.worker_category"],
-      "label": "As a remote worker, can you provide an employment or collaboration contract, or a binding offer?",
+      "depends_on": ["financial.annual_work_income_eur"],
+      "label": "Do you have an employment or collaboration contract, or a binding job offer for this remote work?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
@@ -123,7 +74,7 @@
     {
       "key": "role.remote_worker.employer_clean_record_declaration_available",
       "depends_on": ["role.remote_worker.contract_available"],
-      "label": "Can your employer confirm they have a clean legal record from the past 5 years?",
+      "label": "Can your employer provide the required declaration concerning its legal record for the past 5 years?",
       "input_type": "choice",
       "required": true,
       "choices": ["yes", "no"],
@@ -131,61 +82,34 @@
     },
     {
       "key": "routing.health_insurance_status",
-      "depends_on": ["financial.income_evidence_types"],
-      "label": "Do you have health insurance for medical care and hospitalization valid in Italy for the stay period, or will you obtain it?",
+      "depends_on": ["financial.annual_work_income_eur"],
+      "label": "Will you have health insurance covering medical care and hospitalization in Italy for the full stay period?",
       "input_type": "choice",
       "required": true,
-      "choices": ["have_it", "will_obtain", "cannot_obtain"]
+      "choices": ["yes", "no"]
     },
     {
       "key": "housing.accommodation_status",
       "depends_on": ["routing.health_insurance_status"],
-      "label": "Do you have accommodation arranged in Italy for the visa period?",
+      "label": "Will you have suitable accommodation arranged in Italy for the visa period?",
       "input_type": "choice",
       "required": true,
-      "choices": [
-        "have_qualifying_accommodation",
-        "will_secure_before_travel",
-        "not_available"
-      ]
+      "choices": ["yes", "no"]
     },
     {
       "key": "routing.passport_validity_months",
       "depends_on": ["housing.accommodation_status"],
-      "label": "How many months will your passport be valid beyond your intended travel or stay period?",
-      "input_type": "number",
-      "required": true
-    },
-    {
-      "key": "routing.passport_blank_pages",
-      "depends_on": ["routing.passport_validity_months"],
-      "label": "How many blank passport pages do you have available?",
+      "label": "How many months will your passport remain valid beyond your intended stay in Italy?",
       "input_type": "number",
       "required": true
     },
     {
       "key": "routing.family_reunification_intent",
-      "depends_on": ["routing.passport_blank_pages"],
-      "label": "Will you be including a spouse or children on this application?",
+      "depends_on": ["routing.passport_validity_months"],
+      "label": "Who will be included with you?",
       "input_type": "choice",
       "required": true,
       "choices": ["no_one_else", "spouse_or_minor_children", "adult_children_or_parents"]
-    },
-    {
-      "key": "routing.family_documents_available",
-      "depends_on": ["routing.family_reunification_intent"],
-      "label": "Can you provide family relationship documents for the spouse or minor children you intend to include?",
-      "input_type": "choice",
-      "required": true,
-      "choices": ["yes", "no"],
-      "applies_when": { "equals": ["routing.family_reunification_intent", "spouse_or_minor_children"] }
-    },
-    {
-      "key": "routing.additional_information",
-      "depends_on": ["routing.family_reunification_intent"],
-      "label": "What else about your Italy Digital Nomad / Remote Worker Visa situation should QIQ consider?",
-      "input_type": "text",
-      "required": false
     }
   ],
   "post_eligibility_checklist": {

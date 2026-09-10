@@ -21,10 +21,7 @@
         "text": "Based on the information provided, you do not currently appear to meet the highly qualified worker basis required for Italy's Digital Nomad / Remote Worker Visa."
       },
       "income_below_minimum": {
-        "text": "Based on the annual income provided, you do not currently appear to meet the Italy Digital Nomad / Remote Worker Visa income threshold."
-      },
-      "passive_income_not_accepted": {
-        "text": "Italy Digital Nomad / Remote Worker screening requires work-derived income. Based on the information provided, passive income alone does not appear to satisfy this pathway."
+        "text": "Based on the annual income from the remote work you will perform, you do not currently appear to meet the Italy Digital Nomad / Remote Worker Visa income threshold."
       },
       "prior_experience_below_minimum": {
         "text": "Based on the experience provided, you do not currently appear to meet the minimum prior-experience requirement for the remote activity you will perform from Italy."
@@ -43,9 +40,6 @@
       },
       "remote_worker_employer_clean_record_unavailable": {
         "text": "Remote workers must provide an employer clean-record declaration. Based on the information provided, this route-specific requirement is not currently met."
-      },
-      "digital_nomad_self_employment_proof_unavailable": {
-        "text": "Self-employed digital nomads must document freelance or self-employment activity. Based on the information provided, this route-specific requirement is not currently met."
       },
       "adult_children_or_parents_family_route_not_supported": {
         "text": "The Italy family route in this screening is focused on spouse and minor children. Adult children or parents do not appear to fit the supported family reunification route."
@@ -108,28 +102,6 @@
         ],
         "action": {
           "label": "Wait for qualification review",
-          "type": "email_followup"
-        }
-      },
-      "income_source_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your income source needs manual review.",
-          "The team should verify whether your income is work-derived and tied to the remote work you will perform from Italy."
-        ],
-        "action": {
-          "label": "Wait for income-source review",
-          "type": "email_followup"
-        }
-      },
-      "income_evidence_needs_review": {
-        "enabled": true,
-        "text": [
-          "Your income evidence needs manual review before eligibility can be confirmed.",
-          "The team should verify whether your payslips, tax returns, bank statements, invoices, or other documents can support the Italy income requirement."
-        ],
-        "action": {
-          "label": "Wait for income-evidence review",
           "type": "email_followup"
         }
       },
