@@ -4,6 +4,11 @@
  */
 
 // ── Choice label formatter ────────────────────────────────────────────────────
+// General-purpose snake_case -> Title Case humanizer. Originally used only
+// for question-choice buttons; also reused as the single fallback
+// humanizer for result status text and requirement-code display titles (see
+// _qiqRequirementTitle below) so raw snake_case never leaks into
+// applicant-facing UI.
 function _qiqDisplayChoiceLabel(v) {
   return String(v ?? "")
     .replaceAll("_", " ")
@@ -12,6 +17,29 @@ function _qiqDisplayChoiceLabel(v) {
     .split(" ")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(" ");
+}
+
+// ── Result status display ──────────────────────────────────────────────────
+// Prefers the backend-provided humanized status (meta.status_display, added
+// by app/engine/output_builder.py) and falls back to local humanization of
+// the raw status value so display never regresses to snake_case even
+// against an older/alternate backend response shape.
+function _qiqStatusDisplay(meta, status) {
+  const provided = meta && meta.status_display;
+  if (typeof provided === "string" && provided.trim()) return provided;
+  return _qiqDisplayChoiceLabel(status);
+}
+
+// ── Requirement display-title resolver ───────────────────────────────────
+// Priority: 1) backend-provided display_title, 2) explicit clarification
+// title, 3) humanized fallback of the internal requirement code. The raw
+// snake_case requirement code must never be shown directly to an applicant.
+function _qiqRequirementTitle(c) {
+  if (!c || typeof c !== "object") return "";
+  if (typeof c.display_title === "string" && c.display_title.trim()) return c.display_title;
+  if (typeof c.title === "string" && c.title.trim()) return c.title;
+  if (c.requirement) return _qiqDisplayChoiceLabel(c.requirement);
+  return "";
 }
 
 // ── UUID helper (crypto.randomUUID with legacy fallback) ──────────────────────
@@ -742,7 +770,7 @@ class QIQWidget {
     html += `<div class="qiq-summary-block">`;
     html += `<h3>Eligibility Summary</h3>`;
     html += `<div class="qiq-summary-meta">`;
-    html += `<span>Status: ${this._escapeHtml(status)}</span>`;
+    html += `<span>Status: ${this._escapeHtml(_qiqStatusDisplay(meta, status))}</span>`;
     if (meta.work_type) html += `<span>Work Type: ${this._escapeHtml(meta.work_type)}</span>`;
     if (meta.visa_type) html += `<span>Visa Type: ${this._escapeHtml(meta.visa_type)}</span>`;
     html += `</div>`;
@@ -823,7 +851,7 @@ class QIQWidget {
     const e   = s => this._escapeHtml(s);
     let html  = `<div class="qiq-clar-card">`;
 
-    html += `<h4 class="qiq-clar-title">${e(c.title || c.requirement || "")}</h4>`;
+    html += `<h4 class="qiq-clar-title">${e(_qiqRequirementTitle(c))}</h4>`;
     if (c.clarification) {
       html += `<p class="qiq-clar-body">${e(c.clarification)}</p>`;
     }
@@ -903,7 +931,7 @@ class QIQWidget {
       criminal_record_disclosed: "Record disclosed",
       minimum_requirement:       "Minimum requirement",
     };
-    return MAP[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    return MAP[key] || _qiqDisplayChoiceLabel(key);
   }
 
   // Boundary keys: null = render as plain paragraph, string = bold label
@@ -914,7 +942,7 @@ class QIQWidget {
       legal_deferral:      "Legal guidance",
       minimum_requirement: "Minimum requirement",
     };
-    return MAP[key] || key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    return MAP[key] || _qiqDisplayChoiceLabel(key);
   }
 
   // ── Utils ─────────────────────────────────────────────────────

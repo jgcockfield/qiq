@@ -25,7 +25,42 @@ import os
 from datetime import datetime, timezone
 from typing import Optional
 
+from app.engine.output_builder import humanize_status
+
 logger = logging.getLogger(__name__)
+
+
+def _build_subject_and_body(
+    *,
+    full_name: Optional[str],
+    email: Optional[str],
+    phone: Optional[str],
+    pathway: Optional[str],
+    status: Optional[str],
+    created_at: Optional[str],
+    console_url: Optional[str] = "",
+) -> tuple[str, str]:
+    """Pure helper: assemble the email subject/body text. Extracted from
+    `_send()` so presentation (humanization) can be tested directly without
+    invoking SendGrid. Never renders the raw snake_case `status` value --
+    see `humanize_status()`."""
+    status_display = humanize_status(status) or "Unknown"
+
+    ts = created_at or datetime.now(timezone.utc).isoformat()
+    subject = f"New QIQ Demo Completed — {status_display}"
+    body = (
+        "New QIQ eligibility check completed.\n\n"
+        f"Name:     {full_name or '—'}\n"
+        f"Email:    {email or '—'}\n"
+        f"Phone:    {phone or '—'}\n"
+        f"Pathway:  {pathway or '—'}\n"
+        f"Status:   {status_display}\n"
+        f"Created:  {ts}\n"
+    )
+    if console_url:
+        body += f"\nView in console:\n{console_url}\n"
+
+    return subject, body
 
 
 def send_lead_notification(
@@ -95,19 +130,15 @@ def _send(
         logger.warning("Lead notification skipped — sendgrid package not installed")
         return
 
-    ts = created_at or datetime.now(timezone.utc).isoformat()
-    subject = f"New QIQ Demo Completed — {status or 'unknown'}"
-    body = (
-        "New QIQ eligibility check completed.\n\n"
-        f"Name:     {full_name or '—'}\n"
-        f"Email:    {email or '—'}\n"
-        f"Phone:    {phone or '—'}\n"
-        f"Pathway:  {pathway or '—'}\n"
-        f"Status:   {status or '—'}\n"
-        f"Created:  {ts}\n"
+    subject, body = _build_subject_and_body(
+        full_name=full_name,
+        email=email,
+        phone=phone,
+        pathway=pathway,
+        status=status,
+        created_at=created_at,
+        console_url=console_url,
     )
-    if console_url:
-        body += f"\nView in console:\n{console_url}\n"
 
     message = Mail(
         from_email=from_email,

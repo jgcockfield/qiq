@@ -21,6 +21,7 @@ from reportlab.lib.pagesizes import LETTER
 from reportlab.pdfgen import canvas
 
 from app.core.eligibility_decision_record import EligibilityDecisionRecord
+from app.engine.output_builder import display_title_for_clarification, humanize_requirement_code, humanize_status
 
 
 REPORTS_DIR = Path("exports/reports")
@@ -60,17 +61,17 @@ def render_pdf(edr: EligibilityDecisionRecord) -> tuple[str, str]:
         f"Program ID: {edr.program_id}",
         f"Program Type: {edr.program_type}",
         "",
-        f"Eligibility Status: {edr.eligibility_status}",
+        f"Eligibility Status: {humanize_status(edr.eligibility_status)}",
         f"Eligible: {edr.eligible}",
     ]
 
     if edr.primary_reason_code:
-        lines.append(f"Primary Reason: {edr.primary_reason_code}")
+        lines.append(f"Primary Reason: {humanize_requirement_code(edr.primary_reason_code)}")
 
     if edr.reason_codes:
         lines.append("")
         lines.append("Reason Codes:")
-        lines.extend([f" - {rc}" for rc in edr.reason_codes])
+        lines.extend([f" - {humanize_requirement_code(rc)}" for rc in edr.reason_codes])
 
     if edr.next_steps:
         lines.append("")
@@ -129,7 +130,7 @@ def render_pdf(edr: EligibilityDecisionRecord) -> tuple[str, str]:
         visa_type = _ui_get(meta, "visa_type")
         
         if status:
-            lines.append(f"Status: {status}")
+            lines.append(f"Status: {humanize_status(status)}")
         if work_type:
             lines.append(f"Work Type: {work_type}")
         if visa_type:
@@ -150,12 +151,13 @@ def render_pdf(edr: EligibilityDecisionRecord) -> tuple[str, str]:
             lines.append("Clarifications:")
             for i, clarification in enumerate(clarifications, 1):
                 if isinstance(clarification, dict):
-                    req = clarification.get("requirement", "")
-                    title = clarification.get("title", "")
                     clarif_text = clarification.get("clarification", "")
-                    
+                    display_title = clarification.get("display_title") or display_title_for_clarification(
+                        clarification
+                    )
+
                     lines.append("")
-                    lines.append(f"  {i}. {title or req}")
+                    lines.append(f"  {i}. {display_title}")
                     if clarif_text:
                         for wrapped_line in _wrap_text(clarif_text, 85):
                             lines.append(f"     {wrapped_line}")

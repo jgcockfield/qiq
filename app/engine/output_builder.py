@@ -6,11 +6,29 @@ Assembles the final user-facing eligibility output using:
 - Clarification taxonomies (work-type specific + shared)
 
 This module contains NO question flow logic.
+
+Presentation layer
+-------------------
+This module is also the single, centralized place that converts internal
+snake_case values (the `eligibility_status` enum and requirement/reason
+codes) into applicant-facing display strings. Internal values themselves are
+never renamed -- `humanize_status()`/`humanize_requirement_code()` /
+`display_title_for_clarification()` only compute an additional, additive
+*display* string alongside the existing machine-readable fields:
+
+- `output["meta"]["status_display"]` -- e.g. "Not Eligible" for "not_eligible"
+- each `output["clarifications"][i]["display_title"]` -- the existing
+  clarification `title` when present, otherwise a mechanically humanized
+  fallback of the requirement code (never the raw snake_case code itself)
+
+Every applicant-facing surface (widget, PDF/EDR export) should prefer these
+`*_display`/`display_title` fields over the raw machine values, falling back
+to their own local humanization only as defense-in-depth.
 """
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from app.engine.pathway_registry import resolve_pathway
 from app.engine.taxonomy_loader import load_all_taxonomies
@@ -20,6 +38,84 @@ from app.engine.taxonomy_loader import load_all_taxonomies
 TAXONOMIES = load_all_taxonomies()
 SPAIN_DNV_OUTPUT_PATH = Path(__file__).resolve().parent / "pathways" / "spain_dnv" / "output.json"
 SPAIN_DNV_CLARIFICATIONS_PATH = Path(__file__).resolve().parent / "pathways" / "spain_dnv" / "clarifications.json"
+
+# Explicit display strings for the three known internal status values. Any
+# other/unrecognized status value falls back to mechanical humanization
+# rather than leaking snake_case.
+_STATUS_DISPLAY_MAP = {
+    "eligible": "Eligible",
+    "needs_review": "Needs Review",
+    "not_eligible": "Not Eligible",
+}
+
+
+def humanize_requirement_code(code: Any) -> str:
+    """Mechanical snake_case -> Title Case fallback humanization.
+
+    This is a FALLBACK ONLY. Whenever an explicit applicant-facing
+    clarification title exists, prefer that instead -- see
+    `display_title_for_clarification()`.
+    """
+    if not code:
+        return ""
+    words = [w for w in str(code).replace("-", "_").split("_") if w]
+    return " ".join(w.capitalize() for w in words)
+
+
+def humanize_status(status: Any) -> str:
+    """Applicant-facing display string for an internal eligibility_status
+    value (or any other internal snake_case status-like value). Never
+    returns the raw snake_case value for a recognized or unrecognized
+    status -- unrecognized values fall back to mechanical humanization."""
+    if not status:
+        return ""
+    return _STATUS_DISPLAY_MAP.get(status, humanize_requirement_code(status))
+
+
+def display_title_for_clarification(clarification: Any) -> str:
+    """Resolve the applicant-facing title for one clarification entry.
+
+    Priority:
+    1. The clarification's own explicit `title` (applicant-facing, already
+       authored in clarifications.json).
+    2. A mechanically humanized fallback of the internal `requirement` code.
+
+    The raw snake_case `requirement` code is never returned as-is.
+    """
+    if not isinstance(clarification, dict):
+        return ""
+    title = clarification.get("title")
+    if isinstance(title, str) and title.strip():
+        return title.strip()
+    return humanize_requirement_code(clarification.get("requirement"))
+
+
+def _with_display_title(clarification: Any) -> Any:
+    """Return a copy of `clarification` with a guaranteed `display_title`
+    added, without mutating the original (which may be a taxonomy entry
+    loaded once at module import and shared across requests)."""
+    if not isinstance(clarification, dict):
+        return clarification
+    augmented = dict(clarification)
+    augmented["display_title"] = display_title_for_clarification(clarification)
+    return augmented
+
+
+def _finalize_ui_output(output: Dict) -> Dict:
+    """Attach additive, backward-compatible display fields to an assembled
+    UI output dict: `meta.status_display` and, on each clarification entry,
+    `display_title`. Existing keys (`meta.status`, `clarifications[i].title`,
+    `clarifications[i].requirement`, etc.) are left completely untouched --
+    this only adds new keys for applicant-facing rendering to prefer."""
+    meta = output.get("meta")
+    if isinstance(meta, dict):
+        meta["status_display"] = humanize_status(meta.get("status"))
+
+    clarifications = output.get("clarifications")
+    if isinstance(clarifications, list):
+        output["clarifications"] = [_with_display_title(c) for c in clarifications]
+
+    return output
 
 
 def _load_pathway_json(relative_path: Optional[str]) -> Optional[Dict]:
@@ -106,7 +202,7 @@ def _build_pathway_output(
     if isinstance(cta_variant, dict) and cta_variant.get("enabled"):
         output["next_steps"] = cta_variant
 
-    return output
+    return _finalize_ui_output(output)
 
 
 def _build_spain_dnv_output(result: Dict, output_taxonomy: Dict) -> Dict:
@@ -248,4 +344,4 @@ def build_output(result: Dict) -> Dict:
             ]
         }
 
-    return output
+    return _finalize_ui_output(output)
