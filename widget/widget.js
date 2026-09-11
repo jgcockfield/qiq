@@ -771,7 +771,7 @@ class QIQWidget {
     html += `<h3>Eligibility Summary</h3>`;
     html += `<div class="qiq-summary-meta">`;
     html += `<span>Status: ${this._escapeHtml(_qiqStatusDisplay(meta, status))}</span>`;
-    if (meta.work_type) html += `<span>Work Type: ${this._escapeHtml(meta.work_type)}</span>`;
+    if (meta.work_type) html += `<span>Work Type: ${this._escapeHtml(_qiqDisplayChoiceLabel(meta.work_type))}</span>`;
     if (meta.visa_type) html += `<span>Visa Type: ${this._escapeHtml(meta.visa_type)}</span>`;
     html += `</div>`;
     if (summary && status !== "eligible") html += `<p class="qiq-summary-sentence">${this._escapeHtml(summary)}</p>`;
